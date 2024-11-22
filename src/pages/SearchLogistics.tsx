@@ -346,15 +346,21 @@ const SearchLogistics: React.FC = () => {
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <div>
-                              <p className="text-lg font-semibold">₹ {provider.shippingCharges.toFixed(2)}</p>
+                              <p className="text-lg font-semibold text-center">₹ {provider.shippingCharges.toFixed(2)}</p>
                               <p className="text-xs text-gray-600">Shipping Charges</p>
                             </div>
                             <span className="text-gray-400">+</span>
                             <div>
-                              <p className="text-lg font-semibold">₹ {provider.rtoCharges.toFixed(2)}</p>
+                              <p className="text-lg font-semibold text-center">₹ {provider.rtoCharges.toFixed(2)}</p>
                               <p className="text-xs text-gray-600">RTO Charges</p>
                             </div>
+                            <span className="text-gray-400">=</span>
+                            <div>
+                              <p className="text-lg font-semibold text-center">₹ {(provider.shippingCharges + provider.rtoCharges).toFixed(2)}</p>
+                              <p className="text-xs text-gray-600">Total Charges</p>
+                            </div>
                           </div>
+                          
                           <p className="text-xs text-gray-500 mt-2">Prices may change according to the package details provided</p>
                           <button 
                             onClick={() => navigate('/confirmation-instructions', {
