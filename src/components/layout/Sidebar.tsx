@@ -15,6 +15,7 @@ import {
   UserCircle,
   Settings,
   Receipt,
+  PhoneCall,
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -27,10 +28,9 @@ const Sidebar: React.FC = () => {
     { icon: Package, label: 'Orders', path: '/orders' },
     { icon: RotateCcw, label: 'RTO Management', path: '/rto' },
     { icon: RefreshCcw, label: 'Returns', path: '/returns' },
-    // { icon: Wallet, label: 'Wallet', path: '/wallet' },
     { icon: FileText, label: 'Billing', path: '/billing' },
     { icon: Receipt, label: 'Transactions', path: '/transactions' },
-    { icon: Users, label: 'Customers', path: '/customers', adminOnly: true },
+    { icon: Users, label: 'Customers', path: '/customers' },
     { icon: HeadphonesIcon, label: 'Support', path: '/support' },
     { icon: Settings, label: 'Settings', path: '/settings', adminOnly: true },
   ];
@@ -50,6 +50,7 @@ const Sidebar: React.FC = () => {
         className={`
           fixed left-0 top-0 h-screen bg-white shadow-lg 
           transition-all duration-300 ease-in-out z-20
+          flex flex-col
           ${isOpen ? 'w-64' : 'w-16'}
         `}
       >
@@ -67,7 +68,7 @@ const Sidebar: React.FC = () => {
             )}
           </div>
         </div>
-        <nav className="mt-8">
+        <nav className="mt-8 flex-1">
           {menuItems.map((item) => (
             (!item.adminOnly || isAdmin) && (
               <NavLink

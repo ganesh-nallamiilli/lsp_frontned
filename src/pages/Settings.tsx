@@ -79,7 +79,7 @@ const Settings: React.FC = () => {
       icon: <FaCreditCard />,
       title: "Payment Providers",
       description: "These providers enable businesses to accept credit and debit card payments. They typically partner with banks to authorize and process transactions.",
-      path: "/settings/payments"
+      path: "/settings/payment-providers"
     }
   ];
 
@@ -89,7 +89,7 @@ const Settings: React.FC = () => {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-md hover:bg-amber-200 transition-colors"
           >
             <IoArrowBack />

@@ -22,6 +22,19 @@ import SearchLogistics from './pages/SearchLogistics';
 import ConfirmationInstructions from './pages/ConfirmationInstructions';
 import ConfirmationDetails from './pages/ConfirmationDetails';
 import Settings from './pages/Settings';
+import BankingSettings from './pages/BankingSettings';
+import MapsSettings from './pages/MapsSettings';
+import MapServiceConfiguration from './pages/MapServiceConfiguration';
+import PaymentServiceConfiguration from './pages/PaymentServiceConfiguration';
+import PaymentSettings from './pages/PaymentSettings';
+import PennyDropSettings from './pages/PennyDropSettings';
+import PennyDropServiceConfiguration from './pages/PennyDropServiceConfiguration';
+import UIConfiguration from './pages/UIConfiguration';
+import NotificationSettings from './pages/NotificationSettings';
+import EmailServiceConfiguration from './pages/EmailServiceConfiguration';
+import SMSServiceConfiguration from './pages/SMSServiceConfiguration';
+import NotificationTemplates from './pages/NotificationTemplates';
+import Support from './pages/Support';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -110,6 +123,7 @@ function App() {
               <Route path="billing" element={<Billing />} />
               <Route path="notifications" element={<Notifications />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="support" element={<Support />} />
               <Route path="orders/create" element={<CreateOrderPage />} />
               <Route path="orders/:id" element={<OrderView />} />
               <Route path="search-logistics" element={<SearchLogistics />} />
@@ -122,6 +136,18 @@ function App() {
                 element={<ConfirmationDetailsWrapper />} 
               />
               <Route path="settings" element={<Settings />} />
+              <Route path="settings/banking" element={<BankingSettings />} />
+              <Route path="settings/maps" element={<MapsSettings />} />
+              <Route path="/maps-service/:provider" element={<MapServiceConfiguration />} />
+              <Route path="/payment-service/:provider" element={<PaymentServiceConfiguration />} />
+              <Route path="settings/payment-providers" element={<PaymentSettings />} />
+              <Route path="/settings/verification" element={<PennyDropSettings />} />
+              <Route path="/verification-service/:provider" element={<PennyDropServiceConfiguration />} />
+              <Route path="/settings/ui" element={<UIConfiguration />} />
+              <Route path="/settings/notifications" element={<NotificationSettings />} />
+              <Route path="/settings/notifications/email/:provider" element={<EmailServiceConfiguration />} />
+              <Route path="/settings/notifications/sms/:provider" element={<SMSServiceConfiguration />} />
+              <Route path="/settings/notifications/templates" element={<NotificationTemplates />} />
             </Route>
 
             {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}

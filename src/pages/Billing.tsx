@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Download, Filter, Calendar, DollarSign, CreditCard } from 'lucide-react';
+import { FileText, Download, Filter, Calendar, DollarSign, CreditCard, Plus } from 'lucide-react';
 
 const invoices = [
   {

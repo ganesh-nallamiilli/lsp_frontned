@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, User, ChevronDown, Menu, Wallet } from 'lucide-react';
+import { Bell, Search, User, ChevronDown, Menu, Wallet, Phone } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
@@ -79,6 +79,14 @@ const Header: React.FC = () => {
             <Wallet className="h-5 w-5 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">₹10,000</span>
           </div>
+
+          <a 
+            href="tel:+918806500700"
+            className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+          >
+            <Phone className="h-5 w-5 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">+91 8806500700</span>
+          </a>
 
           <button 
             onClick={() => navigate('/notifications')} 
