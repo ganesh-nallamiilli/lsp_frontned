@@ -10,9 +10,9 @@ interface FormContextType {
 // Define the form data interface
 interface OrderFormData {
   // Order Details
-  retailOrderId: string;
-  retailOrderAmount: number;
-  retailOrderCategory: string;
+  franchiseOrderId: string;
+  franchiseOrderAmount: number;
+  franchiseOrderCategory: string;
   categoryType: string;
   preparationTime: string;
   paymentType: 'COD' | 'Prepaid';
@@ -342,10 +342,10 @@ const BasicOrderInformation: React.FC = () => {
 
       {/* Form Fields - Now in a grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Retail Order ID */}
+        {/* Franchise Order Id */}
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
-            Retail Order ID
+              Franchise Order Id
             <span className="text-red-500 ml-1">*</span>
           </label>
           <div className="relative">
@@ -354,8 +354,8 @@ const BasicOrderInformation: React.FC = () => {
             </div>
             <input
               type="text"
-              value={formData.retailOrderId}
-              onChange={(e) => setFormData(prev => ({ ...prev, retailOrderId: e.target.value }))}
+              value={formData.franchiseOrderId}
+              onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderId: e.target.value }))}
               placeholder="Enter order ID"
               className={`${inputClasses} pl-10`}
             />
@@ -374,8 +374,8 @@ const BasicOrderInformation: React.FC = () => {
             </div>
             <input
               type="number"
-              value={formData.retailOrderAmount || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, retailOrderAmount: Number(e.target.value) }))}
+              value={formData.franchiseOrderAmount || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderAmount: Number(e.target.value) }))}
               placeholder="0.00"
               min="0"
               step="0.01"
@@ -391,8 +391,8 @@ const BasicOrderInformation: React.FC = () => {
             <span className="text-red-500 ml-1">*</span>
           </label>
           <select
-            value={formData.retailOrderCategory}
-            onChange={(e) => setFormData(prev => ({ ...prev, retailOrderCategory: e.target.value }))}
+            value={formData.franchiseOrderCategory}
+            onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderCategory: e.target.value }))}
             className={selectClasses}
           >
             <option value="">Select a category</option>
@@ -423,7 +423,7 @@ const BasicOrderInformation: React.FC = () => {
           </select>
         </div>
 
-        {/* Payment Type */}
+        {/* Payment Type
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
             Payment Type
@@ -437,7 +437,7 @@ const BasicOrderInformation: React.FC = () => {
             <option value="COD">Cash on Delivery (COD)</option>
             <option value="Prepaid">Prepaid</option>
           </select>
-        </div>
+        </div> */}
 
         {/* Order Category Type */}
         <div>
