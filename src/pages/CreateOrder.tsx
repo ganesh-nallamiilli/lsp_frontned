@@ -1185,6 +1185,7 @@ const AddDeliveryAddressModal: React.FC<{
 // Add delivery address selection component
 const DeliveryAddressSelection: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
@@ -1192,6 +1193,12 @@ const DeliveryAddressSelection: React.FC = () => {
     const id = (addresses.length + 1).toString();
     setAddresses(prev => [...prev, { ...newAddress, id }]);
   };
+
+  const filteredAddresses = addresses.filter(address => 
+    address.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    address.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    address.city.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -1216,6 +1223,20 @@ const DeliveryAddressSelection: React.FC = () => {
           </svg>
           Add Delivery Address
         </button>
+      </div>
+
+      {/* Search Filter */}
+      <div className="relative">
+        <input
+          type="text"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="Search addresses..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <svg className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
       </div>
 
       {addresses.length === 0 ? (
@@ -1243,43 +1264,66 @@ const DeliveryAddressSelection: React.FC = () => {
           <p className="mt-1 text-sm text-gray-500">Add a delivery address to continue.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {addresses.map((address) => (
-            <div
-              key={address.id}
-              className={`relative rounded-lg border p-4 cursor-pointer transition-all duration-200 ${
-                selectedAddressId === address.id
-                  ? 'border-indigo-600 bg-indigo-50'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-              onClick={() => setSelectedAddressId(address.id)}
-            >
-              <div className="absolute top-4 right-4">
-                <div
-                  className={`w-4 h-4 rounded-full border-2 ${
-                    selectedAddressId === address.id
-                      ? 'border-indigo-600 bg-indigo-600'
-                      : 'border-gray-300'
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="w-12 px-4 py-3"></th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer Name
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Address
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Landmark
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  City
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  State
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Pincode
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Phone
+                </th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Alt. Phone
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAddresses.map((address) => (
+                <tr
+                  key={address.id}
+                  className={`cursor-pointer ${
+                    selectedAddressId === address.id ? 'bg-indigo-50' : 'hover:bg-gray-50'
                   }`}
+                  onClick={() => setSelectedAddressId(address.id)}
                 >
-                  {selectedAddressId === address.id && (
-                    <div className="w-1.5 h-1.5 mx-auto mt-0.5 rounded-full bg-white" />
-                  )}
-                </div>
-              </div>
-
-              <div className="pr-8">
-                <h4 className="text-sm font-medium text-gray-900">{address.name}</h4>
-                <div className="mt-2 text-sm text-gray-500 space-y-1">
-                  <p>{address.address}</p>
-                  {address.landmark && <p>Landmark: {address.landmark}</p>}
-                  <p>{`${address.city}, ${address.state} ${address.pincode}`}</p>
-                  <p>Phone: {address.phone}</p>
-                  {address.alternatePhone && <p>Alt Phone: {address.alternatePhone}</p>}
-                </div>
-              </div>
-            </div>
-          ))}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <input
+                      type="radio"
+                      checked={selectedAddressId === address.id}
+                      onChange={() => setSelectedAddressId(address.id)}
+                      className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                    />
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.name}</td>
+                  <td className="px-4 py-4 text-sm text-gray-900">{address.address}</td>
+                  <td className="px-4 py-4 text-sm text-gray-900">{address.landmark || '-'}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.city}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.state}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.pincode}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.phone}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.alternatePhone || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
