@@ -35,6 +35,7 @@ import EmailServiceConfiguration from './pages/EmailServiceConfiguration';
 import SMSServiceConfiguration from './pages/SMSServiceConfiguration';
 import NotificationTemplates from './pages/NotificationTemplates';
 import Support from './pages/Support';
+import UserRegistration from './pages/UserRegistration';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -149,6 +150,7 @@ function App() {
               <Route path="/settings/notifications/sms/:provider" element={<SMSServiceConfiguration />} />
               <Route path="/settings/notifications/templates" element={<NotificationTemplates />} />
             </Route>
+            <Route path="/user_registration" element={<UserRegistration />} />
 
             {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
             <Route
