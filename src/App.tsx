@@ -21,6 +21,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import SearchLogistics from './pages/SearchLogistics';
 import ConfirmationInstructions from './pages/ConfirmationInstructions';
 import ConfirmationDetails from './pages/ConfirmationDetails';
+import Settings from './pages/Settings';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -120,6 +121,7 @@ function App() {
                 path="/confirmation-details" 
                 element={<ConfirmationDetailsWrapper />} 
               />
+              <Route path="settings" element={<Settings />} />
             </Route>
 
             {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
