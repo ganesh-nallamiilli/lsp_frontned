@@ -11,8 +11,7 @@ import {
   FileText,
   Users,
   HeadphonesIcon,
-  Bell,
-  UserCircle,
+  Store,
   Settings,
   Receipt,
   PhoneCall,
@@ -31,6 +30,7 @@ const Sidebar: React.FC = () => {
     { icon: FileText, label: 'Billing', path: '/billing' },
     { icon: Receipt, label: 'Transactions', path: '/transactions' },
     { icon: Users, label: 'Customers', path: '/customers' },
+    { icon: Store, label: 'Franchise', path: '/franchise' },
     { icon: HeadphonesIcon, label: 'Support', path: '/support' },
     { icon: Settings, label: 'Settings', path: '/settings', adminOnly: true },
   ];

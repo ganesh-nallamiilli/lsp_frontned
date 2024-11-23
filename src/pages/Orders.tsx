@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Plus } from 'lucide-react';
+import { Download, Plus, Search as SearchIcon, Trash2 } from 'lucide-react';
 import OrdersTable from '../components/orders/OrdersTable';
 import OrderFilters from '../components/orders/OrderFilters';
 import TabPanel from '../components/common/TabPanel';
@@ -96,12 +96,275 @@ const mockOrders: Order[] = [
     cancellationReason: 'Delivery address changed',
     platformChargeAmount: 0.00,
     shippingCharges: 0.00
+  },
+  {
+    id: '4',
+    retailOrderId: 'Test001',
+    createdAt: '2024-02-15T13:03:00Z',
+    status: 'draft',
+    pickupAddress: {
+      name: 'desk',
+      address: 'sector 5,main road,',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '9638527410',
+      email: 'desk@adya.ai'
+    },
+    deliveryAddress: {
+      name: 'desk',
+      address: 'main road,sector 6,',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '7569316623',
+      email: 'saira@tmail.com'
+    },
+    orderCategory: 'Fashion',
+    totalOrderItems: 1,
+    packageDeadWeight: '0.5 kilogram',
+    packageDimensions: {
+      length: '10',
+      breadth: '10',
+      height: '10'
+    },
+    orderCategoryType: 'Standard',
+    logisticsBuyerNpName: '',
+    logisticsSellerNpName: '',
+    createdBy: 'System',
+    networkOrderId: '',
+    networkTransactionId: '',
+    logisticsSellerNpOrderId: '',
+    fulfillmentStatus: 'pending',
+    rtoStatus: 'none',
+    updatedAt: '',
+    readyToShip: false,
+    awbNo: '',
+    readyToShipTimestamp: '',
+    shipmentType: '',
+    logisticsProvider: '',
+    promisedTatDelivery: '',
+    shippedDateTime: '',
+    deliveredDateTime: '',
+    cancelledDateTime: '',
+    cancelledBy: '',
+    cancellationReason: '',
+    platformChargeAmount: 0,
+    shippingCharges: 0
+  },
+  {
+    id: '5',
+    retailOrderId: 'Test002',
+    createdAt: '2024-02-15T14:30:00Z',
+    status: 'draft',
+    pickupAddress: {
+      name: 'warehouse',
+      address: 'industrial area, phase 1',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '8527419630',
+      email: 'warehouse@adya.ai'
+    },
+    deliveryAddress: {
+      name: 'office',
+      address: 'tech park, sector 3',
+      city: 'Delhi',
+      state: 'Delhi',
+      pincode: '9632587410',
+      email: 'john@tmail.com'
+    },
+    orderCategory: 'Electronics',
+    totalOrderItems: 2,
+    packageDeadWeight: '1.2 kilogram',
+    packageDimensions: {
+      length: '20',
+      breadth: '15',
+      height: '10'
+    },
+    orderCategoryType: 'Express',
+    logisticsBuyerNpName: '',
+    logisticsSellerNpName: '',
+    createdBy: 'System',
+    networkOrderId: '',
+    networkTransactionId: '',
+    logisticsSellerNpOrderId: '',
+    fulfillmentStatus: 'pending',
+    rtoStatus: 'none',
+    updatedAt: '',
+    readyToShip: false,
+    awbNo: '',
+    readyToShipTimestamp: '',
+    shipmentType: '',
+    logisticsProvider: '',
+    promisedTatDelivery: '',
+    shippedDateTime: '',
+    deliveredDateTime: '',
+    cancelledDateTime: '',
+    cancelledBy: '',
+    cancellationReason: '',
+    platformChargeAmount: 0,
+    shippingCharges: 0
   }
 ];
+
+// Update the Order interface for draft orders
+interface DraftOrder {
+  retailOrderId: string;
+  createDateTime: string;
+  pickupAddress: {
+    name: string;
+    address: string;
+    email: string;
+  };
+  deliveryAddress: {
+    name: string;
+    address: string;
+    email: string;
+  };
+  orderCategory: string;
+  totalOrderItems: number;
+  packageDeadWeight: string;
+  packageDimensions: {
+    length: string;
+    breadth: string;
+    height: string;
+  };
+  orderCategoryType: string;
+}
+
+// Add this component for Draft Orders Table
+const DraftOrdersTable: React.FC<{
+  orders: Order[];
+  onEdit: (order: Order) => void;
+  onShipNow: (order: Order) => void;
+  selectedOrders: string[];
+  onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelectOrder: (orderId: string) => void;
+}> = ({ 
+  orders, 
+  onEdit, 
+  onShipNow, 
+  selectedOrders, 
+  onSelectAll, 
+  onSelectOrder 
+}) => {
+  const draftOrders = orders.filter(order => order.status === 'draft');
+  
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="w-12 px-6 py-3">
+              <input
+                type="checkbox"
+                className="rounded border-gray-300"
+                checked={selectedOrders.length === draftOrders.length && draftOrders.length > 0}
+                onChange={onSelectAll}
+              />
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Retail Order ID
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Create Date & Time
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Pickup Address
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Delivery Address
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Order Category
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Total Order Items
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Package Dead Weight
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Package Dimensions
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Order Category Type
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {draftOrders.map((order) => (
+            <tr key={order.id} className="hover:bg-gray-50">
+              <td className="px-6 py-4">
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300"
+                  checked={selectedOrders.includes(order.id)}
+                  onChange={() => onSelectOrder(order.id)}
+                />
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-medium">
+                {order.retailOrderId}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {order.createDateTime}
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                <div>{order.pickupAddress.name}</div>
+                <div>{order.pickupAddress.address}</div>
+                <div>{order.pickupAddress.email}</div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                <div>{order.deliveryAddress.name}</div>
+                <div>{order.deliveryAddress.address}</div>
+                <div>{order.deliveryAddress.email}</div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {order.orderCategory}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {order.totalOrderItems}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {order.packageDeadWeight}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                L - {order.packageDimensions.length} cm<br />
+                B - {order.packageDimensions.breadth} cm<br />
+                H - {order.packageDimensions.height} cm
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {order.orderCategoryType}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                <button
+                  onClick={() => onShipNow(order)}
+                  className="text-white bg-green-600 hover:bg-green-700 px-3 py-1 rounded"
+                >
+                  SHIP NOW
+                </button>
+                <button
+                  onClick={() => onEdit(order)}
+                  className="text-blue-600 hover:text-blue-900"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const Orders: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const tabs = [
@@ -112,6 +375,8 @@ const Orders: React.FC = () => {
     { label: 'In Progress', count: orders.filter((o) => o.status === 'in_progress').length },
     { label: 'Completed', count: orders.filter((o) => o.status === 'completed').length },
     { label: 'Cancelled', count: orders.filter((o) => o.status === 'cancelled').length },
+    { label: 'Draft Orders', count: orders.filter((o) => o.status === 'draft').length },
+
   ];
 
   const handleSearch = (query: string) => {
@@ -135,7 +400,13 @@ const Orders: React.FC = () => {
   };
 
   const handleEdit = (order: Order) => {
-    // Implement edit logic
+    // Update the navigation path to match your route structure
+    navigate('/orders/create', { 
+      state: { 
+        mode: 'edit',
+        orderData: order 
+      }
+    });
   };
 
   const handleDelete = (order: Order) => {
@@ -144,6 +415,119 @@ const Orders: React.FC = () => {
 
   const handleCreateOrder = () => {
     navigate('/orders/create');
+  };
+
+  // Function to get filtered orders based on active tab
+  const getFilteredOrders = () => {
+    switch (activeTab) {
+      case 0: // All Orders
+        return orders;
+      case 1: // Ready to Ship
+        return orders.filter(order => order.status === 'ready_to_ship');
+      case 2: // Created
+        return orders.filter(order => order.status === 'created');
+      case 3: // Accepted
+        return orders.filter(order => order.status === 'accepted');
+      case 4: // In Progress
+        return orders.filter(order => order.status === 'in_progress');
+      case 5: // Completed
+        return orders.filter(order => order.status === 'completed');
+      case 6: // Cancelled
+        return orders.filter(order => order.status === 'cancelled');
+      case 7: // Draft Orders
+        return orders.filter(order => order.status === 'draft');
+      default:
+        return orders;
+    }
+  };
+
+  // Render different filters based on active tab
+  const renderFilters = () => {
+    if (activeTab === 7) { // Draft Orders tab
+      return (
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-4 items-center">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Retail Order ID"
+                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <SearchIcon className="w-5 h-5" />
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {selectedOrders.length > 0 && (
+              <button
+                onClick={() => handleBulkDelete()}
+                className="flex items-center px-3 py-2 text-red-600 hover:text-red-700"
+                title="Delete selected orders"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
+            <button
+              onClick={handleBulkOrder}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              BULK ORDER
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Return default filters for other tabs
+    return (
+      <OrderFilters
+        onSearch={handleSearch}
+        onDateChange={handleDateChange}
+        onStatusChange={handleStatusChange}
+      />
+    );
+  };
+
+  const handleBulkOrder = () => {
+    navigate('/orders/bulk');
+  };
+
+  const handleBulkDelete = () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedOrders.length} orders?`)) {
+      // Implement delete logic here
+      console.log('Deleting orders:', selectedOrders);
+      setSelectedOrders([]); // Clear selection after delete
+    }
+  };
+
+  // Add these handlers for selection
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const draftOrders = orders.filter(order => order.status === 'draft');
+    if (e.target.checked) {
+      setSelectedOrders(draftOrders.map(order => order.id));
+    } else {
+      setSelectedOrders([]);
+    }
+  };
+
+  const handleSelectOrder = (orderId: string) => {
+    setSelectedOrders(prev => 
+      prev.includes(orderId) 
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleShipNow = (order: Order) => {
+    // Navigate to Search Logistics page with order data
+    navigate('/search-logistics', {
+      state: {
+        orderId: order.id,
+        retailOrderId: order.retailOrderId
+      }
+    });
   };
 
   return (
@@ -191,20 +575,27 @@ const Orders: React.FC = () => {
         </div>
 
         <div className="p-6">
-          <OrderFilters
-            onSearch={handleSearch}
-            onDateChange={handleDateChange}
-            onStatusChange={handleStatusChange}
-          />
+          {renderFilters()}
 
           {tabs.map((_, index) => (
             <TabPanel key={index} value={activeTab} index={index}>
-              <OrdersTable
-                orders={orders}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
+              {activeTab === 7 ? (
+                <DraftOrdersTable
+                  orders={getFilteredOrders()}
+                  onEdit={handleEdit}
+                  onShipNow={handleShipNow}
+                  selectedOrders={selectedOrders}
+                  onSelectAll={handleSelectAll}
+                  onSelectOrder={handleSelectOrder}
+                />
+              ) : (
+                <OrdersTable
+                  orders={getFilteredOrders()}
+                  onView={handleView}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              )}
             </TabPanel>
           ))}
         </div>

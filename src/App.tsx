@@ -36,6 +36,12 @@ import SMSServiceConfiguration from './pages/SMSServiceConfiguration';
 import NotificationTemplates from './pages/NotificationTemplates';
 import Support from './pages/Support';
 import UserRegistration from './pages/UserRegistration';
+import Franchise from './pages/Franchise';
+import CreateFranchise from './pages/CreateFranchise';
+import BulkOrders from './pages/BulkOrders';
+import TicketDetails from './pages/TicketDetails';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -89,80 +95,86 @@ const ConfirmationDetailsWrapper = () => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <OrderProvider>
-          <Routes>
-            {/* Public Route */}
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              }
-            />
-
-            {/* Protected Routes */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="orders" element={<Orders />} />
-              <Route path="rto" element={<RTO />} />
-              <Route path="returns" element={<Returns />} />
-              <Route path="payouts" element={<Payouts />} />
-              <Route path="transactions" element={<Transactions />} />
-              <Route path="customers" element={<Customers />} />
-              <Route path="subscriptions" element={<Subscriptions />} />
-              <Route path="wallet" element={<Wallet />} />
-              <Route path="billing" element={<Billing />} />
-              <Route path="notifications" element={<Notifications />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="support" element={<Support />} />
-              <Route path="orders/create" element={<CreateOrderPage />} />
-              <Route path="orders/:id" element={<OrderView />} />
-              <Route path="search-logistics" element={<SearchLogistics />} />
-              <Route 
-                path="/confirmation-instructions" 
-                element={<ConfirmationInstructionsWrapper />} 
+    <Provider store={store}>
+      <BrowserRouter>
+        <AuthProvider>
+          <OrderProvider>
+            <Routes>
+              {/* Public Route */}
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
               />
-              <Route 
-                path="/confirmation-details" 
-                element={<ConfirmationDetailsWrapper />} 
-              />
-              <Route path="settings" element={<Settings />} />
-              <Route path="settings/banking" element={<BankingSettings />} />
-              <Route path="settings/maps" element={<MapsSettings />} />
-              <Route path="/maps-service/:provider" element={<MapServiceConfiguration />} />
-              <Route path="/payment-service/:provider" element={<PaymentServiceConfiguration />} />
-              <Route path="settings/payment-providers" element={<PaymentSettings />} />
-              <Route path="/settings/verification" element={<PennyDropSettings />} />
-              <Route path="/verification-service/:provider" element={<PennyDropServiceConfiguration />} />
-              <Route path="/settings/ui" element={<UIConfiguration />} />
-              <Route path="/settings/notifications" element={<NotificationSettings />} />
-              <Route path="/settings/notifications/email/:provider" element={<EmailServiceConfiguration />} />
-              <Route path="/settings/notifications/sms/:provider" element={<SMSServiceConfiguration />} />
-              <Route path="/settings/notifications/templates" element={<NotificationTemplates />} />
-            </Route>
-            <Route path="/user_registration" element={<UserRegistration />} />
 
-            {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
-            <Route
-              path="*"
-              element={
-                <Navigate to="/login" replace />
-              }
-            />
-          </Routes>
-        </OrderProvider>
-      </AuthProvider>
-    </BrowserRouter>
+              {/* Protected Routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="rto" element={<RTO />} />
+                <Route path="returns" element={<Returns />} />
+                <Route path="payouts" element={<Payouts />} />
+                <Route path="transactions" element={<Transactions />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="subscriptions" element={<Subscriptions />} />
+                <Route path="wallet" element={<Wallet />} />
+                <Route path="billing" element={<Billing />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="support" element={<Support />} />
+                <Route path="orders/create" element={<CreateOrderPage />} />
+                <Route path="orders/:id" element={<OrderView />} />
+                <Route path="search-logistics" element={<SearchLogistics />} />
+                <Route 
+                  path="/confirmation-instructions" 
+                  element={<ConfirmationInstructionsWrapper />} 
+                />
+                <Route 
+                  path="/confirmation-details" 
+                  element={<ConfirmationDetailsWrapper />} 
+                />
+                <Route path="settings" element={<Settings />} />
+                <Route path="settings/banking" element={<BankingSettings />} />
+                <Route path="settings/maps" element={<MapsSettings />} />
+                <Route path="/maps-service/:provider" element={<MapServiceConfiguration />} />
+                <Route path="/payment-service/:provider" element={<PaymentServiceConfiguration />} />
+                <Route path="settings/payment-providers" element={<PaymentSettings />} />
+                <Route path="/settings/verification" element={<PennyDropSettings />} />
+                <Route path="/verification-service/:provider" element={<PennyDropServiceConfiguration />} />
+                <Route path="/settings/ui" element={<UIConfiguration />} />
+                <Route path="/settings/notifications" element={<NotificationSettings />} />
+                <Route path="/settings/notifications/email/:provider" element={<EmailServiceConfiguration />} />
+                <Route path="/settings/notifications/sms/:provider" element={<SMSServiceConfiguration />} />
+                <Route path="/settings/notifications/templates" element={<NotificationTemplates />} />
+                <Route path="/franchise" element={<Franchise />} />
+                <Route path="/franchise/create" element={<CreateFranchise />} />
+                <Route path="/orders/bulk" element={<BulkOrders />} />
+                <Route path="/support/ticket/:ticketId" element={<TicketDetails />} />
+              </Route>
+              <Route path="/user_registration" element={<UserRegistration />} />
+
+              {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
+              <Route
+                path="*"
+                element={
+                  <Navigate to="/login" replace />
+                }
+              />
+            </Routes>
+          </OrderProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </Provider>
   );
 }
 
