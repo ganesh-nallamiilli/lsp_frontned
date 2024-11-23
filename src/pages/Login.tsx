@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Phone, ArrowRight, Truck, Package, MapPin, Box } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { initiateLogin, resetAuth } from '../store/slices/authSlice';
 
 const LogisticsAnimation = () => {
   return (
@@ -52,20 +54,20 @@ const Login: React.FC = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { loading: authLoading, error: authError, otpSent } = useAppSelector((state) => state.auth);
 
   const handleIdentifierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
+    
     try {
-      // Add your API call here to send OTP
-      // await sendOTP(identifier);
-      setStep('otp');
+      const result = await dispatch(initiateLogin(identifier)).unwrap();
+      if (result.data.otp_sent) {
+        setStep('otp');
+      }
     } catch (err) {
       setError('Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -104,6 +106,12 @@ const Login: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBackToIdentifier = () => {
+    setStep('identifier');
+    setOtp(['', '', '', '', '', '']);
+    dispatch(resetAuth());
   };
 
   return (
@@ -213,10 +221,7 @@ const Login: React.FC = () => {
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => {
-                    setStep('identifier');
-                    setOtp(['', '', '', '', '', '']);
-                  }}
+                  onClick={handleBackToIdentifier}
                   className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
                   Change email/phone number

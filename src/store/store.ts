@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import ticketReducer from './slices/ticketSlice';
+import authReducer from './slices/authSlice';
 
 export const store = configureStore({
   reducer: {
     tickets: ticketReducer,
+    auth: authReducer,
   },
 });
 
