@@ -24,29 +24,101 @@ interface Ticket {
   assignedSeller: string;
 }
 
+// Add dummy data
+const DUMMY_TICKETS: Ticket[] = [
+  {
+    status: 'OPEN',
+    ticketType: 'Support',
+    ticketId: 'TKT-001',
+    networkIssueId: 'NET-001',
+    orderId: 'ORD-001',
+    category: 'Technical',
+    network: 'Network A',
+    participants: ['John Doe', 'Support Team'],
+    creationDateTime: '2024-03-20 10:30:00',
+    issueCategory: 'FULFILLMENT',
+    issueSubCategory: 'Delivery',
+    relayDateTime: '2024-03-20 10:35:00',
+    lastUpdateDateTime: '2024-03-20 11:00:00',
+    closedDateTime: '',
+    assignedAgent: '',
+    assignedSeller: ''
+  },
+  {
+    status: 'CLOSED',
+    ticketType: 'Complaint',
+    ticketId: 'TKT-002',
+    networkIssueId: 'NET-002',
+    orderId: 'ORD-002',
+    category: 'Payment',
+    network: 'Network B',
+    participants: ['Jane Smith', 'Finance Team'],
+    creationDateTime: '2024-03-19 15:20:00',
+    issueCategory: 'PAYMENT',
+    issueSubCategory: 'Refund',
+    relayDateTime: '2024-03-19 15:25:00',
+    lastUpdateDateTime: '2024-03-19 16:00:00',
+    closedDateTime: '2024-03-19 16:30:00',
+    assignedAgent: 'Agent Smith',
+    assignedSeller: 'Seller X'
+  },
+  {
+    status: 'OPEN',
+    ticketType: 'Query',
+    ticketId: 'TKT-003',
+    networkIssueId: 'NET-003',
+    orderId: 'ORD-003',
+    category: 'Product',
+    network: 'Network C',
+    participants: ['Mike Johnson', 'Product Team'],
+    creationDateTime: '2024-03-21 09:00:00',
+    issueCategory: 'FULFILLMENT',
+    issueSubCategory: 'Quality',
+    relayDateTime: '2024-03-21 09:05:00',
+    lastUpdateDateTime: '2024-03-21 09:30:00',
+    closedDateTime: '',
+    assignedAgent: '',
+    assignedSeller: ''
+  }
+];
+
 const Support: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { tickets, loading, error } = useAppSelector(state => state.tickets);
+  const { tickets = [], loading = false, error = null } = useAppSelector(state => state.tickets || {});
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(tickets.length / itemsPerPage);
+  const totalPages = Math.ceil((Array.isArray(tickets) ? tickets.length : 0) / itemsPerPage);
 
   useEffect(() => {
-    dispatch(fetchTickets());
+    try {
+      // Comment out the actual API call for now
+      // dispatch(fetchTickets());
+      
+      // Simulate API call with dummy data
+      setTimeout(() => {
+        dispatch({ type: 'tickets/fetchTickets/fulfilled', payload: DUMMY_TICKETS });
+      }, 1000); // Simulate 1 second loading
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
   }, [dispatch]);
 
-  const paginatedTickets = tickets.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedTickets = Array.isArray(tickets) 
+    ? tickets.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    : [];
 
   const handleTicketClick = (ticketId: string) => {
-    navigate(`/support/ticket/${ticketId}`);
+    if (ticketId) {
+      navigate(`/support/ticket/${ticketId}`);
+    }
   };
 
   const handleAssign = async (e: React.MouseEvent, ticketId: string) => {
+    e.preventDefault();
     e.stopPropagation();
+    if (!ticketId) return;
+
     try {
       await dispatch(assignTicket({ 
         ticketId, 
@@ -111,14 +183,24 @@ const Support: React.FC = () => {
     };
   }, [isModalOpen]);
 
-  // Show loading state
+  // Show loading state with better UI
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-600">Loading tickets...</div>
+      </div>
+    );
   }
 
   // Show error state
   if (error) {
-    return <div className="text-red-600">Error: {error}</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+          Error loading tickets: {error.toString()}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -240,86 +322,98 @@ const Support: React.FC = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-200">
-              {paginatedTickets.map((ticket) => (
-                <tr 
-                  key={ticket.ticketId}
-                  onClick={() => handleTicketClick(ticket.ticketId)}
-                  className="hover:bg-gray-50/50 cursor-pointer transition-colors"
-                >
-                  <td className="sticky left-0 bg-white py-4 px-5 border-r border-gray-100">
-                    <span className={`
-                      inline-flex px-3 py-1 text-xs font-medium rounded-full
-                      ${ticket.status === 'OPEN' 
-                        ? 'bg-red-50 text-red-700' 
-                        : 'bg-green-50 text-green-700'
-                      }
-                    `}>
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-900">{ticket.ticketType}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-blue-600 hover:text-blue-800">{ticket.ticketId}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.networkIssueId}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-900">{ticket.orderId}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.category}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center">🏪</span>
-                      <span className="text-sm text-gray-900">{ticket.network}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-purple-50 rounded-full flex items-center justify-center">🏢</span>
-                      <span className="text-sm text-gray-900">{ticket.participants.join(', ')}</span>
-                    </div>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.creationDateTime}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.lastUpdateDateTime}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.closedDateTime}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm font-medium text-gray-900">{ticket.issueCategory}</span>
-                  </td>
-                  <td className="py-4 px-5 border-r border-gray-100">
-                    <span className="text-sm text-gray-600">{ticket.issueSubCategory}</span>
-                  </td>
-                  <td className="py-4 px-5">
-                    <button 
-                      onClick={(e) => handleAssign(e, ticket.ticketId)}
-                      className="px-4 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-full 
-                        hover:bg-purple-50 transition-colors duration-200 
-                        focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                    >
-                      Assign
-                    </button>
+              {Array.isArray(paginatedTickets) && paginatedTickets.length > 0 ? (
+                paginatedTickets.map((ticket) => (
+                  <tr 
+                    key={ticket?.ticketId || 'unknown'}
+                    onClick={() => ticket?.ticketId && handleTicketClick(ticket.ticketId)}
+                    className="hover:bg-gray-50/50 cursor-pointer transition-colors"
+                  >
+                    <td className="sticky left-0 bg-white py-4 px-5 border-r border-gray-100">
+                      <span className={`
+                        inline-flex px-3 py-1 text-xs font-medium rounded-full
+                        ${ticket?.status === 'OPEN' 
+                          ? 'bg-red-50 text-red-700' 
+                          : 'bg-green-50 text-green-700'
+                        }
+                      `}>
+                        {ticket?.status || 'Unknown'}
+                      </span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-900">{ticket?.ticketType || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-blue-600 hover:text-blue-800">{ticket?.ticketId || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.networkIssueId || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-900">{ticket?.orderId || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.category || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center">🏪</span>
+                        <span className="text-sm text-gray-900">{ticket?.network || 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 bg-purple-50 rounded-full flex items-center justify-center">🏢</span>
+                        <span className="text-sm text-gray-900">{ticket?.participants.join(', ') || 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.creationDateTime || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.lastUpdateDateTime || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.closedDateTime || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm font-medium text-gray-900">{ticket?.issueCategory || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5 border-r border-gray-100">
+                      <span className="text-sm text-gray-600">{ticket?.issueSubCategory || 'Unknown'}</span>
+                    </td>
+                    <td className="py-4 px-5">
+                      <button 
+                        onClick={(e) => handleAssign(e, ticket?.ticketId || '')}
+                        className="px-4 py-1.5 text-xs font-medium text-purple-600 border border-purple-200 rounded-full 
+                          hover:bg-purple-50 transition-colors duration-200 
+                          focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      >
+                        Assign
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={14} className="py-4 px-5 text-center text-gray-500">
+                    No tickets found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
-            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, tickets.length)} of {tickets.length} results
-          </div>
+          {Array.isArray(tickets) && tickets.length > 0 ? (
+            <div className="text-sm text-gray-500">
+              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, tickets.length)} of {tickets.length} results
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">No results</div>
+          )}
           
           <div className="flex items-center gap-2">
             <button

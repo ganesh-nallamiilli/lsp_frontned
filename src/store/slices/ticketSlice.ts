@@ -97,7 +97,7 @@ const ticketSlice = createSlice({
       })
       .addCase(fetchTickets.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.error.message || 'An error occurred';
       })
       // Create Ticket
       .addCase(createTicket.pending, (state) => {
