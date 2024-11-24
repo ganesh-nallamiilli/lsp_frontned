@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Truck, Package, MapPin, Box } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { registerUser } from '../store/slices/authSlice';
 
 interface RegistrationForm {
   storeName: string;
@@ -58,10 +61,19 @@ const LogisticsAnimation = () => {
 };
 
 const UserRegistration: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { token } = useAppSelector((state) => state.auth);
+  const [error, setError] = useState('');
+  
+  // Get user data from location state
+  const location = useLocation();
+  const userData = location.state?.userData;
+
   const [formData, setFormData] = useState<RegistrationForm>({
     storeName: '',
-    storeEmail: '',
-    storeMobile: '',
+    storeEmail: userData?.email || '',
+    storeMobile: userData?.mobile_number || '',
     fullName: '',
     gstNumber: '',
     panNumber: '',
@@ -82,8 +94,29 @@ const UserRegistration: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement API call for registration
-    console.log('Form submitted:', formData);
+    
+    try {
+      const registrationData = {
+        store_name: formData.storeName,
+        gst_number: formData.gstNumber,
+        pan_number: formData.panNumber,
+        name: formData.fullName,
+        mobile_number: formData.storeMobile,
+        email: formData.storeEmail,
+        address: {
+          building: formData.building,
+          locality: formData.locality,
+          city: formData.city,
+          state: formData.state,
+          area_code: formData.areaCode
+        }
+      };
+
+      await dispatch(registerUser(registrationData)).unwrap();
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Failed to register user. Please try again.');
+    }
   };
 
   return (

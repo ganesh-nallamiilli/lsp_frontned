@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
         />
         <KPICard
           title="Revenue"
-          value="$52,389"
+          value="₹52,389"
           change={15}
           icon={DollarSign}
           color="bg-purple-500"

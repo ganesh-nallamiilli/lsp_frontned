@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Download, Filter, Calendar, DollarSign, CreditCard, Plus } from 'lucide-react';
+import { FileText, Download, Filter, Calendar, DollarSign, CreditCard, Plus, IndianRupee } from 'lucide-react';
 
 const invoices = [
   {
@@ -50,11 +50,11 @@ const Billing: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="flex items-center space-x-3">
             <div className="p-3 bg-indigo-100 rounded-full">
-              <DollarSign className="h-6 w-6 text-indigo-600" />
+              <IndianRupee className="h-6 w-6 text-indigo-600" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Total Due</p>
-              <p className="text-2xl font-bold text-gray-900">$1,299.00</p>
+              <p className="text-2xl font-bold text-gray-900">₹1,299.00</p>
             </div>
           </div>
         </div>

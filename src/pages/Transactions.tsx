@@ -54,7 +54,7 @@ const Transactions: React.FC = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Total Credits</p>
-              <p className="text-2xl font-bold text-gray-900">$45,289.00</p>
+              <p className="text-2xl font-bold text-gray-900">₹45,289.00</p>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ const Transactions: React.FC = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Total Debits</p>
-              <p className="text-2xl font-bold text-gray-900">$12,450.00</p>
+              <p className="text-2xl font-bold text-gray-900">₹12,450.00</p>
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@ const Transactions: React.FC = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900">$3,890.00</p>
+              <p className="text-2xl font-bold text-gray-900">₹3,890.00</p>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@ const Transactions: React.FC = () => {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600">Total Volume</p>
-              <p className="text-2xl font-bold text-gray-900">$89,567.00</p>
+              <p className="text-2xl font-bold text-gray-900">₹89,567.00</p>
             </div>
           </div>
         </div>

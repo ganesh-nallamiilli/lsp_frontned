@@ -40,7 +40,7 @@ const Wallet: React.FC = () => {
               <h2 className="text-xl font-semibold">Wallet Balance</h2>
             </div>
             <div className="mb-6">
-              <p className="text-4xl font-bold">$2,458.50</p>
+              <p className="text-4xl font-bold">₹2,458.50</p>
               <p className="text-sm opacity-80">Available Balance</p>
             </div>
             <div className="flex space-x-4">

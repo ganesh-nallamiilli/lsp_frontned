@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { config } from '../../config/env';
 
 interface LoginResponse {
   data: {
@@ -12,12 +13,50 @@ interface LoginResponse {
   status: boolean;
 }
 
+interface VerifyOtpResponse {
+  data: {
+    new_user: boolean;
+    status: boolean;
+    token: string;
+    verified: boolean;
+    user_data: UserData;
+  };
+  status: boolean;
+}
+
+interface VerifyOtpPayload {
+  id: number;
+  otp: string;
+}
+
 interface AuthState {
   loading: boolean;
   error: string | null;
   userId: number | null;
   otpSent: boolean;
   isNewUser: boolean;
+  token: string | null;
+}
+
+interface UserData {
+  email?: string;
+  mobile_number?: string;
+}
+
+interface RegistrationPayload {
+  store_name: string;
+  gst_number: string;
+  pan_number: string;
+  name: string;
+  mobile_number: string;
+  email: string;
+  address: {
+    building: string;
+    locality: string;
+    city: string;
+    state: string;
+    area_code: string;
+  };
 }
 
 const initialState: AuthState = {
@@ -26,6 +65,7 @@ const initialState: AuthState = {
   userId: null,
   otpSent: false,
   isNewUser: false,
+  token: null,
 };
 
 export const initiateLogin = createAsyncThunk(
@@ -33,12 +73,54 @@ export const initiateLogin = createAsyncThunk(
   async (login: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<LoginResponse>(
-        'http://localhost:8080/api/v1/lsp_backend/core_user/login',
+        `${config.apiBaseUrl}/core_user/login`,
         { login }
       );
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to initiate login');
+    }
+  }
+);
+
+export const verifyOtp = createAsyncThunk(
+  'auth/verifyOtp',
+  async (payload: VerifyOtpPayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<VerifyOtpResponse>(
+        `${config.apiBaseUrl}/core_user/verify_otp`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to verify OTP');
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (userData: RegistrationPayload, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/core_user/user_onboarding`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to register user');
     }
   }
 );
@@ -66,6 +148,18 @@ const authSlice = createSlice({
         state.isNewUser = action.payload.data.new_user;
       })
       .addCase(initiateLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.data.token;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

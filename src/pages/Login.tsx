@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Phone, ArrowRight, Truck, Package, MapPin, Box } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { initiateLogin, resetAuth } from '../store/slices/authSlice';
+import { initiateLogin, resetAuth, verifyOtp } from '../store/slices/authSlice';
 
 const LogisticsAnimation = () => {
   return (
@@ -55,7 +55,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const { loading: authLoading, error: authError, otpSent } = useAppSelector((state) => state.auth);
+  const { loading: authLoading, error: authError, otpSent, userId } = useAppSelector((state) => state.auth);
 
   const handleIdentifierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,23 +88,30 @@ const Login: React.FC = () => {
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
     try {
-      // Add your API call here to verify OTP
-      // const response = await verifyOTP(identifier, otp.join(''));
-      // login(response.token);
-      
-      // For demo purposes:
-      login('dummy-token');
-      
-      // Redirect to the page they came from or dashboard
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      const result = await dispatch(verifyOtp({
+        id: userId!,
+        otp: otp.join('')
+      })).unwrap();
+
+      if (result.data.verified) {
+        // Store token in localStorage
+        localStorage.setItem('token', result.data.token);
+        login(result.data.token);
+        
+        if (result.data.new_user) {
+          navigate('/user_registration', { 
+            replace: true,
+            state: { userData: result.data.user_data }
+          });
+        } else {
+          const from = location.state?.from?.pathname || '/';
+          navigate(from, { replace: true });
+        }
+      }
     } catch (err) {
       setError('Invalid OTP. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
