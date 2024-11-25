@@ -19,7 +19,15 @@ interface VerifyOtpResponse {
     status: boolean;
     token: string;
     verified: boolean;
-    user_data: UserData;
+    user_data: {
+      _id: number;
+      company_id: number;
+      email: string;
+      mobile_number: string;
+      name: string;
+      user_types: Array<{ name: string }>;
+      // ... other user data fields
+    };
   };
   status: boolean;
 }
@@ -158,6 +166,20 @@ const authSlice = createSlice({
       .addCase(verifyOtp.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.data.token;
+        
+        // Store important data in localStorage
+        localStorage.setItem('token', action.payload.data.token);
+        localStorage.setItem('user_id', action.payload.data.user_data._id.toString());
+        localStorage.setItem('user_type', action.payload.data.user_data.user_types[0]?.name || '');
+        localStorage.setItem('user_details', JSON.stringify({
+          name: action.payload.data.user_data.name,
+          email: action.payload.data.user_data.email,
+          mobile_number: action.payload.data.user_data.mobile_number,
+          company_id: action.payload.data.user_data.company_id
+        }));
+        localStorage.setItem('is_franchise', 
+          (action.payload.data.user_data.user_types[0]?.name === 'FRANCHISE_USER').toString()
+        );
       })
       .addCase(verifyOtp.rejected, (state, action) => {
         state.loading = false;
