@@ -3,7 +3,9 @@ import { User, Mail, Phone, MapPin, Camera, Lock, Save } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 interface ProfileForm {
-  name: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
   email: string;
   phone: string;
   company: string;
@@ -16,11 +18,52 @@ interface ProfileForm {
   };
 }
 
+const INDIAN_STATES = [
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+  'Andaman and Nicobar Islands',
+  'Chandigarh',
+  'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi',
+  'Jammu and Kashmir',
+  'Ladakh',
+  'Lakshadweep',
+  'Puducherry'
+];
+
 const Profile: React.FC = () => {
   const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('basic');
   const [form, setForm] = useState<ProfileForm>({
-    name: user?.name || '',
+    firstName: user?.firstName || '',
+    middleName: user?.middleName || '',
+    lastName: user?.lastName || '',
     email: user?.email || '',
     phone: '',
     company: '',
@@ -35,6 +78,18 @@ const Profile: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    // For phone field, only allow numbers
+    if (name === 'phone' && value !== '') {
+      if (!/^\d+$/.test(value)) return; // Only allow digits
+    }
+
+    // For PIN code, only allow numbers
+    if (name === 'address.zipCode' && value !== '') {
+      if (!/^\d+$/.test(value)) return; // Only allow digits
+    }
+
+    // Rest of your existing handleInputChange logic
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setForm(prev => ({
@@ -125,19 +180,56 @@ const Profile: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Full Name
-                  </label>
-                  <div className="mt-1 relative">
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
-                    <User className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                <div className="md:col-span-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        First Name
+                      </label>
+                      <div className="mt-1 relative">
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={form.firstName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          required
+                        />
+                        <User className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Middle Name
+                      </label>
+                      <div className="mt-1 relative">
+                        <input
+                          type="text"
+                          name="middleName"
+                          value={form.middleName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Last Name
+                      </label>
+                      <div className="mt-1 relative">
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={form.lastName}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          required
+                        />
+                        <User className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -161,16 +253,28 @@ const Profile: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700">
                     Phone Number
                   </label>
-                  <div className="mt-1 relative">
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
-                    <Phone className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                  <div className="mt-1 flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-200 bg-gray-50 text-gray-500 text-sm">
+                      +91
+                    </span>
+                    <div className="relative flex-1">
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleInputChange}
+                        maxLength={10}
+                        placeholder="Enter 10 digit mobile number"
+                        className="w-full px-4 py-2 rounded-l-none rounded-r-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      />
+                      <Phone className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                    </div>
                   </div>
+                  {form.phone && !/^\d{10}$/.test(form.phone) && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Please enter a valid 10-digit mobile number
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -223,28 +327,41 @@ const Profile: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      State / Province
+                      State
                     </label>
-                    <input
-                      type="text"
+                    <select
                       name="address.state"
                       value={form.address.state}
                       onChange={handleInputChange}
                       className="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">Select State</option>
+                      {INDIAN_STATES.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      ZIP / Postal Code
+                      PIN Code
                     </label>
                     <input
                       type="text"
                       name="address.zipCode"
                       value={form.address.zipCode}
                       onChange={handleInputChange}
+                      maxLength={6}
+                      placeholder="Enter 6-digit PIN code"
                       className="mt-1 w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
+                    {form.address.zipCode && !/^\d{6}$/.test(form.address.zipCode) && (
+                      <p className="mt-1 text-sm text-red-500">
+                        Please enter a valid 6-digit PIN code
+                      </p>
+                    )}
                   </div>
 
                   <div>

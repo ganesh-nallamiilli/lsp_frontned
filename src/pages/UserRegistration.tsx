@@ -84,16 +84,50 @@ const UserRegistration: React.FC = () => {
     areaCode: ''
   });
 
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'gstNumber':
+        if (value.length !== 15) {
+          return 'GST Number must be exactly 15 characters';
+        }
+        break;
+      case 'panNumber':
+        if (value.length !== 10) {
+          return 'PAN Number must be exactly 10 characters';
+        }
+        break;
+      case 'storeMobile':
+        if (!/^\d{10}$/.test(value)) {
+          return 'Mobile number must be exactly 10 digits';
+        }
+        break;
+    }
+    return '';
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    const fieldError = validateField(name, value);
+    setError(fieldError);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate GST and PAN numbers before submission
+    if (formData.gstNumber.length !== 15) {
+      setError('GST Number must be exactly 15 characters');
+      return;
+    }
+    if (formData.panNumber.length !== 10) {
+      setError('PAN Number must be exactly 10 characters');
+      return;
+    }
     
     try {
       const registrationData = {
@@ -162,15 +196,25 @@ const UserRegistration: React.FC = () => {
                 <label htmlFor="storeMobile" className="block text-sm font-medium text-gray-700">
                   Store Mobile Number <span className="text-red-500">*</span>
                 </label>
-                <Input
-                  id="storeMobile"
-                  name="storeMobile"
-                  type="tel"
-                  value={formData.storeMobile}
-                  onChange={handleChange}
-                  required
-                  className="mt-1"
-                />
+                <div className="flex mt-1">
+                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                    +91
+                  </span>
+                  <Input
+                    id="storeMobile"
+                    name="storeMobile"
+                    type="tel"
+                    value={formData.storeMobile}
+                    onChange={handleChange}
+                    required
+                    maxLength={10}
+                    className="rounded-l-none"
+                    placeholder="Enter 10 digit mobile number"
+                  />
+                </div>
+                {error && formData.storeMobile.length > 0 && error.includes('mobile') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
@@ -197,8 +241,12 @@ const UserRegistration: React.FC = () => {
                   value={formData.gstNumber}
                   onChange={handleChange}
                   required
+                  maxLength={15}
                   className="mt-1"
                 />
+                {error && formData.gstNumber.length > 0 && error.includes('GST') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
@@ -211,8 +259,12 @@ const UserRegistration: React.FC = () => {
                   value={formData.panNumber}
                   onChange={handleChange}
                   required
+                  maxLength={10}
                   className="mt-1"
                 />
+                {error && formData.panNumber.length > 0 && error.includes('PAN') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
