@@ -8,6 +8,7 @@ import {
   Users,
   Truck,
   AlertCircle,
+  IndianRupee,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -72,9 +73,74 @@ const Dashboard: React.FC = () => {
           title="Revenue"
           value="₹52,389"
           change={15}
-          icon={DollarSign}
+          icon={IndianRupee}
           color="bg-purple-500"
         />
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <h2 className="text-lg font-semibold mb-6">Shipping Status</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+              <Package className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Pickup Pending</div>
+              <div className="text-lg font-semibold">64</div>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+              <Users className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Searching For Agent</div>
+              <div className="text-lg font-semibold">10</div>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+              <Users className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Agent Assigned</div>
+              <div className="text-lg font-semibold">22</div>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+              <Package className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Order Picked Up</div>
+              <div className="text-lg font-semibold">7</div>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+              <Truck className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Out For Delivery</div>
+              <div className="text-lg font-semibold">2</div>
+            </div>
+          </div>
+
+          <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+              <Package className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-600">Order Delivered</div>
+              <div className="text-lg font-semibold">199</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -140,6 +206,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      
     </div>
   );
 }
