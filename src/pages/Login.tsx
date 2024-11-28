@@ -95,15 +95,18 @@ const Login: React.FC = () => {
         otp: otp.join('')
       })).unwrap();
 
-      if (result.data.verified) {
+      if (result.meta.status) {
         // Store token in localStorage
         localStorage.setItem('token', result.data.token);
         login(result.data.token);
         
-        if (result.data.new_user) {
+        // Check new_user from localStorage instead
+        const isNewUser = localStorage.getItem('new_user') === 'true';
+        
+        if (isNewUser) {
           navigate('/user_registration', { 
             replace: true,
-            state: { userData: result.data.user_data }
+            state: { userData: result.data.user }
           });
         } else {
           const from = location.state?.from?.pathname || '/';

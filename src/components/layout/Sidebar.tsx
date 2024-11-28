@@ -20,19 +20,22 @@ import {
 const Sidebar: React.FC = () => {
   const { isOpen, toggle } = useSidebar();
   const { user } = useAuthStore();
-  const isAdmin = user?.role === 'STANDALONE_ADMIN';
+  const userType = localStorage.getItem("user_type");
+  const isAdmin = userType === 'STANDALONE_ADMIN';
+  const isUser = userType === 'STANDALONE_USER';
+  const isFranchise = userType === 'FRANCHISE';
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: Package, label: 'Orders', path: '/orders' },
     { icon: RotateCcw, label: 'RTO Management', path: '/rto' },
     { icon: RefreshCcw, label: 'Returns', path: '/returns' },
-    { icon: FileText, label: 'Billing', path: '/billing' },
+    { icon: FileText, label: 'Billing', path: '/billing', hideFor: ['STANDALONE_ADMIN'] },
     { icon: Receipt, label: 'Transactions', path: '/transactions' },
-    { icon: Users, label: 'Customers', path: '/customers' },
-    { icon: Store, label: 'Franchise', path: '/franchise' },
+    { icon: Users, label: 'Customers', path: '/customers', showFor: ['STANDALONE_ADMIN'] },
+    { icon: Store, label: 'Franchise', path: '/franchise', showFor: ['STANDALONE_ADMIN'] },
     { icon: HeadphonesIcon, label: 'Support', path: '/support' },
-    { icon: Settings, label: 'Settings', path: '/settings', adminOnly: true },
+    { icon: Settings, label: 'Settings', path: '/settings',  showFor: ['STANDALONE_ADMIN'] },
   ];
 
   return (
@@ -69,8 +72,13 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
         <nav className="mt-8 flex-1">
-          {menuItems.map((item) => (
-            (!item.adminOnly || isAdmin) && (
+          {menuItems.map((item) => {
+            const shouldShow = 
+              (!item.showFor && !item.hideFor) || // Show if no restrictions
+              (item.showFor && item.showFor.includes(userType as string)) || // Show if user type is in showFor
+              (item.hideFor && !item.hideFor.includes(userType as string)); // Show if user type is not in hideFor
+
+            return shouldShow ? (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -95,8 +103,8 @@ const Sidebar: React.FC = () => {
                   </div>
                 )}
               </NavLink>
-            )
-          ))}
+            ) : null;
+          })}
         </nav>
       </div>
     </>

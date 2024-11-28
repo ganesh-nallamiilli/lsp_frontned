@@ -18,6 +18,11 @@ interface RegistrationForm {
   city: string;
   state: string;
   areaCode: string;
+  settlementType: 'upi' | 'account';
+  upiAddress: string;
+  accountNumber: string;
+  ifscCode: string;
+  beneficiaryName: string;
 }
 
 const LogisticsAnimation = () => {
@@ -81,7 +86,12 @@ const UserRegistration: React.FC = () => {
     locality: '',
     city: '',
     state: '',
-    areaCode: ''
+    areaCode: '',
+    settlementType: 'account',
+    upiAddress: '',
+    accountNumber: '',
+    ifscCode: '',
+    beneficiaryName: ''
   });
 
   const validateField = (name: string, value: string): string => {
@@ -137,12 +147,23 @@ const UserRegistration: React.FC = () => {
         name: formData.fullName,
         mobile_number: formData.storeMobile,
         email: formData.storeEmail,
-        address: {
+        gst_address: {
           building: formData.building,
           locality: formData.locality,
           city: formData.city,
           state: formData.state,
           area_code: formData.areaCode
+        },
+        bank_details: {
+          settlement_type: formData.settlementType,
+          ...(formData.settlementType === 'upi' 
+            ? { upi_address: formData.upiAddress }
+            : {
+                settlement_bank_account_no: formData.accountNumber,
+                settlement_ifsc_code: formData.ifscCode,
+                beneficiary_name: formData.beneficiaryName
+              }
+          )
         }
       };
 
@@ -336,6 +357,90 @@ const UserRegistration: React.FC = () => {
                   className="mt-1"
                 />
               </div>
+            </div>
+
+            <div className="space-y-4 border-t pt-4 mt-4">
+              <h2 className="text-lg font-semibold text-gray-900">Bank Details</h2>
+              <div>
+                <label htmlFor="settlementType" className="block text-sm font-medium text-gray-700">
+                  Settlement Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="settlementType"
+                  name="settlementType"
+                  value={formData.settlementType}
+                  onChange={handleChange}
+                  required
+                  className="mt-1"
+                >
+                  <option value="upi">UPI</option>
+                  <option value="account">Bank Account</option>
+                </select>
+              </div>
+
+              {formData.settlementType === 'upi' && (
+                <div>
+                  <label htmlFor="upiAddress" className="block text-sm font-medium text-gray-700">
+                    UPI Address <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="upiAddress"
+                    name="upiAddress"
+                    value={formData.upiAddress}
+                    onChange={handleChange}
+                    required
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
+              {formData.settlementType === 'account' && (
+                <>
+                  <div>
+                    <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700">
+                      Account Number <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="accountNumber"
+                      name="accountNumber"
+                      value={formData.accountNumber}
+                      onChange={handleChange}
+                      required
+                      maxLength={16}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="ifscCode" className="block text-sm font-medium text-gray-700">
+                      IFSC Code <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="ifscCode"
+                      name="ifscCode"
+                      value={formData.ifscCode}
+                      onChange={handleChange}
+                      required
+                      maxLength={11}
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="beneficiaryName" className="block text-sm font-medium text-gray-700">
+                      Beneficiary Name <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="beneficiaryName"
+                      name="beneficiaryName"
+                      value={formData.beneficiaryName}
+                      onChange={handleChange}
+                      required
+                      className="mt-1"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <Button

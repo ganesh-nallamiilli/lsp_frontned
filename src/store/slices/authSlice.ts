@@ -3,33 +3,38 @@ import axios from 'axios';
 import { config } from '../../config/env';
 
 interface LoginResponse {
-  data: {
-    id: number;
+  meta: {
+    status: boolean;
     message: string;
+  };
+  data: {
+    status: boolean;
+    message: string;
+    id: number;
     new_user: boolean;
     otp_sent: boolean;
-    status: boolean;
   };
-  status: boolean;
 }
 
 interface VerifyOtpResponse {
+  meta: {
+    status: boolean;
+    message: string;
+  };
   data: {
-    new_user: boolean;
+    message: string;
     status: boolean;
     token: string;
-    verified: boolean;
-    user_data: {
-      _id: number;
-      company_id: number;
+    user: {
+      id: number;
       email: string;
       mobile_number: string;
       name: string;
+      company_id: number;
       user_types: Array<{ name: string }>;
-      // ... other user data fields
+      access_template_ids: number[];
     };
   };
-  status: boolean;
 }
 
 interface VerifyOtpPayload {
@@ -44,6 +49,7 @@ interface AuthState {
   otpSent: boolean;
   isNewUser: boolean;
   token: string | null;
+  userProfile: UserProfile | null;
 }
 
 interface UserData {
@@ -58,13 +64,52 @@ interface RegistrationPayload {
   name: string;
   mobile_number: string;
   email: string;
-  address: {
+  gst_address: {
     building: string;
     locality: string;
     city: string;
     state: string;
     area_code: string;
   };
+}
+
+interface UserProfile {
+  _id: string;
+  email: string;
+  company_id: number;
+  user_types: Array<{ name: string }>;
+  is_active: boolean;
+  id: number;
+  otp: string;
+  bank_details: {
+    settlement_type: string;
+    upi_address: string;
+    beneficiary_name: string;
+    settlement_bank_account_no: string;
+    bank_name: string;
+    settlement_ifsc_code: string;
+  };
+  gst_number: string;
+  mobile_number: string;
+  name: string;
+  pan_number: string;
+  store_name: string;
+  draft_reasons: any[];
+  gst_address: {
+    building: string;
+    locality: string;
+    city: string;
+    state: string;
+    area_code: string;
+  };
+}
+
+interface UserProfileResponse {
+  meta: {
+    status: boolean;
+    message: string;
+  };
+  data: UserProfile;
 }
 
 const initialState: AuthState = {
@@ -74,6 +119,7 @@ const initialState: AuthState = {
   otpSent: false,
   isNewUser: false,
   token: null,
+  userProfile: null,
 };
 
 export const initiateLogin = createAsyncThunk(
@@ -81,7 +127,7 @@ export const initiateLogin = createAsyncThunk(
   async (login: string, { rejectWithValue }) => {
     try {
       const response = await axios.post<LoginResponse>(
-        `${config.apiBaseUrl}/core_user/login`,
+        `${config.apiBaseUrl}/auth/login`,
         { login }
       );
       return response.data;
@@ -96,7 +142,7 @@ export const verifyOtp = createAsyncThunk(
   async (payload: VerifyOtpPayload, { rejectWithValue }) => {
     try {
       const response = await axios.post<VerifyOtpResponse>(
-        `${config.apiBaseUrl}/core_user/verify_otp`,
+        `${config.apiBaseUrl}/auth/verify_otp`,
         payload
       );
       return response.data;
@@ -111,13 +157,14 @@ export const registerUser = createAsyncThunk(
   async (userData: RegistrationPayload, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('id');
       
-      if (!token) {
-        return rejectWithValue('No authentication token found');
+      if (!token || !userId) {
+        return rejectWithValue('No authentication token or user ID found');
       }
 
       const response = await axios.post(
-        `${config.apiBaseUrl}/core_user/user_onboarding`,
+        `${config.apiBaseUrl}/auth/${userId}/update`,
         userData,
         {
           headers: {
@@ -129,6 +176,62 @@ export const registerUser = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to register user');
+    }
+  }
+);
+
+export const fetchUserProfile = createAsyncThunk(
+  'auth/fetchUserProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const userId = localStorage.getItem('id');
+      const token = localStorage.getItem('token');
+      
+      if (!userId || !token) {
+        return rejectWithValue('No user ID or token found');
+      }
+
+      const url = `${config.apiBaseUrl}/auth/get/${userId}`;
+      console.log('Fetching profile from:', url);
+
+      const response = await axios.get<UserProfileResponse>(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      console.log('Profile response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Profile fetch error:', error.response || error);
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user profile');
+    }
+  }
+);
+
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateUserProfile',
+  async (userData: Partial<UserProfile>, { rejectWithValue }) => {
+    try {
+      const userId = localStorage.getItem('id');
+      const token = localStorage.getItem('token');
+      
+      if (!userId || !token) {
+        return rejectWithValue('No user ID or token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/auth/${userId}/update`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update profile');
     }
   }
 );
@@ -154,6 +257,10 @@ const authSlice = createSlice({
         state.userId = action.payload.data.id;
         state.otpSent = action.payload.data.otp_sent;
         state.isNewUser = action.payload.data.new_user;
+        
+        // Store id and new_user in localStorage
+        localStorage.setItem('id', action.payload.data.id.toString());
+        localStorage.setItem('new_user', action.payload.data.new_user.toString());
       })
       .addCase(initiateLogin.rejected, (state, action) => {
         state.loading = false;
@@ -169,19 +276,35 @@ const authSlice = createSlice({
         
         // Store important data in localStorage
         localStorage.setItem('token', action.payload.data.token);
-        localStorage.setItem('user_id', action.payload.data.user_data._id.toString());
-        localStorage.setItem('user_type', action.payload.data.user_data.user_types[0]?.name || '');
+        localStorage.setItem('user_type', action.payload.data.user.user_types[0]?.name || '');
         localStorage.setItem('user_details', JSON.stringify({
-          name: action.payload.data.user_data.name,
-          email: action.payload.data.user_data.email,
-          mobile_number: action.payload.data.user_data.mobile_number,
-          company_id: action.payload.data.user_data.company_id
+          name: action.payload.data.user.name,
+          email: action.payload.data.user.email,
+          mobile_number: action.payload.data.user.mobile_number,
+          company_id: action.payload.data.user.company_id
         }));
         localStorage.setItem('is_franchise', 
-          (action.payload.data.user_data.user_types[0]?.name === 'FRANCHISE_USER').toString()
+          (action.payload.data.user.user_types[0]?.name === 'FRANCHISE_USER').toString()
         );
+        // Add new_user to localStorage here if not already set
+        if (!localStorage.getItem('new_user')) {
+          localStorage.setItem('new_user', (!action.payload.data.user.name).toString());
+        }
       })
       .addCase(verifyOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userProfile = action.payload.data;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
