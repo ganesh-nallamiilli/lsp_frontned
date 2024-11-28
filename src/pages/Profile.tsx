@@ -97,7 +97,6 @@ const Profile: React.FC = () => {
     bank: false
   });
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [addresses, setAddresses] = useState<Address[]>([]);
 
   const [form, setForm] = useState<ProfileForm>({
     storeName: '',
@@ -176,24 +175,6 @@ const Profile: React.FC = () => {
       dispatch(fetchDeliveryAddresses());
     }
   }, [activeTab, dispatch]);
-
-  useEffect(() => {
-    if (activeTab === 'addresses') {
-      if (userProfile?.pickup_addresses) {
-        const formattedAddresses = userProfile.pickup_addresses.map(addr => ({
-          id: addr.id || String(Math.random()),
-          type: 'pickup' as const,
-          isDefault: addr.is_default || false,
-          building: addr.location?.address?.building || '',
-          locality: addr.location?.address?.locality || '',
-          city: addr.location?.address?.city || '',
-          state: addr.location?.address?.state || '',
-          zipCode: addr.location?.address?.area_code || ''
-        }));
-        setAddresses(formattedAddresses);
-      }
-    }
-  }, [activeTab, userProfile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -934,85 +915,152 @@ const Profile: React.FC = () => {
 
   const renderAddressTab = () => {
     return (
-      <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-        <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-          <div>
-            <h4 className="text-base font-medium text-gray-900">Addresses</h4>
-            <p className="text-sm text-gray-500 mt-1">Manage your pickup and delivery addresses</p>
-          </div>
-          <button
-            onClick={() => {
-              setEditingAddress(null);
-              setShowAddressModal(true);
-            }}
-            className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
-          >
-            <PlusCircle className="w-4 h-4" />
-            Add Address
-          </button>
-        </div>
-        <div className="p-6">
-          {addresses.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">No addresses found</p>
-              <button
-                onClick={() => {
-                  setEditingAddress(null);
-                  setShowAddressModal(true);
-                }}
-                className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                Add your first address
-              </button>
+      <div className="space-y-6">
+        {/* Header with Add Button */}
+        <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+          <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+            <div>
+              <h4 className="text-base font-medium text-gray-900">Addresses</h4>
+              <p className="text-sm text-gray-500 mt-1">Manage your pickup and delivery addresses</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {addresses.map((address) => (
-                <div 
-                  key={address.id}
-                  className="border rounded-lg p-4 flex justify-between items-start"
-                >
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${
-                        address.type === 'pickup' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-purple-100 text-purple-800'
-                      }`}>
-                        {address.type}
-                      </span>
-                      {address.isDefault && (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">
-                          Default
-                        </span>
+            <button
+              onClick={() => {
+                setEditingAddress(null);
+                setShowAddressModal(true);
+              }}
+              className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
+            >
+              <PlusCircle className="w-4 h-4" />
+              Add Address
+            </button>
+          </div>
+
+          {/* Pickup Addresses Section */}
+          <div className="p-6 border-b border-gray-100">
+            <h5 className="text-sm font-medium text-gray-900 mb-4">Pickup Addresses</h5>
+            {pickupAddresses.length === 0 ? (
+              <p className="text-gray-500 text-sm">No pickup addresses found</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {pickupAddresses.map((address) => (
+                  <div 
+                    key={address.id}
+                    className="border rounded-lg p-4 hover:border-blue-200 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h6 className="font-medium text-gray-900">{address.location.address.name}</h6>
+                        <p className="text-sm text-gray-600">{address.person.name}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingAddress({
+                              id: String(address.id),
+                              type: 'pickup',
+                              isDefault: false,
+                              building: address.location.address.building,
+                              locality: address.location.address.locality,
+                              city: address.location.address.city,
+                              state: address.location.address.state,
+                              zipCode: address.location.address.area_code,
+                            });
+                            setShowAddressModal(true);
+                          }}
+                          className="p-1.5 text-gray-600 hover:text-blue-600 rounded-md hover:bg-blue-50"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(String(address.id))}
+                          className="p-1.5 text-gray-600 hover:text-red-600 rounded-md hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-gray-600">
+                        {address.location.address.building}, {address.location.address.locality}
+                      </p>
+                      <p className="text-gray-600">
+                        {address.location.address.city}, {address.location.address.state} - {address.location.address.area_code}
+                      </p>
+                      <p className="text-gray-600">
+                        {address.contact.phone} | {address.contact.email}
+                      </p>
+                      {address.provider_store_details?.time && (
+                        <p className="text-gray-600 mt-2">
+                          Working hours: {address.provider_store_details.time.range.start} - {address.provider_store_details.time.range.end}
+                        </p>
                       )}
                     </div>
-                    <p className="text-gray-900">{address.building}</p>
-                    <p className="text-gray-600 text-sm">
-                      {address.locality}, {address.city}, {address.state} - {address.zipCode}
-                    </p>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingAddress(address);
-                        setShowAddressModal(true);
-                      }}
-                      className="p-2 text-gray-600 hover:text-blue-600"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteAddress(address.id)}
-                      className="p-2 text-gray-600 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Delivery Addresses Section */}
+          <div className="p-6">
+            <h5 className="text-sm font-medium text-gray-900 mb-4">Delivery Addresses</h5>
+            {deliveryAddresses.length === 0 ? (
+              <p className="text-gray-500 text-sm">No delivery addresses found</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {deliveryAddresses.map((address) => (
+                  <div 
+                    key={address.id}
+                    className="border rounded-lg p-4 hover:border-blue-200 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h6 className="font-medium text-gray-900">{address.location.address.name}</h6>
+                        <p className="text-sm text-gray-600">{address.person.name}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingAddress({
+                              id: String(address.id),
+                              type: 'delivery',
+                              isDefault: false,
+                              building: address.location.address.building,
+                              locality: address.location.address.locality,
+                              city: address.location.address.city,
+                              state: address.location.address.state,
+                              zipCode: address.location.address.area_code,
+                            });
+                            setShowAddressModal(true);
+                          }}
+                          className="p-1.5 text-gray-600 hover:text-blue-600 rounded-md hover:bg-blue-50"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(String(address.id))}
+                          className="p-1.5 text-gray-600 hover:text-red-600 rounded-md hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-gray-600">
+                        {address.location.address.building}, {address.location.address.locality}
+                      </p>
+                      <p className="text-gray-600">
+                        {address.location.address.city}, {address.location.address.state} - {address.location.address.area_code}
+                      </p>
+                      <p className="text-gray-600">
+                        {address.contact.phone} | {address.contact.email}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
