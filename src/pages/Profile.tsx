@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Camera, Lock, Save, PlusCircle, Pencil, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchUserProfile, updateUserProfile, createPickupAddress } from '../store/slices/authSlice';
+import { fetchUserProfile, updateUserProfile, createPickupAddress, fetchPickupAddresses, fetchDeliveryAddresses, createDeliveryAddress } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
 import TimeInput from '../components/TimeInput';
 
@@ -129,6 +129,9 @@ const Profile: React.FC = () => {
     }
   });
 
+  const pickupAddresses = useAppSelector((state) => state.auth.pickupAddresses);
+  const deliveryAddresses = useAppSelector((state) => state.auth.deliveryAddresses);
+
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
@@ -166,6 +169,13 @@ const Profile: React.FC = () => {
       });
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    if (activeTab === 'addresses') {
+      dispatch(fetchPickupAddresses());
+      dispatch(fetchDeliveryAddresses());
+    }
+  }, [activeTab, dispatch]);
 
   useEffect(() => {
     if (activeTab === 'addresses') {
@@ -331,6 +341,39 @@ const Profile: React.FC = () => {
         }
       } catch (error) {
         toast.error(error.message || 'Failed to create pickup address');
+      }
+    } else {
+      const payload = {
+        person: {
+          name: formData.contactPersonName
+        },
+        contact: {
+          phone: formData.phoneNumber,
+          email: formData.email
+        },
+        location: {
+          address: {
+            name: formData.storeName || formData.contactPersonName,
+            building: formData.building,
+            locality: formData.locality,
+            city: formData.city,
+            state: formData.state,
+            country: 'INDIA',
+            area_code: formData.zipCode
+          },
+          gps: "12.9789845,77.728393"
+        }
+      };
+
+      try {
+        const result = await dispatch(createDeliveryAddress(payload)).unwrap();
+        if (result.meta.status) {
+          toast.success('Delivery address created successfully');
+          dispatch(fetchDeliveryAddresses());
+          onClose();
+        }
+      } catch (error) {
+        toast.error(error.message || 'Failed to create delivery address');
       }
     }
   };

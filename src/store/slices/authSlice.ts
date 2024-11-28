@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { config } from '../../config/env';
+import { toast } from 'react-hot-toast';
 
 interface LoginResponse {
   meta: {
@@ -50,6 +51,8 @@ interface AuthState {
   isNewUser: boolean;
   token: string | null;
   userProfile: UserProfile | null;
+  pickupAddresses: PickupAddressResponse[];
+  deliveryAddresses: DeliveryAddressResponse[];
 }
 
 interface UserData {
@@ -146,6 +149,66 @@ interface PickupAddressPayload {
   };
 }
 
+interface PickupAddressResponse {
+  _id: string;
+  person: {
+    name: string;
+  };
+  contact: {
+    phone: string;
+    email: string;
+  };
+  location: {
+    gps: string;
+    address: {
+      name: string;
+      building: string;
+      locality: string;
+      city: string;
+      state: string;
+      area_code: string;
+      country: string;
+    };
+  };
+  provider_store_details: {
+    time: {
+      days: string;
+      schedule: {
+        holidays: string[];
+      };
+      range: {
+        start: string;
+        end: string;
+      };
+    };
+  };
+  id: number;
+}
+
+interface DeliveryAddressResponse {
+  _id: string;
+  person: {
+    name: string;
+  };
+  contact: {
+    phone: string;
+    email: string;
+  };
+  location: {
+    gps: string;
+    address: {
+      name: string;
+      building: string;
+      locality: string;
+      city: string;
+      state: string;
+      area_code: string;
+      country: string;
+    };
+  };
+  id: number;
+}
+
 const initialState: AuthState = {
   loading: false,
   error: null,
@@ -154,6 +217,8 @@ const initialState: AuthState = {
   isNewUser: false,
   token: null,
   userProfile: null,
+  pickupAddresses: [],
+  deliveryAddresses: [],
 };
 
 export const initiateLogin = createAsyncThunk(
@@ -281,7 +346,7 @@ export const createPickupAddress = createAsyncThunk(
       }
 
       const response = await axios.post(
-        `${config.apiBaseUrl}/delivery_address/create`,
+        `${config.apiBaseUrl}/pickup_address/create`,
         addressData,
         {
           headers: {
@@ -293,6 +358,101 @@ export const createPickupAddress = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create pickup address');
+    }
+  }
+);
+
+export const fetchPickupAddresses = createAsyncThunk(
+  'auth/fetchPickupAddresses',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/pickup_address`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch pickup addresses');
+    }
+  }
+);
+
+export const fetchDeliveryAddresses = createAsyncThunk(
+  'auth/fetchDeliveryAddresses',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/delivery_address`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch delivery addresses');
+    }
+  }
+);
+
+export const createDeliveryAddress = createAsyncThunk(
+  'auth/createDeliveryAddress',
+  async (addressData: {
+    person: {
+      name: string;
+    };
+    contact: {
+      phone: string;
+      email: string;
+    };
+    location: {
+      address: {
+        name: string;
+        building: string;
+        locality: string;
+        city: string;
+        state: string;
+        country: string;
+        area_code: string;
+      };
+      gps: string;
+    };
+  }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/delivery_address/create`,
+        addressData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create delivery address');
     }
   }
 );
@@ -368,6 +528,18 @@ const authSlice = createSlice({
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(fetchPickupAddresses.fulfilled, (state, action) => {
+        state.pickupAddresses = action.payload.data;
+      })
+      .addCase(fetchDeliveryAddresses.fulfilled, (state, action) => {
+        state.deliveryAddresses = action.payload.data;
+      })
+      .addCase(createDeliveryAddress.fulfilled, (state, action) => {
+        toast.success('Delivery address created successfully');
+      })
+      .addCase(createDeliveryAddress.rejected, (state, action) => {
+        toast.error(action.payload as string || 'Failed to create delivery address');
       });
   },
 });
