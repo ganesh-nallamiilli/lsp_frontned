@@ -35,52 +35,103 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <div className="flex space-x-3">
-          <select className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm">
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-            <option>Last 90 days</option>
-          </select>
-          <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
-            Download Report
-          </button>
+        
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-4 rounded-xl shadow-sm">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-600">Total Orders Amount</p>
+              <h3 className="text-2xl font-bold">₹14,036.13</h3>
+            </div>
+            <div className="text-teal-500">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-600">All Users Wallet Amount</p>
+              <h3 className="text-2xl font-bold">₹12,074.32</h3>
+            </div>
+            <div className="text-teal-500">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-xl shadow-sm">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-600">Total Platform Commission</p>
+              <h3 className="text-2xl font-bold">₹2,648.77</h3>
+            </div>
+            <div className="text-teal-500">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <KPICard
-          title="Total Orders"
-          value="1,234"
-          change={12}
-          icon={Package}
-          color="bg-blue-500"
-        />
-        <KPICard
-          title="Average Delivery Time"
-          value="2.3 days"
-          change={-8}
-          icon={Clock}
-          color="bg-green-500"
-        />
-        <KPICard
-          title="RTO Rate"
-          value="4.2%"
-          change={-2}
-          icon={RotateCcw}
-          color="bg-yellow-500"
-        />
-        <KPICard
-          title="Revenue"
-          value="₹52,389"
-          change={15}
-          icon={IndianRupee}
-          color="bg-purple-500"
-        />
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div className="bg-yellow-100 p-3 rounded-lg">
+              <Package className="w-6 h-6 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Created</p>
+              <p className="font-semibold">48</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <Package className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Accepted</p>
+              <p className="font-semibold">10</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <RotateCcw className="w-6 h-6 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">In Progress</p>
+              <p className="font-semibold">37</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div className="bg-green-100 p-3 rounded-lg">
+              <Package className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Completed</p>
+              <p className="font-semibold">199</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div className="bg-red-100 p-3 rounded-lg">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Cancelled</p>
+              <p className="font-semibold">57</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-lg font-semibold mb-6">Shipping Status</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-semibold">Shipping Status</h2>
+          <div className="p-2 bg-blue-50 rounded-lg">
+            <Truck className="w-6 h-6 text-blue-600" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="flex items-center p-4 bg-gray-50 rounded-lg">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
               <Package className="w-5 h-5 text-blue-600" />
@@ -138,6 +189,53 @@ const Dashboard: React.FC = () => {
             <div>
               <div className="text-sm text-gray-600">Order Delivered</div>
               <div className="text-lg font-semibold">199</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-1 h-6 bg-green-500 rounded-full"></div>
+              <h2 className="text-lg font-medium">Total RTO's</h2>
+              <span className="text-2xl font-bold">22</span>
+            </div>
+            <div className="bg-orange-50 p-2 rounded-lg">
+              <RotateCcw className="w-6 h-6 text-orange-400" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+              <div className="bg-indigo-100 p-2 rounded-lg">
+                <Package className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Initialized</p>
+                <p className="font-semibold">22</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Package className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Disposed</p>
+                <p className="font-semibold">0</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+              <div className="bg-red-100 p-2 rounded-lg">
+                <Package className="w-5 h-5 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Delivered</p>
+                <p className="font-semibold">0</p>
+              </div>
             </div>
           </div>
         </div>
