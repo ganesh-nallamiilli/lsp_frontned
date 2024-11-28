@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Camera, Lock, Save, PlusCircle, Pencil, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchUserProfile, updateUserProfile } from '../store/slices/authSlice';
+import { fetchUserProfile, updateUserProfile, createPickupAddress } from '../store/slices/authSlice';
+import { toast } from 'react-hot-toast';
+import TimeInput from '../components/TimeInput';
 
 interface ProfileForm {
   storeName: string;
@@ -27,6 +29,10 @@ interface ProfileForm {
     settlement_bank_account_no: string;
     bank_name: string;
     settlement_ifsc_code: string;
+  };
+  shopTime: {
+    start: string;
+    end: string;
   };
 }
 
@@ -81,16 +87,26 @@ const INDIAN_STATES = [
 ];
 
 const Profile: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { user } = useAuthStore();
+  const userProfile = useAppSelector((state) => state.auth.userProfile);
   const [activeTab, setActiveTab] = useState('basic');
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editMode, setEditMode] = useState({
+    basic: false,
+    bank: false
+  });
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
   const [form, setForm] = useState<ProfileForm>({
     storeName: '',
     website: '',
-    fullName: user?.fullName || '',
+    fullName: '',
     phoneNumber: '',
     gstNumber: '',
     panNumber: '',
-    email: user?.email || '',
+    email: '',
     logo: '',
     address: {
       building: '',
@@ -106,22 +122,14 @@ const Profile: React.FC = () => {
       settlement_bank_account_no: '',
       bank_name: '',
       settlement_ifsc_code: '',
+    },
+    shopTime: {
+      start: '',
+      end: ''
     }
   });
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [editMode, setEditMode] = useState({
-    basic: false,
-    address: false,
-    bank: false
-  });
-
-  const dispatch = useAppDispatch();
-  const { userProfile, loading, error } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log('Dispatching fetchUserProfile');
     dispatch(fetchUserProfile());
   }, [dispatch]);
 
@@ -150,47 +158,61 @@ const Profile: React.FC = () => {
           settlement_bank_account_no: userProfile.bank_details?.settlement_bank_account_no || '',
           bank_name: userProfile.bank_details?.bank_name || '',
           settlement_ifsc_code: userProfile.bank_details?.settlement_ifsc_code || '',
+        },
+        shopTime: {
+          start: userProfile.provider_store_details?.time?.range?.start || '',
+          end: userProfile.provider_store_details?.time?.range?.end || ''
         }
       });
     }
   }, [userProfile]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (activeTab === 'addresses') {
+      if (userProfile?.pickup_addresses) {
+        const formattedAddresses = userProfile.pickup_addresses.map(addr => ({
+          id: addr.id || String(Math.random()),
+          type: 'pickup' as const,
+          isDefault: addr.is_default || false,
+          building: addr.location?.address?.building || '',
+          locality: addr.location?.address?.locality || '',
+          city: addr.location?.address?.city || '',
+          state: addr.location?.address?.state || '',
+          zipCode: addr.location?.address?.area_code || ''
+        }));
+        setAddresses(formattedAddresses);
+      }
+    }
+  }, [activeTab, userProfile]);
 
-  if (error) {
-    return (
-      <div className="p-6 text-center">
-        <div className="text-red-600 mb-4">Error: {error}</div>
-        <button 
-          onClick={() => dispatch(fetchUserProfile())}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  // Handler Functions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const [parent, child] = name.split('.');
     
-    if (child) {
+    if (name.startsWith('shopTime.')) {
+      const timeField = name.split('.')[1];
       setForm(prev => ({
         ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: value
+        shopTime: {
+          ...prev.shopTime,
+          [timeField]: value
+        }
+      }));
+    } else if (name.startsWith('bankDetails.')) {
+      const field = name.split('.')[1];
+      setForm(prev => ({
+        ...prev,
+        bankDetails: {
+          ...prev.bankDetails,
+          [field]: value
+        }
+      }));
+    } else if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
+      setForm(prev => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [field]: value
         }
       }));
     } else {
@@ -201,26 +223,115 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleSaveAddress = async (addressData: Omit<Address, 'id'>) => {
+  const handleSaveBasicInfo = async () => {
     try {
-      // If editing existing address
-      if (editingAddress) {
-        const updatedAddresses = addresses.map(addr => 
-          addr.id === editingAddress.id ? { ...addressData, id: addr.id } : addr
-        );
-        setAddresses(updatedAddresses);
-      } else {
-        // Add new address
-        const newAddress = {
-          ...addressData,
-          id: `addr_${Date.now()}` // Generate temporary ID
-        };
-        setAddresses([...addresses, newAddress]);
-      }
+      await dispatch(updateUserProfile({
+        name: form.fullName,
+        store_name: form.storeName,
+        mobile_number: form.phoneNumber,
+        email: form.email,
+        gst_number: form.gstNumber,
+        pan_number: form.panNumber,
+        gst_address: {
+          building: form.address.building,
+          locality: form.address.locality,
+          city: form.address.city,
+          state: form.address.state,
+          area_code: form.address.zipCode,
+        },
+        provider_store_details: {
+          time: {
+            range: {
+              start: form.shopTime.start,
+              end: form.shopTime.end
+            }
+          }
+        }
+      }));
+      setEditMode(prev => ({ ...prev, basic: false }));
+      toast.success('Basic information updated successfully');
+    } catch (error) {
+      toast.error('Failed to update basic information');
+    }
+  };
+
+  const handleSaveAddressForm = async (formData: any) => {
+    try {
+      await handleSaveAddress(formData);
       setShowAddressModal(false);
-      setEditingAddress(null);
+      
+      if (userProfile?.pickup_addresses) {
+        const formattedAddresses = userProfile.pickup_addresses.map(addr => ({
+          id: addr.id || String(Math.random()),
+          type: 'pickup' as const,
+          isDefault: addr.is_default || false,
+          building: addr.location?.address?.building || '',
+          locality: addr.location?.address?.locality || '',
+          city: addr.location?.address?.city || '',
+          state: addr.location?.address?.state || '',
+          zipCode: addr.location?.address?.area_code || ''
+        }));
+        setAddresses(formattedAddresses);
+      }
     } catch (error) {
       console.error('Error saving address:', error);
+      toast.error('Failed to save address');
+    }
+  };
+
+  const handleSaveAddress = async (formData) => {
+    if (formData.type === 'pickup') {
+      const workingDays = formData.workingDays.map(day => {
+        const daysMap = {
+          'Monday': '1', 'Tuesday': '2', 'Wednesday': '3', 'Thursday': '4',
+          'Friday': '5', 'Saturday': '6', 'Sunday': '7'
+        };
+        return daysMap[day];
+      }).join(',');
+
+      const payload = {
+        person: {
+          name: formData.contactPersonName
+        },
+        contact: {
+          phone: formData.phoneNumber,
+          email: formData.email
+        },
+        location: {
+          address: {
+            name: formData.storeName,
+            building: formData.building,
+            locality: formData.locality,
+            city: formData.city,
+            state: formData.state,
+            country: 'INDIA',
+            area_code: formData.zipCode
+          },
+          gps: "12.9789845,77.728393"
+        },
+        provider_store_details: {
+          time: {
+            days: workingDays,
+            schedule: {
+              holidays: []
+            },
+            range: {
+              start: formatTimeForApi(formData.shopTime.start),
+              end: formatTimeForApi(formData.shopTime.end)
+            }
+          }
+        }
+      };
+
+      try {
+        const result = await dispatch(createPickupAddress(payload)).unwrap();
+        if (result.meta.status) {
+          toast.success('Pickup address created successfully');
+          onClose();
+        }
+      } catch (error) {
+        toast.error(error.message || 'Failed to create pickup address');
+      }
     }
   };
 
@@ -228,8 +339,10 @@ const Profile: React.FC = () => {
     try {
       const updatedAddresses = addresses.filter(addr => addr.id !== addressId);
       setAddresses(updatedAddresses);
+      toast.success('Address deleted successfully');
     } catch (error) {
       console.error('Error deleting address:', error);
+      toast.error('Failed to delete address');
     }
   };
 
@@ -259,38 +372,6 @@ const Profile: React.FC = () => {
       toggleEdit(section);
     } catch (error) {
       console.error('Failed to save changes:', error);
-    }
-  };
-
-  const handleSaveBasicInfo = async () => {
-    const userId = localStorage.getItem('id');
-    if (!userId) return;
-
-    const updateData = {
-      store_name: form.storeName,
-      name: form.fullName,
-      mobile_number: form.phoneNumber,
-      gst_number: form.gstNumber,
-      pan_number: form.panNumber,
-      email: form.email,
-      website: form.website,
-      gst_address: {
-        building: form.address.building,
-        locality: form.address.locality,
-        city: form.address.city,
-        state: form.address.state,
-        area_code: form.address.zipCode
-      }
-    };
-
-    try {
-      await dispatch(updateUserProfile(updateData)).unwrap();
-      setEditMode(prev => ({ ...prev, basic: false }));
-      // Refresh profile data
-      dispatch(fetchUserProfile());
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      // Handle error (show toast notification, etc.)
     }
   };
 
@@ -828,68 +909,73 @@ const Profile: React.FC = () => {
           </button>
         </div>
         <div className="p-6">
-          <div className="space-y-4">
-            {addresses.map((address) => (
-              <div 
-                key={address.id}
-                className="border rounded-lg p-4 flex justify-between items-start"
+          {addresses.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No addresses found</p>
+              <button
+                onClick={() => {
+                  setEditingAddress(null);
+                  setShowAddressModal(true);
+                }}
+                className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${
-                      address.type === 'pickup' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-purple-100 text-purple-800'
-                    }`}>
-                      {address.type}
-                    </span>
-                    {address.isDefault && (
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">
-                        Default
+                Add your first address
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {addresses.map((address) => (
+                <div 
+                  key={address.id}
+                  className="border rounded-lg p-4 flex justify-between items-start"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${
+                        address.type === 'pickup' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-purple-100 text-purple-800'
+                      }`}>
+                        {address.type}
                       </span>
-                    )}
+                      {address.isDefault && (
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-gray-900">{address.building}</p>
+                    <p className="text-gray-600 text-sm">
+                      {address.locality}, {address.city}, {address.state} - {address.zipCode}
+                    </p>
                   </div>
-                  <p className="text-gray-900">{address.building}</p>
-                  <p className="text-gray-600 text-sm">
-                    {address.locality}, {address.city}, {address.state} - {address.zipCode}
-                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditingAddress(address);
+                        setShowAddressModal(true);
+                      }}
+                      className="p-2 text-gray-600 hover:text-blue-600"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteAddress(address.id)}
+                      className="p-2 text-gray-600 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setEditingAddress(address);
-                      setShowAddressModal(true);
-                    }}
-                    className="p-2 text-gray-600 hover:text-blue-600"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteAddress(address.id)}
-                    className="p-2 text-gray-600 hover:text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
-  const AddressModal = ({ 
-    isOpen, 
-    onClose, 
-    address, 
-    onSave 
-  }: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    address?: Address | null; 
-    onSave: (address: Omit<Address, 'id'>) => void; 
-  }) => {
+  const AddressModal = ({ isOpen, onClose, address, onSave }) => {
     const [form, setForm] = useState({
       type: address?.type || 'pickup',
       isDefault: address?.isDefault || false,
@@ -897,25 +983,322 @@ const Profile: React.FC = () => {
       locality: address?.locality || '',
       city: address?.city || '',
       state: address?.state || '',
-      zipCode: address?.zipCode || ''
+      zipCode: address?.zipCode || '',
+      storeName: address?.storeName || '',
+      contactPersonName: address?.contactPersonName || '',
+      email: address?.email || '',
+      phoneNumber: address?.phoneNumber || '',
+      workingDays: address?.workingDays || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      shopTime: {
+        start: address?.shopTime?.start || '',
+        end: address?.shopTime?.end || ''
+      }
     });
+
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      
+      if (name.startsWith('shopTime.')) {
+        const timeField = name.split('.')[1];
+        setForm(prev => ({
+          ...prev,
+          shopTime: {
+            ...prev.shopTime,
+            [timeField]: value
+          }
+        }));
+      } else {
+        setForm(prev => ({
+          ...prev,
+          [name]: value
+        }));
+      }
+    };
 
     if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg w-full max-w-md p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">
-              {address ? 'Edit Address' : 'Add New Address'}
-            </h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </button>
+      <>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150]" onClick={onClose} />
+        
+        <div className="fixed inset-0 flex items-center justify-center z-[160] p-4">
+          <div 
+            className="bg-white rounded-xl w-full max-w-2xl shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {address ? 'Edit Address' : 'Add New Address'}
+                </h3>
+                <button 
+                  onClick={onClose} 
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+              <div className="space-y-6">
+                {/* Address Type Selection */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select Address Type
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex-1">
+                      <input
+                        type="radio"
+                        name="type"
+                        value="pickup"
+                        checked={form.type === 'pickup'}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                                    peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                        <span className="text-sm font-medium peer-checked:text-blue-600">Pickup Address</span>
+                      </div>
+                    </label>
+                    <label className="flex-1">
+                      <input
+                        type="radio"
+                        name="type"
+                        value="delivery"
+                        checked={form.type === 'delivery'}
+                        onChange={handleInputChange}
+                        className="sr-only peer"
+                      />
+                      <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                                    peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                        <span className="text-sm font-medium peer-checked:text-blue-600">Delivery Address</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Pickup Address Specific Fields */}
+                {form.type === 'pickup' && (
+                  <div className="space-y-6 border-b border-gray-100 pb-6">
+                    <h4 className="font-medium text-gray-900">Pickup Location Details</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Store Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="storeName"
+                        value={form.storeName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Working Days *
+                      </label>
+                      <div className="grid grid-cols-4 gap-3">
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                          <label key={day} className="relative flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              name="workingDays"
+                              value={day}
+                              checked={form.workingDays.includes(day)}
+                              onChange={(e) => {
+                                const days = e.target.checked 
+                                  ? [...form.workingDays, day]
+                                  : form.workingDays.filter(d => d !== day);
+                                setForm(prev => ({ ...prev, workingDays: days }));
+                              }}
+                              className="sr-only peer"
+                            />
+                            <div className="w-full py-2 text-center text-sm border rounded-md cursor-pointer
+                                          peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-600
+                                          hover:bg-gray-50">
+                              {day.slice(0, 3)}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TimeInput
+                        label="Shop Opening Time"
+                        name="shopTime.start"
+                        value={form.shopTime.start}
+                        onChange={handleInputChange}
+                        required
+                      />
+                      <TimeInput
+                        label="Shop Closing Time"
+                        name="shopTime.end"
+                        value={form.shopTime.end}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Contact Details */}
+                <div className="space-y-6 border-b border-gray-100 pb-6">
+                  <h4 className="font-medium text-gray-900">Contact Details</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Contact Person Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="contactPersonName"
+                        value={form.contactPersonName}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={form.phoneNumber}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        maxLength={10}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email ID *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Address Details */}
+                <div className="space-y-6">
+                  <h4 className="font-medium text-gray-900">Address Details</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Building *
+                    </label>
+                    <input
+                      type="text"
+                      name="building"
+                      value={form.building}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Locality *
+                    </label>
+                    <input
+                      type="text"
+                      name="locality"
+                      value={form.locality}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={form.city}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        State *
+                      </label>
+                      <select
+                        name="state"
+                        value={form.state}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      >
+                        <option value="">Select State</option>
+                        {INDIAN_STATES.map(state => (
+                          <option key={state} value={state}>{state}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Pin Code *
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={form.zipCode}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        maxLength={6}
+                        pattern="[0-9]*"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
+                  <button
+                    onClick={onClose}
+                    className="px-6 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => onSave(form)}
+                    className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                  >
+                    Save Address
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          {/* Add form fields for address */}
         </div>
-      </div>
+      </>
     );
   };
 
@@ -946,6 +1329,11 @@ const Profile: React.FC = () => {
         </nav>
       </div>
     );
+  };
+
+  const formatTimeForApi = (time: string) => {
+    // Convert "HH:mm" to "HHmm"
+    return time.replace(':', '');
   };
 
   return (
@@ -1023,7 +1411,7 @@ const Profile: React.FC = () => {
             isOpen={showAddressModal}
             onClose={() => setShowAddressModal(false)}
             address={editingAddress}
-            onSave={handleSaveAddress}
+            onSave={handleSaveAddressForm}
           />
         )}
       </div>

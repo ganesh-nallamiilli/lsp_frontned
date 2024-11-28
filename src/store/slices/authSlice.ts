@@ -112,6 +112,40 @@ interface UserProfileResponse {
   data: UserProfile;
 }
 
+interface PickupAddressPayload {
+  person: {
+    name: string;
+  };
+  contact: {
+    phone: string;
+    email: string;
+  };
+  location: {
+    address: {
+      name: string;
+      building: string;
+      locality: string;
+      city: string;
+      state: string;
+      country: string;
+      area_code: string;
+    };
+    gps: string;
+  };
+  provider_store_details: {
+    time: {
+      days: string;
+      schedule: {
+        holidays: string[];
+      };
+      range: {
+        start: string;
+        end: string;
+      };
+    };
+  };
+}
+
 const initialState: AuthState = {
   loading: false,
   error: null,
@@ -232,6 +266,33 @@ export const updateUserProfile = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update profile');
+    }
+  }
+);
+
+export const createPickupAddress = createAsyncThunk(
+  'auth/createPickupAddress',
+  async (addressData: PickupAddressPayload, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/delivery_address/create`,
+        addressData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create pickup address');
     }
   }
 );
