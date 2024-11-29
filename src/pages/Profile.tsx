@@ -219,6 +219,7 @@ const Profile: React.FC = () => {
       await dispatch(updateUserProfile({
         name: form.fullName,
         store_name: form.storeName,
+        website: form.website,
         mobile_number: form.phoneNumber,
         email: form.email,
         gst_number: form.gstNumber,
