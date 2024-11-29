@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Package,
   Clock,
@@ -20,6 +20,14 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import KPICard from '../components/dashboard/KPICard';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  fetchShippingDetails,
+  fetchDashboardCounts,
+  fetchRTODetails,
+  fetchWalletDetails,
+  fetchUserProfile,
+} from '../store/slices/dashboardSlice';
 
 const data = [
   { name: 'Jan', orders: 4000, revenue: 2400 },
@@ -31,6 +39,23 @@ const data = [
 ];
 
 const Dashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { 
+    shippingDetails, 
+    dashboardCounts, 
+    rtoDetails,
+    walletDetails,
+    userProfile 
+  } = useAppSelector((state) => state.dashboard);
+
+  useEffect(() => {
+    dispatch(fetchShippingDetails());
+    dispatch(fetchDashboardCounts());
+    dispatch(fetchRTODetails());
+    dispatch(fetchWalletDetails());
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -43,7 +68,9 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-gray-600">Total Orders Amount</p>
-              <h3 className="text-2xl font-bold">₹14,036.13</h3>
+              <h3 className="text-2xl font-bold">
+                ₹{dashboardCounts?.total_orders_amount || '0.00'}
+              </h3>
             </div>
             <div className="text-teal-500">
               <TrendingUp className="w-6 h-6" />
@@ -54,7 +81,9 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-gray-600">All Users Wallet Amount</p>
-              <h3 className="text-2xl font-bold">₹12,074.32</h3>
+              <h3 className="text-2xl font-bold">
+                ₹{walletDetails?.total_available || '0.00'}
+              </h3>
             </div>
             <div className="text-teal-500">
               <TrendingUp className="w-6 h-6" />
@@ -65,7 +94,9 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-gray-600">Total Platform Commission</p>
-              <h3 className="text-2xl font-bold">₹2,648.77</h3>
+              <h3 className="text-2xl font-bold">
+                ₹{dashboardCounts?.total_platform_charge || '0.00'}
+              </h3>
             </div>
             <div className="text-teal-500">
               <TrendingUp className="w-6 h-6" />
@@ -81,8 +112,8 @@ const Dashboard: React.FC = () => {
               <Package className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Created</p>
-              <p className="font-semibold">48</p>
+              <p className="text-sm text-gray-600">Pending</p>
+              <p className="font-semibold">{shippingDetails?.pending || 0}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
@@ -200,7 +231,9 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center space-x-3">
               <div className="w-1 h-6 bg-green-500 rounded-full"></div>
               <h2 className="text-lg font-medium">Total RTO's</h2>
-              <span className="text-2xl font-bold">22</span>
+              <span className="text-2xl font-bold">
+                {dashboardCounts?.total_rtos || 0}
+              </span>
             </div>
             <div className="bg-orange-50 p-2 rounded-lg">
               <RotateCcw className="w-6 h-6 text-orange-400" />
