@@ -1,53 +1,100 @@
 import React from 'react';
-import { Search, Calendar, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface OrderFiltersProps {
   onSearch: (query: string) => void;
-  onDateChange: (date: string) => void;
-  onStatusChange: (status: string) => void;
+  onShipmentTypeChange: (type: string) => void;
+  onProviderChange: (provider: string) => void;
+  onFulfillmentStatusChange: (status: string) => void;
+  onCreatedByChange: (creator: string) => void;
+  onDateRangeChange: (startDate: string, endDate: string) => void;
 }
 
 const OrderFilters: React.FC<OrderFiltersProps> = ({
   onSearch,
-  onDateChange,
-  onStatusChange,
+  onShipmentTypeChange,
+  onProviderChange,
+  onFulfillmentStatusChange,
+  onCreatedByChange,
+  onDateRangeChange,
 }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="relative">
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {/* Search Input */}
+        <div className="relative min-w-[240px]">
           <input
             type="text"
-            placeholder="Search orders..."
+            placeholder="Search Order ID/ Transaction ID"
             onChange={(e) => onSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full pl-8 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
           />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
         </div>
 
-        <div className="relative">
+        {/* Shipment Type Dropdown */}
+        <div className="min-w-[160px]">
+          <select
+            onChange={(e) => onShipmentTypeChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none bg-white"
+          >
+            <option value="">Shipment Type</option>
+            <option value="express">Express</option>
+            <option value="standard">Standard</option>
+            {/* Add more shipment types as needed */}
+          </select>
+        </div>
+
+        {/* Provider Dropdown */}
+        <div className="min-w-[160px]">
+          <select
+            onChange={(e) => onProviderChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none bg-white"
+          >
+            <option value="">Provider</option>
+            {/* Add provider options */}
+          </select>
+        </div>
+
+        {/* Fulfillment Status Dropdown */}
+        <div className="min-w-[160px]">
+          <select
+            onChange={(e) => onFulfillmentStatusChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none bg-white"
+          >
+            <option value="">Fulfillment Status</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="completed">Completed</option>
+            {/* Add more status options */}
+          </select>
+        </div>
+
+        {/* Created By Dropdown */}
+        <div className="min-w-[160px]">
+          <select
+            onChange={(e) => onCreatedByChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none bg-white"
+          >
+            <option value="">Created By</option>
+            {/* Add creator options */}
+          </select>
+        </div>
+
+        {/* Date Range Inputs */}
+        <div className="flex gap-2">
           <input
             type="date"
-            onChange={(e) => onDateChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            onChange={(e) => onDateRangeChange(e.target.value, '')}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+            placeholder="From Date"
           />
-          <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
-
-        <div className="relative">
-          <select
-            onChange={(e) => onStatusChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none"
-          >
-            <option value="">All Statuses</option>
-            <option value="created">Created</option>
-            <option value="ready_to_ship">Ready to Ship</option>
-            <option value="accepted">Accepted</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <Filter className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          <input
+            type="date"
+            onChange={(e) => onDateRangeChange('', e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+            placeholder="To Date"
+          />
         </div>
       </div>
     </div>
