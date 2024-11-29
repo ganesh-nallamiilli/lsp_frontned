@@ -1491,16 +1491,7 @@ const Profile: React.FC = () => {
               >
                 Basic Information
               </button>
-              <button
-                onClick={() => setActiveTab('addresses')}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'addresses'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Addresses
-              </button>
+              
               <button
                 onClick={() => setActiveTab('bank')}
                 className={`pb-4 px-1 border-b-2 font-medium text-sm ${
@@ -1510,6 +1501,16 @@ const Profile: React.FC = () => {
                 }`}
               >
                 Bank Details
+              </button>
+              <button
+                onClick={() => setActiveTab('addresses')}
+                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'addresses'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Addresses
               </button>
             </nav>
           </div>
