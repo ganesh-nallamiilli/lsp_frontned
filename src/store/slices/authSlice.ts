@@ -484,6 +484,106 @@ export const updatePickupAddress = createAsyncThunk(
   }
 );
 
+export const updateDeliveryAddress = createAsyncThunk(
+  'auth/updateDeliveryAddress',
+  async ({ id, addressData }: { 
+    id: string; 
+    addressData: {
+      person: {
+        name: string;
+      };
+      contact: {
+        phone: string;
+        email: string;
+      };
+      location: {
+        address: {
+          name: string;
+          building: string;
+          locality: string;
+          city: string;
+          state: string;
+          country: string;
+          area_code: string;
+        };
+        gps: string;
+      };
+    }
+  }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/delivery_address/${id}/update`,
+        addressData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update delivery address');
+    }
+  }
+);
+
+export const deletePickupAddress = createAsyncThunk(
+  'auth/deletePickupAddress',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.delete(
+        `${config.apiBaseUrl}/pickup_address/${id}/delete`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete pickup address');
+    }
+  }
+);
+
+export const deleteDeliveryAddress = createAsyncThunk(
+  'auth/deleteDeliveryAddress',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.delete(
+        `${config.apiBaseUrl}/delivery_address/${id}/delete`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete delivery address');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
