@@ -1,37 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchRTOOrders } from '../store/slices/rtoSlice';
+import { RootState } from '../store/store';
 import { Download, RotateCcw } from 'lucide-react';
 import OrdersTable from '../components/orders/OrdersTable';
 import OrderFilters from '../components/orders/OrderFilters';
 import { Order } from '../types/orders';
 
-const mockRTOOrders: Order[] = [
-  {
-    id: '1',
-    customerName: 'John Smith',
-    orderNumber: 'RTO-2024-001',
-    status: 'in_progress',
-    createdAt: '2024-03-15',
-    total: 199.99,
-    items: [
-      {
-        id: '1',
-        name: 'Product 1',
-        quantity: 1,
-        price: 199.99,
-      },
-    ],
-    shippingAddress: {
-      street: '456 Oak St',
-      city: 'Chicago',
-      state: 'IL',
-      zipCode: '60601',
-      country: 'USA',
-    },
-  },
-];
-
 const RTO: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>(mockRTOOrders);
+  const dispatch = useDispatch();
+  const { orders, loading, error } = useSelector((state: RootState) => state.rto);
+
+  useEffect(() => {
+    dispatch(fetchRTOOrders() as any);
+  }, [dispatch]);
+
+  console.log("orders>>>>>>>>>>>>>>>>>>>>>",orders);
 
   const handleSearch = (query: string) => {
     // Implement search logic
@@ -61,6 +45,39 @@ const RTO: React.FC = () => {
     // Implement delete logic
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading orders...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center bg-red-50 p-6 rounded-lg max-w-md">
+          <div className="text-red-600 mb-4">
+            <svg className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-red-800">Error Loading Orders</h3>
+          <p className="mt-2 text-sm text-red-600">{error}</p>
+          <button
+            onClick={() => dispatch(fetchRTOOrders())}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -77,42 +94,6 @@ const RTO: React.FC = () => {
           <Download className="w-4 h-4 mr-2" />
           Export RTO Data
         </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-red-100 rounded-full">
-              <RotateCcw className="h-6 w-6 text-red-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total RTO</p>
-              <p className="text-2xl font-bold text-gray-900">24</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <RotateCcw className="h-6 w-6 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending RTO</p>
-              <p className="text-2xl font-bold text-gray-900">8</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-100 rounded-full">
-              <RotateCcw className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Completed RTO</p>
-              <p className="text-2xl font-bold text-gray-900">16</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">

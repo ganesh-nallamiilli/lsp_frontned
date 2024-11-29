@@ -30,7 +30,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = orders.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(orders.length / itemsPerPage);
-
+  console.log("Current Items",currentItems);
   // Pagination controls
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -113,53 +113,43 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Cancellation/Failure/return reason</th>
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Platform Charge Amount</th>
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Shipping charges</th>
-              <th scope="col" className="px-6 py-3 whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((order) => (
               <tr key={order.id} className="bg-white border-b hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">{order.logisticsBuyerNpName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.logisticsSellerNpName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{new Date(order.createdAt).toLocaleString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.createdBy}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.networkOrderId}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.retailOrderId}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.networkTransactionId}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.logisticsSellerNpOrderId}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.context?.bap_id || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.context?.bpp_id || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{new Date(order?.createdAt).toLocaleString()}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.billing_address?.name || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.network_order_id || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order["@ondc/org/linked_order"]?.order?.id || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.transaction_id || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.network_order_id || "-"}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                    {order.status.replace('_', ' ').toUpperCase()}
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.state)}`}>
+                      {order?.state && order?.state.replace('_', ' ').toUpperCase() || "-"}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.fulfillmentStatus}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.rtoStatus}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{new Date(order.updatedAt).toLocaleString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.readyToShip ? 'Yes' : 'No'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.awbNo}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.readyToShipTimestamp}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.shipmentType}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.logisticsProvider}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.promisedTatDelivery}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.shippedDateTime}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.deliveredDateTime}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.pickupCity}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.deliveryCity}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.cancelledDateTime}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.cancelledBy}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.cancellationReason}</td>
-                <td className="px-6 py-4 whitespace-nowrap">${order.platformChargeAmount?.toFixed(2)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">${order.shippingCharges?.toFixed(2)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleViewOrder(order)} 
-                      className="p-1 hover:bg-gray-100 rounded-full"
-                    >
-                      <Eye className="h-4 w-4 text-gray-500" />
-                    </button>
-                  </div>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.fulfilment_state || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.rto_fulfillment_state || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{new Date(order?.updatedAt).toLocaleString()}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.ready_to_ship|| "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.fulfillments?.find(item => item?.["@ondc/org/awb_no"])?.["@ondc/org/awb_no"]  || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.context?.timestamp || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.category_type || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.provider_descriptor?.name || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.end_location?.time?.range?.end || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.shipped_at || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.ready_to_ship_timeline || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.billing_address?.address?.city || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.end_location?.location?.address?.city || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.cancelled_at || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.cancelled_by || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.cancellationReason || "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.platform_charges ? parseInt(order?.platform_charges).toFixed(2) : "-"}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order?.quote?.price?.value ? parseInt(order?.quote?.price?.value).toFixed(2) : "-"}</td>
+                
               </tr>
             ))}
           </tbody>
