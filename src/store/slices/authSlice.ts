@@ -457,6 +457,33 @@ export const createDeliveryAddress = createAsyncThunk(
   }
 );
 
+export const updatePickupAddress = createAsyncThunk(
+  'auth/updatePickupAddress',
+  async ({ id, addressData }: { id: string; addressData: PickupAddressPayload }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        return rejectWithValue('No authentication token found');
+      }
+
+      const response = await axios.post(
+        `${config.apiBaseUrl}/pickup_address/${id}/update`,
+        addressData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update pickup address');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,

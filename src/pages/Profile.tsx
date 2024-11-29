@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Camera, Lock, Save, PlusCircle, Pencil, Trash2, X } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchUserProfile, updateUserProfile, createPickupAddress, fetchPickupAddresses, fetchDeliveryAddresses, createDeliveryAddress } from '../store/slices/authSlice';
+import { fetchUserProfile, updateUserProfile, createPickupAddress, fetchPickupAddresses, fetchDeliveryAddresses, createDeliveryAddress, updatePickupAddress } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
 import TimeInput from '../components/TimeInput';
 
@@ -315,13 +315,25 @@ const Profile: React.FC = () => {
       };
 
       try {
-        const result = await dispatch(createPickupAddress(payload)).unwrap();
+        let result;
+        if (editingAddress?.id) {
+          // Update existing address
+          result = await dispatch(updatePickupAddress({
+            id: editingAddress.id,
+            addressData: payload
+          })).unwrap();
+        } else {
+          // Create new address
+          result = await dispatch(createPickupAddress(payload)).unwrap();
+        }
+
         if (result.meta.status) {
-          toast.success('Pickup address created successfully');
-          onClose();
+          toast.success(editingAddress?.id ? 'Pickup address updated successfully' : 'Pickup address created successfully');
+          dispatch(fetchPickupAddresses());
+          setShowAddressModal(false);
         }
       } catch (error) {
-        toast.error(error.message || 'Failed to create pickup address');
+        toast.error(error.message || 'Failed to save pickup address');
       }
     } else {
       const payload = {
@@ -964,6 +976,21 @@ const Profile: React.FC = () => {
                               city: address.location.address.city,
                               state: address.location.address.state,
                               zipCode: address.location.address.area_code,
+                              storeName: address.location.address.name,
+                              contactPersonName: address.person.name,
+                              email: address.contact.email,
+                              phoneNumber: address.contact.phone,
+                              workingDays: address.provider_store_details?.time?.days?.split(',').map(day => {
+                                const daysMap = {
+                                  '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday', '4': 'Thursday',
+                                  '5': 'Friday', '6': 'Saturday', '7': 'Sunday'
+                                };
+                                return daysMap[day];
+                              }) || [],
+                              shopTime: {
+                                start: address.provider_store_details?.time?.range?.start?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || '',
+                                end: address.provider_store_details?.time?.range?.end?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || ''
+                              }
                             });
                             setShowAddressModal(true);
                           }}
@@ -1030,6 +1057,10 @@ const Profile: React.FC = () => {
                               city: address.location.address.city,
                               state: address.location.address.state,
                               zipCode: address.location.address.area_code,
+                              storeName: address.location.address.name,
+                              contactPersonName: address.person.name,
+                              email: address.contact.email,
+                              phoneNumber: address.contact.phone
                             });
                             setShowAddressModal(true);
                           }}
