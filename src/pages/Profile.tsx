@@ -386,16 +386,14 @@ const Profile: React.FC = () => {
 
   const handleDeleteAddress = async (addressId: string, type: 'pickup' | 'delivery') => {
     try {
-      if (window.confirm('Are you sure you want to delete this address?')) {
-        if (type === 'pickup') {
-          await dispatch(deletePickupAddress(addressId)).unwrap();
-          toast.success('Pickup address deleted successfully');
-          dispatch(fetchPickupAddresses()); // Refresh the list
-        } else {
-          await dispatch(deleteDeliveryAddress(addressId)).unwrap();
-          toast.success('Delivery address deleted successfully');
-          dispatch(fetchDeliveryAddresses()); // Refresh the list
-        }
+      if (type === 'pickup') {
+        await dispatch(deletePickupAddress(addressId)).unwrap();
+        toast.success('Pickup address deleted successfully');
+        dispatch(fetchPickupAddresses()); // Refresh the list
+      } else {
+        await dispatch(deleteDeliveryAddress(addressId)).unwrap();
+        toast.success('Delivery address deleted successfully');
+        dispatch(fetchDeliveryAddresses()); // Refresh the list
       }
     } catch (error: any) {
       toast.error(error.message || `Failed to delete ${type} address`);
@@ -945,67 +943,118 @@ const Profile: React.FC = () => {
   const renderAddressCard = (address: any, type: 'pickup' | 'delivery') => {
     return (
       <div key={address.id} className="bg-white border border-gray-200 rounded-lg p-4">
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <h6 className="font-medium text-gray-900">{address.location.address.name}</h6>
-            <p className="text-sm text-gray-600">{address.person.name}</p>
+        <div className="space-y-4">
+          {/* Header with actions */}
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              {type === 'pickup' ? (
+                // Pickup address header
+                <h4 className="font-medium text-gray-900">
+                  {address.location?.address?.name}
+                </h4>
+              ) : (
+                // Delivery address header - Contact Person Name prominent
+                <>
+                  <h4 className="font-medium text-gray-900">
+                    {address.person?.name}
+                  </h4>
+                  {/* <p className="text-sm text-gray-500">
+                    {address.location?.address?.name}
+                  </p> */}
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setEditingAddress({
+                    id: address.id,
+                    type,
+                    building: address.location?.address?.building,
+                    locality: address.location?.address?.locality,
+                    city: address.location?.address?.city,
+                    state: address.location?.address?.state,
+                    zipCode: address.location?.address?.area_code,
+                    storeName: address.location?.address?.name,
+                    contactPersonName: address.person?.name,
+                    email: address.contact?.email,
+                    phoneNumber: address.contact?.phone,
+                    ...(type === 'pickup' && {
+                      workingDays: address.provider_store_details?.time?.days?.split(',').map(day => {
+                        const daysMap = {
+                          '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday', '4': 'Thursday',
+                          '5': 'Friday', '6': 'Saturday', '7': 'Sunday'
+                        };
+                        return daysMap[day];
+                      }) || [],
+                      shopTime: {
+                        start: address.provider_store_details?.time?.range?.start?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || '',
+                        end: address.provider_store_details?.time?.range?.end?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || ''
+                      }
+                    })
+                  });
+                  setShowAddressModal(true);
+                }}
+                className="p-1.5 text-gray-600 hover:text-blue-600 rounded-md hover:bg-blue-50"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDeleteAddress(address.id, type)}
+                className="p-1.5 text-gray-600 hover:text-red-600 rounded-md hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setEditingAddress({
-                  id: address.id,
-                  type,
-                  isDefault: false,
-                  building: address.location.address.building,
-                  locality: address.location.address.locality,
-                  city: address.location.address.city,
-                  state: address.location.address.state,
-                  zipCode: address.location.address.area_code,
-                  storeName: address.location.address.name,
-                  contactPersonName: address.person.name,
-                  email: address.contact.email,
-                  phoneNumber: address.contact.phone,
-                  workingDays: address.provider_store_details?.time?.days?.split(',').map(day => {
+
+          {/* Contact Details */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Phone className="w-4 h-4" />
+              <span>{address.contact?.phone}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Mail className="w-4 h-4" />
+              <span>{address.contact?.email}</span>
+            </div>
+          </div>
+
+          {/* Address Details */}
+          <div className="flex items-start gap-2 text-sm text-gray-600">
+            <MapPin className="w-4 h-4 mt-0.5" />
+            <span>
+              {[
+                address.location?.address?.building,
+                address.location?.address?.locality,
+                address.location?.address?.city,
+                address.location?.address?.state,
+                address.location?.address?.area_code
+              ].filter(Boolean).join(', ')}
+            </span>
+          </div>
+
+          {/* Shop Timings - Only for Pickup Addresses */}
+          {type === 'pickup' && (
+            <div className="border-t border-gray-100 pt-3 mt-3">
+              <div className="text-sm text-gray-600">
+                <div className="mb-1">
+                  <span className="font-medium">Working Hours: </span>
+                  {address.provider_store_details?.time?.range?.start?.replace(/^(\d{2})(\d{2})$/, '$1:$2')} - 
+                  {address.provider_store_details?.time?.range?.end?.replace(/^(\d{2})(\d{2})$/, '$1:$2')}
+                </div>
+                <div>
+                  <span className="font-medium">Working Days: </span>
+                  {address.provider_store_details?.time?.days?.split(',').map(day => {
                     const daysMap = {
-                      '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday', '4': 'Thursday',
-                      '5': 'Friday', '6': 'Saturday', '7': 'Sunday'
+                      '1': 'Mon', '2': 'Tue', '3': 'Wed', '4': 'Thu',
+                      '5': 'Fri', '6': 'Sat', '7': 'Sun'
                     };
                     return daysMap[day];
-                  }) || [],
-                  shopTime: {
-                    start: address.provider_store_details?.time?.range?.start?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || '',
-                    end: address.provider_store_details?.time?.range?.end?.replace(/^(\d{2})(\d{2})$/, '$1:$2') || ''
-                  }
-                });
-                setShowAddressModal(true);
-              }}
-              className="p-1.5 text-gray-600 hover:text-blue-600 rounded-md hover:bg-blue-50"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDeleteAddress(address.id, type)}
-              className="p-1.5 text-gray-600 hover:text-red-600 rounded-md hover:bg-red-50"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        <div className="space-y-1 text-sm">
-          <p className="text-gray-600">
-            {address.location.address.building}, {address.location.address.locality}
-          </p>
-          <p className="text-gray-600">
-            {address.location.address.city}, {address.location.address.state} - {address.location.address.area_code}
-          </p>
-          <p className="text-gray-600">
-            {address.contact.phone} | {address.contact.email}
-          </p>
-          {address.provider_store_details?.time && (
-            <p className="text-gray-600 mt-2">
-              Working hours: {address.provider_store_details.time.range.start} - {address.provider_store_details.time.range.end}
-            </p>
+                  }).join(', ')}
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
