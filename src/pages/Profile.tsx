@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchUserProfile, updateUserProfile, createPickupAddress, fetchPickupAddresses, fetchDeliveryAddresses, createDeliveryAddress, updatePickupAddress, updateDeliveryAddress, deletePickupAddress, deleteDeliveryAddress } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
 import TimeInput from '../components/TimeInput';
+import { useDispatch } from 'react-redux';
 
 interface ProfileForm {
   storeName: string;
@@ -98,7 +99,7 @@ const Profile: React.FC = () => {
   });
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
-  const [form, setForm] = useState<ProfileForm>({
+  const [form, setForm] = useState({
     storeName: '',
     website: '',
     fullName: '',
@@ -176,7 +177,7 @@ const Profile: React.FC = () => {
     }
   }, [activeTab, dispatch]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     
     if (name.startsWith('shopTime.')) {
@@ -1181,287 +1182,380 @@ const Profile: React.FC = () => {
       }));
     };
 
-    const handleSubmit = () => {
-      onSave(form);
+    const handleSave = async () => {
+      try {
+        if (form.type === 'pickup') {
+          const pickupAddressData = {
+            person: {
+              name: form.contactPersonName
+            },
+            contact: {
+              phone: form.phoneNumber,
+              email: form.email
+            },
+            location: {
+              address: {
+                name: form.storeName,
+                building: form.building,
+                locality: form.locality,
+                city: form.city,
+                state: form.state,
+                country: 'India',
+                area_code: form.zipCode
+              },
+              gps: ''
+            },
+            provider_store_details: {
+              time: {
+                days: form.workingDays.map(day => {
+                  const daysMap = {
+                    'Monday': '1', 'Tuesday': '2', 'Wednesday': '3', 
+                    'Thursday': '4', 'Friday': '5', 'Saturday': '6', 'Sunday': '7'
+                  };
+                  return daysMap[day];
+                }).join(','),
+                schedule: {
+                  holidays: []
+                },
+                range: {
+                  start: form.shopTime.start.replace(':', ''),
+                  end: form.shopTime.end.replace(':', '')
+                }
+              }
+            }
+          };
+
+          if (editingAddress) {
+            await dispatch(updatePickupAddress({ 
+              id: editingAddress.id, 
+              addressData: pickupAddressData 
+            })).unwrap();
+          } else {
+            await dispatch(createPickupAddress(pickupAddressData)).unwrap();
+          }
+        } else {
+          const deliveryAddressData = {
+            person: {
+              name: form.contactPersonName
+            },
+            contact: {
+              phone: form.phoneNumber,
+              email: form.email
+            },
+            location: {
+              address: {
+                name: form.contactPersonName,
+                building: form.building,
+                locality: form.locality,
+                city: form.city,
+                state: form.state,
+                country: 'India',
+                area_code: form.zipCode
+              },
+              gps: ''
+            }
+          };
+
+          if (editingAddress) {
+            await dispatch(updateDeliveryAddress({
+              id: editingAddress.id,
+              addressData: deliveryAddressData
+            })).unwrap();
+          } else {
+            await dispatch(createDeliveryAddress(deliveryAddressData)).unwrap();
+          }
+        }
+
+        // Refresh the address lists
+        dispatch(fetchPickupAddresses());
+        dispatch(fetchDeliveryAddresses());
+        
+        onClose();
+      } catch (error) {
+        console.error('Error saving address:', error);
+        toast.error('Failed to save address');
+      }
     };
 
     if (!isOpen) return null;
 
     return (
       <>
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150]" onClick={onClose} />
+        {/* Overlay - Increased z-index */}
+        <div className="fixed inset-0 bg-black/50 z-[150]" onClick={onClose} />
         
-        <div className="fixed inset-0 flex items-center justify-center z-[160] p-4">
-          <div className="bg-white rounded-xl w-full max-w-2xl shadow-2xl">
-            {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-100">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-gray-900">
+        {/* Modal Container - Increased z-index */}
+        <div className="fixed inset-0 z-[160] overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full max-w-xl shadow-2xl">
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-white px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                <h3 className="text-lg font-semibold text-gray-900">
                   {address ? 'Edit Address' : 'Add New Address'}
                 </h3>
-                <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                <button 
+                  onClick={onClose} 
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-            </div>
 
-            {/* Modal Body */}
-            <div className="p-6">
-              <div className="space-y-6">
-                {/* Address Type Selection */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select Address Type
-                  </label>
-                  <div className="flex gap-4">
-                    <label className="flex-1">
-                      <input
-                        type="radio"
-                        name="type"
-                        value="pickup"
-                        checked={form.type === 'pickup'}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
-                                    peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
-                        <span className="text-sm font-medium peer-checked:text-blue-600">Pickup Address</span>
-                      </div>
-                    </label>
-                    <label className="flex-1">
-                      <input
-                        type="radio"
-                        name="type"
-                        value="delivery"
-                        checked={form.type === 'delivery'}
-                        onChange={handleInputChange}
-                        className="sr-only peer"
-                      />
-                      <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
-                                    peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
-                        <span className="text-sm font-medium peer-checked:text-blue-600">Delivery Address</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Form Fields */}
+              {/* Modal Body */}
+              <div className="p-4 overflow-y-auto max-h-[calc(100vh-180px)]">
                 <div className="space-y-4">
-                  {/* Store Name - Only show for pickup addresses */}
-                  {form.type === 'pickup' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Store Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="storeName"
-                        value={form.storeName}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {/* Contact Person - Highlighted for delivery addresses */}
-                  <div>
-                    <label className={`block text-sm font-medium mb-2 ${
-                      form.type === 'delivery' ? 'text-blue-600' : 'text-gray-700'
-                    }`}>
-                      {form.type === 'delivery' ? (
-                        <>
-                          Contact Person Name * <span className="text-gray-500">(This will be used as address name)</span>
-                        </>
-                      ) : (
-                        'Contact Person Name *'
-                      )}
+                  {/* Address Type Selection */}
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Select Address Type
                     </label>
-                    <input
-                      type="text"
-                      name="contactPersonName"
-                      value={form.contactPersonName}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-2.5 rounded-lg border ${
-                        form.type === 'delivery' 
-                          ? 'border-blue-300 focus:border-blue-500 focus:ring-blue-500' 
-                          : 'border-gray-300'
-                      }`}
-                      required
-                    />
-                  </div>
-
-                  {/* Contact Details */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={form.phoneNumber}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        maxLength={10}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Address Fields */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Building *
-                      </label>
-                      <input
-                        type="text"
-                        name="building"
-                        value={form.building}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Locality *
-                      </label>
-                      <input
-                        type="text"
-                        name="locality"
-                        value={form.locality}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={form.city}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        State *
-                      </label>
-                      <select
-                        name="state"
-                        value={form.state}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        required
-                      >
-                        <option value="">Select State</option>
-                        {INDIAN_STATES.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Pin Code *
-                      </label>
-                      <input
-                        type="text"
-                        name="zipCode"
-                        value={form.zipCode}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-                        maxLength={6}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Working Days and Time (Only for Pickup Address) */}
-                  {form.type === 'pickup' && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Working Days *
-                        </label>
-                        <div className="grid grid-cols-4 gap-3">
-                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                            <label key={day} className="relative flex items-center justify-center">
-                              <input
-                                type="checkbox"
-                                checked={form.workingDays.includes(day)}
-                                onChange={() => handleWorkingDaysChange(day)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-full py-2 text-center text-sm border rounded-md cursor-pointer
-                                          peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:text-blue-600
-                                          hover:bg-gray-50">
-                                {day.slice(0, 3)}
-                              </div>
-                            </label>
-                          ))}
+                    <div className="flex gap-3">
+                      <label className="flex-1">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="pickup"
+                          checked={form.type === 'pickup'}
+                          onChange={handleInputChange}
+                          className="sr-only peer"
+                        />
+                        <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                                      peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                          <span className="text-sm font-medium peer-checked:text-blue-600">Pickup Address</span>
                         </div>
-                      </div>
+                      </label>
+                      <label className="flex-1">
+                        <input
+                          type="radio"
+                          name="type"
+                          value="delivery"
+                          checked={form.type === 'delivery'}
+                          onChange={handleInputChange}
+                          className="sr-only peer"
+                        />
+                        <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                                      peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                          <span className="text-sm font-medium peer-checked:text-blue-600">Delivery Address</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <TimeInput
-                          label="Shop Opening Time"
-                          name="shopTime.start"
-                          value={form.shopTime.start}
+                  {/* Form Fields in Grid Layout */}
+                  <div className="grid gap-4">
+                    {/* Store Name - Only for pickup */}
+                    {form.type === 'pickup' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Store Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="storeName"
+                          value={form.storeName}
                           onChange={handleInputChange}
-                          required
-                        />
-                        <TimeInput
-                          label="Shop Closing Time"
-                          name="shopTime.end"
-                          value={form.shopTime.end}
-                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
                           required
                         />
                       </div>
-                    </>
-                  )}
+                    )}
+
+                    {/* Contact Person */}
+                    <div>
+                      <label className={`block text-sm font-medium mb-1 ${
+                        form.type === 'delivery' ? 'text-blue-600' : 'text-gray-700'
+                      }`}>
+                        Contact Person Name *
+                        {form.type === 'delivery' && (
+                          <span className="text-xs text-gray-500 ml-1">(This will be used as address name)</span>
+                        )}
+                      </label>
+                      <input
+                        type="text"
+                        name="contactPersonName"
+                        value={form.contactPersonName}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                        required
+                      />
+                    </div>
+
+                    {/* Contact Details */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email *
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={form.email}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number *
+                        </label>
+                        <input
+                          type="tel"
+                          name="phoneNumber"
+                          value={form.phoneNumber}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Address Fields */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Building *
+                        </label>
+                        <input
+                          type="text"
+                          name="building"
+                          value={form.building}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Locality *
+                        </label>
+                        <input
+                          type="text"
+                          name="locality"
+                          value={form.locality}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          City *
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={form.city}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          name="state"
+                          value={form.state}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          ZIP Code *
+                        </label>
+                        <input
+                          type="text"
+                          name="zipCode"
+                          value={form.zipCode}
+                          onChange={handleInputChange}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Working Days and Shop Timings - Only for pickup addresses */}
+                    {form.type === 'pickup' && (
+                      <>
+                        {/* Working Days */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Working Days *
+                          </label>
+                          <div className="grid grid-cols-4 gap-2">
+                            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
+                              <label key={day} className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  checked={form.workingDays.includes(day)}
+                                  onChange={() => handleWorkingDaysChange(day)}
+                                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-gray-600">{day.slice(0, 3)}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Shop Timings */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Opening Time *
+                            </label>
+                            <input
+                              type="time"
+                              name="shopTime.start"
+                              value={form.shopTime.start}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Closing Time *
+                            </label>
+                            <input
+                              type="time"
+                              name="shopTime.end"
+                              value={form.shopTime.end}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Modal Footer */}
-            <div className="px-6 py-4 border-t border-gray-100">
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                >
-                  Save Address
-                </button>
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-white px-4 py-3 border-t border-gray-100">
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={onClose}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+                  >
+                    Save Address
+                  </button>
+                </div>
               </div>
             </div>
           </div>
