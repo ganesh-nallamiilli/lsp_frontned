@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Pending</p>
-              <p className="font-semibold">{shippingDetails?.pending || 0}</p>
+              <p className="font-semibold">{dashboardCounts?.order_details?.created || 0}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
@@ -122,7 +122,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Accepted</p>
-              <p className="font-semibold">10</p>
+              <p className="font-semibold">{dashboardCounts?.order_details?.accepted || 0}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">In Progress</p>
-              <p className="font-semibold">37</p>
+              <p className="font-semibold">{dashboardCounts?.order_details?.InProgress || 0}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
@@ -140,7 +140,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Completed</p>
-              <p className="font-semibold">199</p>
+              <p className="font-semibold">{dashboardCounts?.order_details?.completed || 0}</p>
             </div>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
@@ -149,7 +149,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Cancelled</p>
-              <p className="font-semibold">57</p>
+              <p className="font-semibold">{dashboardCounts?.order_details?.cancelled || 0}</p>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Pickup Pending</div>
-              <div className="text-lg font-semibold">64</div>
+              <div className="text-lg font-semibold">{shippingDetails?.pending || 0}</div>
             </div>
           </div>
 
@@ -179,7 +179,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Searching For Agent</div>
-              <div className="text-lg font-semibold">10</div>
+              <div className="text-lg font-semibold">{shippingDetails?.searching_for_agent || 0}</div>
             </div>
           </div>
 
@@ -189,7 +189,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Agent Assigned</div>
-              <div className="text-lg font-semibold">22</div>
+              <div className="text-lg font-semibold">{shippingDetails?.agent_assigned || 0}</div>
             </div>
           </div>
 
@@ -199,7 +199,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Order Picked Up</div>
-              <div className="text-lg font-semibold">7</div>
+              <div className="text-lg font-semibold">{shippingDetails?.order_picked_up || 0}</div>
             </div>
           </div>
 
@@ -209,7 +209,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Out For Delivery</div>
-              <div className="text-lg font-semibold">2</div>
+              <div className="text-lg font-semibold">{shippingDetails?.out_for_delivery || 0}</div>
             </div>
           </div>
 
@@ -219,7 +219,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <div className="text-sm text-gray-600">Order Delivered</div>
-              <div className="text-lg font-semibold">199</div>
+              <div className="text-lg font-semibold">{shippingDetails?.order_delivered || 0}</div>
             </div>
           </div>
         </div>
@@ -247,7 +247,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Initialized</p>
-                <p className="font-semibold">22</p>
+                <p className="font-semibold">{rtoDetails?.rto_initiated || 0}</p>
               </div>
             </div>
 
@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Disposed</p>
-                <p className="font-semibold">0</p>
+                <p className="font-semibold">{rtoDetails?.rto_disposed || 0}</p>
               </div>
             </div>
 
@@ -267,7 +267,7 @@ const Dashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Delivered</p>
-                <p className="font-semibold">0</p>
+                <p className="font-semibold">{rtoDetails?.rto_delivered || 0}</p>
               </div>
             </div>
           </div>

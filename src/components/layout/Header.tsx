@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useSidebar } from '../../context/SidebarContext';
 import { useAuth } from '../../context/AuthContext';
-
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { fetchWalletDetails } from '../../store/slices/dashboardSlice';
 const Header: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -13,6 +14,12 @@ const Header: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { isOpen, toggle } = useSidebar();
   const { logout } = useAuth();
+  const { walletDetails } = useAppSelector((state) => state.dashboard);
+  const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    dispatch(fetchWalletDetails());
+  }, [dispatch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -77,7 +84,7 @@ const Header: React.FC = () => {
             className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
           >
             <Wallet className="h-5 w-5 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">₹10,000</span>
+            <span className="text-sm font-medium text-gray-700">₹{walletDetails?.total_available || '0.00'}</span>
           </div>
 
           <a 
@@ -144,6 +151,7 @@ const Header: React.FC = () => {
       </div>
     </header>
   );
-}
+};
+  
 
 export default Header;
