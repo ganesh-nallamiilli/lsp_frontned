@@ -130,6 +130,7 @@ const RTO: React.FC = () => {
             onFulfillmentStatusChange={handleFulfillmentStatusChange}
             onDateRangeChange={handleDateRangeChange}
             onCreatedByChange={handleCreatedByChange}
+            filters={filters}
           />
           <OrdersTable
             orders={orders}
