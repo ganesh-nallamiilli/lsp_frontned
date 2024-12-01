@@ -3,6 +3,7 @@ import ticketReducer from './slices/ticketSlice';
 import authReducer from './slices/authSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import rtoReducer from './slices/rtoSlice';
+import lookupReducer from './slices/lookupSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     dashboard: dashboardReducer,
     rto: rtoReducer,
+    lookup: lookupReducer,
   },
 });
 
