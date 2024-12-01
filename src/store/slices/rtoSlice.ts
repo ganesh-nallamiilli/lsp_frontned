@@ -14,6 +14,16 @@ interface RTOOrder {
   shippingAddress: any;
 }
 
+interface RTOFilters {
+  search?: string;
+  category?: string;
+  provider?: string;
+  fulfillment_state?: string;
+  from_date?: string;
+  to_date?: string;
+  created_by?: string;
+}
+
 interface RTOState {
   orders: RTOOrder[];
   loading: boolean;
@@ -28,15 +38,25 @@ const initialState: RTOState = {
 
 export const fetchRTOOrders = createAsyncThunk(
   'rto/fetchRTOOrders',
-  async (_, { rejectWithValue }) => {
+  async (filters: RTOFilters = {}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${config.apiBaseUrl}/orders?rto=true`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      
+      // Build query params
+      const queryParams = new URLSearchParams({ rto: 'true' });
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
       });
-      console.log("response.data",Array.isArray(response.data.data));
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/orders?${queryParams.toString()}`, 
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
       if (!Array.isArray(response.data.data)) {
         return rejectWithValue('Invalid response format from server');
       }

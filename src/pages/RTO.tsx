@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRTOOrders } from '../store/slices/rtoSlice';
 import { RootState } from '../store/store';
@@ -10,23 +10,48 @@ import { Order } from '../types/orders';
 const RTO: React.FC = () => {
   const dispatch = useDispatch();
   const { orders, loading, error } = useSelector((state: RootState) => state.rto);
+  const [filters, setFilters] = useState({
+    search: '',
+    category: '',
+    provider: '',
+    fulfillment_state: '',
+    from_date: '',
+    to_date: '',
+    created_by: ''
+  });
 
   useEffect(() => {
-    dispatch(fetchRTOOrders() as any);
-  }, [dispatch]);
+    dispatch(fetchRTOOrders(filters) as any);
+  }, [dispatch, filters]);
 
   console.log("orders>>>>>>>>>>>>>>>>>>>>>",orders);
 
   const handleSearch = (query: string) => {
-    // Implement search logic
+    setFilters(prev => ({ ...prev, search: query }));
   };
 
-  const handleDateChange = (date: string) => {
-    // Implement date filter logic
+  const handleShipmentTypeChange = (type: string) => {
+    setFilters(prev => ({ ...prev, category: type }));
   };
 
-  const handleStatusChange = (status: string) => {
-    // Implement status filter logic
+  const handleProviderChange = (provider: string) => {
+    setFilters(prev => ({ ...prev, provider }));
+  };
+
+  const handleFulfillmentStatusChange = (status: string) => {
+    setFilters(prev => ({ ...prev, fulfillment_state: status }));
+  };
+
+  const handleDateRangeChange = (startDate: string, endDate: string) => {
+    setFilters(prev => ({
+      ...prev,
+      from_date: startDate,
+      to_date: endDate
+    }));
+  };
+
+  const handleCreatedByChange = (userId: string) => {
+    setFilters(prev => ({ ...prev, created_by: userId }));
   };
 
   const handleExport = () => {
@@ -68,7 +93,7 @@ const RTO: React.FC = () => {
           <h3 className="text-lg font-medium text-red-800">Error Loading Orders</h3>
           <p className="mt-2 text-sm text-red-600">{error}</p>
           <button
-            onClick={() => dispatch(fetchRTOOrders())}
+            onClick={() => dispatch(fetchRTOOrders(filters))}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             Try Again
@@ -100,8 +125,11 @@ const RTO: React.FC = () => {
         <div className="p-6">
           <OrderFilters
             onSearch={handleSearch}
-            onDateChange={handleDateChange}
-            onStatusChange={handleStatusChange}
+            onShipmentTypeChange={handleShipmentTypeChange}
+            onProviderChange={handleProviderChange}
+            onFulfillmentStatusChange={handleFulfillmentStatusChange}
+            onDateRangeChange={handleDateRangeChange}
+            onCreatedByChange={handleCreatedByChange}
           />
           <OrdersTable
             orders={orders}

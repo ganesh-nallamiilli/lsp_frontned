@@ -13,8 +13,8 @@ interface OrderFiltersProps {
   onShipmentTypeChange: (type: string) => void;
   onProviderChange: (provider: string) => void;
   onFulfillmentStatusChange: (status: string) => void;
-  onCreatedByChange: (creator: string) => void;
   onDateRangeChange: (startDate: string, endDate: string) => void;
+  onCreatedByChange: (userId: string) => void;
 }
 
 const OrderFilters: React.FC<OrderFiltersProps> = ({
@@ -22,8 +22,8 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
   onShipmentTypeChange,
   onProviderChange,
   onFulfillmentStatusChange,
-  onCreatedByChange,
   onDateRangeChange,
+  onCreatedByChange,
 }) => {
   const dispatch = useAppDispatch();
   const { categoryTypes, fulfillmentStatuses, providers, users, loading } = useAppSelector((state) => state.lookup);
@@ -53,7 +53,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         <div className="min-w-[160px]">
           <select
             onChange={(e) => onShipmentTypeChange(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none bg-white"
+            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
             disabled={loading}
           >
             <option value="">Shipment Type</option>
@@ -119,13 +119,11 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
             type="date"
             onChange={(e) => onDateRangeChange(e.target.value, '')}
             className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-            placeholder="From Date"
           />
           <input
             type="date"
             onChange={(e) => onDateRangeChange('', e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-            placeholder="To Date"
           />
         </div>
       </div>
