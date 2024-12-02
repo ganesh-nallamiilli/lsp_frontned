@@ -1,13 +1,16 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { createDraftOrder } from '../store/slices/draftOrderSlice';
+import { fetchPickupAddresses, fetchDeliveryAddresses } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
 
 // Define the form context type
 interface FormContextType {
   formData: OrderFormData;
   setFormData: React.Dispatch<React.SetStateAction<OrderFormData>>;
+  pickupAddresses: PickupAddress[];
+  deliveryAddresses: DeliveryAddress[];
 }
 
 // Define the form data interface
@@ -89,6 +92,15 @@ const FormContext = createContext<FormContextType | undefined>(undefined);
 
 // Create the form provider component
 export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const dispatch = useAppDispatch();
+  const { pickupAddresses, deliveryAddresses } = useAppSelector(state => state.auth);
+  
+  // Fetch addresses when component mounts
+  useEffect(() => {
+    dispatch(fetchPickupAddresses());
+    dispatch(fetchDeliveryAddresses());
+  }, [dispatch]);
+
   const [formData, setFormData] = useState<OrderFormData>({
     retailOrderId: '',
     retailOrderAmount: 0,
@@ -112,8 +124,41 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
     deliveryAddress: undefined
   });
 
+  // Format addresses for form use
+  const formattedPickupAddresses = useMemo(() => 
+    pickupAddresses?.map(addr => ({
+      id: addr._id,
+      name: addr.location?.address?.name || '',
+      address: addr.location?.address?.building || '',
+      city: addr.location?.address?.city || '',
+      state: addr.location?.address?.state || '',
+      pincode: addr.location?.address?.area_code || '',
+      phone: addr.contact?.phone || '',
+      isDefault: false // Add logic for default address if needed
+    })) || [], [pickupAddresses]);
+
+  const formattedDeliveryAddresses = useMemo(() => 
+    deliveryAddresses?.map(addr => ({
+      id: addr._id,
+      name: addr.location?.address?.name || '',
+      address: addr.location?.address?.building || '',
+      city: addr.location?.address?.city || '',
+      state: addr.location?.address?.state || '',
+      pincode: addr.location?.address?.area_code || '',
+      phone: addr.contact?.phone || '',
+      alternatePhone: addr.contact?.alternate_phone,
+      landmark: addr.location?.address?.locality
+    })) || [], [deliveryAddresses]);
+
+  const contextValue = useMemo(() => ({
+    formData,
+    setFormData,
+    pickupAddresses: formattedPickupAddresses,
+    deliveryAddresses: formattedDeliveryAddresses
+  }), [formData, formattedPickupAddresses, formattedDeliveryAddresses]);
+
   return (
-    <FormContext.Provider value={{ formData, setFormData }}>
+    <FormContext.Provider value={contextValue}>
       {children}
     </FormContext.Provider>
   );
