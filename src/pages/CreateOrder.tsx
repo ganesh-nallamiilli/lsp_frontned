@@ -1,5 +1,8 @@
 import React, { useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../store/hooks';
+import { createDraftOrder } from '../store/slices/draftOrderSlice';
+import { toast } from 'react-hot-toast';
 
 // Define the form context type
 interface FormContextType {
@@ -294,9 +297,68 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
   isLastStep,
   onComplete
 }) => {
-  const handleSaveForLater = () => {
-    // Implement the save for later functionality here
-    console.log("Order saved for later");
+  const dispatch = useAppDispatch();
+  const { formData } = useFormContext();
+
+  const handleSaveForLater = async () => {
+    try {
+      console.log('Saving draft order with payload:', formData); // Debug log
+      
+      const payload = {
+        draft_order: {
+          deliveryAddressId: formData.deliveryAddress?.id,
+          deliveryAddress: formData.deliveryAddress,
+          pickupAddressId: formData.pickupAddress?.id,
+          pickupAddress: formData.pickupAddress,
+          packageDetails: {
+            height: formData.packageHeight.toString(),
+            weight: {
+              value: formData.packageWeight.toString(),
+              type: "kilogram"
+            },
+            breadth: formData.packageWidth.toString(),
+            length: formData.packageLength.toString(),
+            hazardous: formData.isFragile
+          },
+          order_items: formData.items.map(item => [
+            { key: "name", value: item.name },
+            { key: "price", value: item.price.toString() },
+            { key: "item_quantity", value: item.quantity.toString() },
+            { key: "weight", value: item.weight.toString(), type: "kilogram" }
+          ]),
+          orderDetails: {
+            retail_order_payment_method: "POST-FULFILLMENT",
+            retail_order_id: formData.franchiseOrderId,
+            retail_order_amount: formData.franchiseOrderAmount.toString(),
+            retail_order_category: {
+              value: formData.franchiseOrderCategory,
+              label: formData.franchiseOrderCategory
+            },
+            retail_order_preparation_time: {
+              value: `PT${formData.preparationTime}M`,
+              label: `Within ${formData.preparationTime} minutes`
+            },
+            retail_order_category_type: {
+              label: formData.categoryType,
+              value: formData.categoryType
+            }
+          },
+          readytoShip: formData.isReadyForShipment,
+          rto: formData.isRtoEligible
+        }
+      };
+
+      const result = await dispatch(createDraftOrder(payload)).unwrap();
+      console.log('Draft order created successfully:', result); // Debug log
+      
+      // Show success message and optionally redirect
+      toast.success('Draft order saved successfully');
+      // Optional: Redirect to orders page or clear form
+      
+    } catch (error) {
+      console.error('Failed to save draft order:', error); // Debug log
+      toast.error('Failed to save draft order. Please try again.');
+    }
   };
 
   return (
