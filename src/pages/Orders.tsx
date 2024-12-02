@@ -7,10 +7,13 @@ import { Order } from '../types/orders';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchOrders } from '../store/slices/ordersSlice';
+import DraftOrdersTable from '../components/orders/DraftOrdersTable';
+import { fetchDraftOrders } from '../store/slices/draftOrderSlice';
 
 const Orders: React.FC = () => {
   const dispatch = useAppDispatch();
   const { orders, loading } = useAppSelector((state) => state.orders);
+  const draftOrders = useAppSelector((state) => state.draftOrders.orders);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [filters, setFilters] = useState({
@@ -25,34 +28,39 @@ const Orders: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Create query parameters based on active tab
-    const tabFilters = { ...filters };
-    
-    switch (activeTab) {
-      case 1: // Ready to Ship
-        tabFilters.rts = 'true';
-        break;
-      case 2: // Created
-        tabFilters.state = 'Created';
-        break;
-      case 3: // Accepted
-        tabFilters.state = 'Accepted';
-        break;
-      case 4: // In Progress
-        tabFilters.state = 'In-Progress';
-        break;
-      case 5: // Completed
-        tabFilters.state = 'Completed';
-        break;
-      case 6: // Cancelled
-        tabFilters.state = 'Cancelled';
-        break;
-      case 7: // Draft Orders
-        // Will be handled later
-        break;
-    }
+    if (activeTab === 7) {
+      console.log("activeTab",activeTab)
+    } else {
+      const tabFilters = { ...filters };
+      
+      switch (activeTab) {
+        case 1: // Ready to Ship
+          tabFilters.rts = 'true';
+          break;
+        case 2: // Created
+          tabFilters.state = 'Created';
+          break;
+        case 3: // Accepted
+          tabFilters.state = 'Accepted';
+          break;
+        case 4: // In Progress
+          tabFilters.state = 'In-Progress';
+          break;
+        case 5: // Completed
+          tabFilters.state = 'Completed';
+          break;
+        case 6: // Cancelled
+          tabFilters.state = 'Cancelled';
+          break;
+        case 7: // Draft Orders
+          // Will be handled later
+          break;
+      }
 
-    dispatch(fetchOrders(tabFilters));
+      dispatch(fetchOrders(tabFilters));
+      dispatch(fetchDraftOrders());
+
+    }
   }, [dispatch, filters, activeTab]);
 
   const handleSearch = (query: string) => {
@@ -277,7 +285,7 @@ const Orders: React.FC = () => {
               <TabPanel key={index} value={activeTab} index={index}>
                 {activeTab === 7 ? (
                   <DraftOrdersTable
-                    orders={getFilteredOrders()}
+                    orders={draftOrders.data}
                     onEdit={handleEdit}
                     onShipNow={handleShipNow}
                     selectedOrders={selectedOrders}

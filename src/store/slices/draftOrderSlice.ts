@@ -42,9 +42,42 @@ export const createDraftOrder = createAsyncThunk(
   }
 );
 
+export const fetchDraftOrders = createAsyncThunk(
+  'draftOrders/fetch',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await axios.get(
+        `${config.apiBaseUrl}/draft_orders`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
+      
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'Failed to fetch draft orders';
+        
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const draftOrderSlice = createSlice({
   name: 'draftOrders',
   initialState: {
+    orders: [],
     loading: false,
     error: null,
   },
@@ -66,6 +99,18 @@ const draftOrderSlice = createSlice({
         state.error = action.payload as string;
         console.error('Draft order creation failed:', action.payload); // Debug log
         toast.error(action.payload as string);
+      })
+      .addCase(fetchDraftOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDraftOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(fetchDraftOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
