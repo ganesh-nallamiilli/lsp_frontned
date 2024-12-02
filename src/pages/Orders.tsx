@@ -22,6 +22,7 @@ const Orders: React.FC = () => {
     to_date: '',
     created_by: ''
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Create query parameters based on active tab
@@ -117,7 +118,11 @@ const Orders: React.FC = () => {
   };
 
   const handleCreateOrder = () => {
-    navigate('/orders/create');
+    navigate('/orders/create', { 
+      state: { 
+        mode: 'create'
+      }
+    });
   };
 
   // Remove or simplify getFilteredOrders since filtering will now happen on the server
