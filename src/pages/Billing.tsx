@@ -1,30 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FileText, Download, Filter, Calendar, DollarSign, CreditCard, Plus, IndianRupee } from 'lucide-react';
-
-const invoices = [
-  {
-    id: 'INV-2024-001',
-    amount: 299.99,
-    status: 'paid',
-    dueDate: '2024-03-20',
-    items: [
-      { description: 'Shipping Services', amount: 249.99 },
-      { description: 'Insurance', amount: 50.00 },
-    ],
-  },
-  {
-    id: 'INV-2024-002',
-    amount: 199.99,
-    status: 'pending',
-    dueDate: '2024-03-25',
-    items: [
-      { description: 'Express Delivery', amount: 199.99 },
-    ],
-  },
-  // Add more invoices as needed
-];
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchBillingData } from '../store/slices/billingSlice';
 
 const Billing: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { data: billingData, loading, error } = useAppSelector((state) => state.billing);
+
+  useEffect(() => {
+    dispatch(fetchBillingData());
+  }, [dispatch]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -46,42 +32,6 @@ const Billing: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <IndianRupee className="h-6 w-6 text-indigo-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Due</p>
-              <p className="text-2xl font-bold text-gray-900">₹1,299.00</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-green-100 rounded-full">
-              <FileText className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Paid Invoices</p>
-              <p className="text-2xl font-bold text-gray-900">24</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <Calendar className="h-6 w-6 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -95,91 +45,135 @@ const Billing: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Invoice ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Due Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {invoices.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <FileText className="h-5 w-5 text-gray-400 mr-2" />
-                        <span className="font-medium text-gray-900">
-                          {invoice.id}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${invoice.amount}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          invoice.status === 'paid'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {invoice.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {invoice.dueDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        View
-                      </button>
-                      <span className="mx-2">|</span>
-                      <button className="text-indigo-600 hover:text-indigo-900">
-                        Download
-                      </button>
-                    </td>
+          <div className="overflow-x-auto max-w-full">
+            <div className="inline-block min-w-full align-middle">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Network Transaction ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bill Create Date & Time
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Order Create Date & Time
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Payment Reference Id
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Order Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Payment Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Refund Amount
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Refund Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Refund Reference Id
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cancellation Fee
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fulfillment State
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cancellation Reason
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cancelled By
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cancelled Date & Time
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {billingData.map((invoice) => (
+                    <tr key={invoice._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <FileText className="h-5 w-5 text-gray-400 mr-2" />
+                          <span className="font-medium text-gray-900">
+                            {invoice.network_transaction_id}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(invoice.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(invoice.order_created_date).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.payment_reference_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ₹{invoice.total_amount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            invoice.payment_status === 'PAID'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
+                          {invoice.payment_status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.refund_amount || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.refund_status || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.refund_reference_id || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.cancellation_fee || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.fulfillment_state || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.cancellation_reason || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.cancelled_by || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {invoice.cancelled_date ? new Date(invoice.cancelled_date).toLocaleString() : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button className="text-indigo-600 hover:text-indigo-900">
+                          View
+                        </button>
+                        <span className="mx-2">|</span>
+                        <button className="text-indigo-600 hover:text-indigo-900">
+                          Download
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Payment Methods</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <CreditCard className="h-6 w-6 text-gray-400" />
-                <span className="text-sm text-gray-500">Default</span>
-              </div>
-              <p className="font-medium">•••• •••• •••• 4242</p>
-              <p className="text-sm text-gray-500 mt-1">Expires 12/24</p>
-            </div>
-            <button className="border border-dashed border-gray-300 rounded-lg p-4 hover:bg-gray-50 flex items-center justify-center">
-              <Plus className="h-5 w-5 text-gray-400 mr-2" />
-              <span className="text-gray-600">Add New Card</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };

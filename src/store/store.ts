@@ -7,6 +7,7 @@ import lookupReducer from './slices/lookupSlice';
 import ordersReducer from './slices/ordersSlice';
 import returnsReducer from './slices/returnsSlice';
 import transactionReducer from './slices/transactionSlice';
+import billingReducer from './slices/billingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     orders: ordersReducer,
     returns: returnsReducer,
     transactions: transactionReducer,
+    billing: billingReducer,
   },
 });
 
