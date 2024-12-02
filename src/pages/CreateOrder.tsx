@@ -87,6 +87,19 @@ interface DeliveryAddress {
   landmark?: string;
 }
 
+// Define a common address interface
+interface Address {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+  alternatePhone?: string;
+  landmark?: string;
+}
+
 // Create the context
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
@@ -124,30 +137,32 @@ export const FormProvider: React.FC<{ children: React.ReactNode }> = ({ children
     deliveryAddress: undefined
   });
 
-  // Format addresses for form use
+  // Transform pickup addresses
   const formattedPickupAddresses = useMemo(() => 
     pickupAddresses?.map(addr => ({
       id: addr._id,
-      name: addr.location?.address?.name || '',
-      address: addr.location?.address?.building || '',
-      city: addr.location?.address?.city || '',
-      state: addr.location?.address?.state || '',
-      pincode: addr.location?.address?.area_code || '',
-      phone: addr.contact?.phone || '',
-      isDefault: false // Add logic for default address if needed
+      name: addr.person.name,
+      address: addr.location.address.building,
+      city: addr.location.address.city,
+      state: addr.location.address.state,
+      pincode: addr.location.address.area_code,
+      phone: addr.contact.phone,
+      // Add any additional fields if needed
     })) || [], [pickupAddresses]);
 
+  // Transform delivery addresses
   const formattedDeliveryAddresses = useMemo(() => 
     deliveryAddresses?.map(addr => ({
       id: addr._id,
-      name: addr.location?.address?.name || '',
-      address: addr.location?.address?.building || '',
-      city: addr.location?.address?.city || '',
-      state: addr.location?.address?.state || '',
-      pincode: addr.location?.address?.area_code || '',
-      phone: addr.contact?.phone || '',
-      alternatePhone: addr.contact?.alternate_phone,
-      landmark: addr.location?.address?.locality
+      name: addr.person.name,
+      address: addr.location.address.building,
+      city: addr.location.address.city,
+      state: addr.location.address.state,
+      pincode: addr.location.address.area_code,
+      phone: addr.contact.phone,
+      alternatePhone: addr.contact.alternate_phone,
+      landmark: addr.location.address.locality,
+      // Add any additional fields if needed
     })) || [], [deliveryAddresses]);
 
   const contextValue = useMemo(() => ({
@@ -941,519 +956,157 @@ const AddAddressModal: React.FC<{
   );
 };
 
-// Update PickupAddressSelection to include the modal
-const PickupAddressSelection: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [addresses, setAddresses] = useState<PickupAddress[]>([
-    {
-      id: '1',
-      name: 'Main Warehouse',
-      address: '123 Business Park, Sector 5',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400001',
-      phone: '+91 98765 43210',
-      isDefault: true
-    }
-  ]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    addresses.find(addr => addr.isDefault)?.id || ''
+// Address Table Component that can be reused for both pickup and delivery
+const AddressTable: React.FC<{
+  addresses: Address[];
+  selectedId?: string;
+  onSelect: (address: Address) => void;
+  type: 'pickup' | 'delivery';
+}> = ({ addresses, selectedId, onSelect, type }) => {
+  return (
+    <div className="mt-4 flow-root">
+      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    Select
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Name
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Address
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    City
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    State
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Pincode
+                  </th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Contact
+                  </th>
+                  {type === 'delivery' && (
+                    <>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Alt. Contact
+                      </th>
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Landmark
+                      </th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {addresses.map((address) => (
+                  <tr 
+                    key={address.id}
+                    className={`${selectedId === address.id ? 'bg-indigo-50' : 'hover:bg-gray-50'} cursor-pointer`}
+                    onClick={() => onSelect(address)}
+                  >
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      <input
+                        type="radio"
+                        checked={selectedId === address.id}
+                        onChange={() => onSelect(address)}
+                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.name}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.address}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.city}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.state}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.pincode}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.phone}</td>
+                    {type === 'delivery' && (
+                      <>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {address.alternatePhone || '-'}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {address.landmark || '-'}
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
+};
 
-  const handleAddAddress = (newAddress: Omit<PickupAddress, 'id'>) => {
-    const id = (addresses.length + 1).toString(); // In real app, use proper ID generation
-    setAddresses(prev => [...prev, { ...newAddress, id }]);
+// Pickup Address Step Component
+const PickupAddressStep: React.FC = () => {
+  const { formData, setFormData, pickupAddresses } = useFormContext();
+
+  const handleSelectAddress = (address: Address) => {
+    setFormData(prev => ({
+      ...prev,
+      pickupAddress: address
+    }));
   };
 
-  const filteredAddresses = addresses.filter(address => 
-    address.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    address.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    address.city.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900">Select Pickup Address</h3>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+    <div className="bg-white rounded-lg p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+          <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          Add New Address
-        </button>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">Select Pickup Address</h3>
       </div>
 
-      {/* Search Filter */}
-      <div className="relative">
-        <input
-          type="text"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Search addresses..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <svg className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      {addresses.length === 0 ? (
-        // Empty state
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No pickup addresses</h3>
-          <p className="mt-1 text-sm text-gray-500">Get started by creating a new pickup address.</p>
-          <div className="mt-6">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Add Pickup Address
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="w-12 px-4 py-3"></th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Location Name
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  City
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  State
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Pincode
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Phone
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAddresses.map((address) => (
-                <tr
-                  key={address.id}
-                  className={`cursor-pointer ${
-                    selectedAddressId === address.id ? 'bg-indigo-50' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedAddressId(address.id)}
-                >
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <input
-                      type="radio"
-                      checked={selectedAddressId === address.id}
-                      onChange={() => setSelectedAddressId(address.id)}
-                      className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
-                    />
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <span className="text-sm text-gray-900">{address.name}</span>
-                      {address.isDefault && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
-                          Default
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-900">{address.address}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.city}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.state}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.pincode}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.phone}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Add Address Modal */}
-      <AddAddressModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleAddAddress}
+      <AddressTable
+        addresses={pickupAddresses}
+        selectedId={formData.pickupAddress?.id}
+        onSelect={handleSelectAddress}
+        type="pickup"
       />
     </div>
   );
 };
 
-// Add delivery address modal
-const AddDeliveryAddressModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (address: Omit<DeliveryAddress, 'id'>) => void;
-}> = ({ isOpen, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    phone: '',
-    alternatePhone: '',
-    landmark: ''
-  });
+// Delivery Address Step Component
+const DeliveryAddressStep: React.FC = () => {
+  const { formData, setFormData, deliveryAddresses } = useFormContext();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
-    setFormData({ name: '', address: '', city: '', state: '', pincode: '', phone: '', alternatePhone: '', landmark: '' });
+  const handleSelectAddress = (address: Address) => {
+    setFormData(prev => ({
+      ...prev,
+      deliveryAddress: address
+    }));
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="fixed inset-0 bg-black opacity-30" onClick={onClose} />
-
-        <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Add Delivery Address</h3>
-            <button
-              type="button"
-              className="text-gray-400 hover:text-gray-500"
-              onClick={onClose}
-            >
-              <span className="sr-only">Close</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Customer Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className={inputClasses}
-                placeholder="Full name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                className={inputClasses}
-                placeholder="Street address"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Landmark
-              </label>
-              <input
-                type="text"
-                value={formData.landmark}
-                onChange={(e) => setFormData(prev => ({ ...prev, landmark: e.target.value }))}
-                className={inputClasses}
-                placeholder="Nearby landmark"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  City <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.city}
-                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                  className={inputClasses}
-                  placeholder="City"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  State <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.state}
-                  onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
-                  className={inputClasses}
-                  placeholder="State"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Pincode <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.pincode}
-                  onChange={(e) => setFormData(prev => ({ ...prev, pincode: e.target.value }))}
-                  className={inputClasses}
-                  placeholder="Pincode"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Phone <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className={inputClasses}
-                  placeholder="Primary phone"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Alternate Phone
-              </label>
-              <input
-                type="tel"
-                value={formData.alternatePhone}
-                onChange={(e) => setFormData(prev => ({ ...prev, alternatePhone: e.target.value }))}
-                className={inputClasses}
-                placeholder="Alternative contact number"
-              />
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                Save Address
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Add delivery address selection component
-const DeliveryAddressSelection: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
-
-  const handleAddAddress = (newAddress: Omit<DeliveryAddress, 'id'>) => {
-    const id = (addresses.length + 1).toString();
-    setAddresses(prev => [...prev, { ...newAddress, id }]);
-  };
-
-  const filteredAddresses = addresses.filter(address => 
-    address.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    address.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    address.city.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900">Select Delivery Address</h3>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+    <div className="bg-white rounded-lg p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+          <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          Add Delivery Address
-        </button>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900">Select Delivery Address</h3>
       </div>
 
-      {/* Search Filter */}
-      <div className="relative">
-        <input
-          type="text"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Search addresses..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <svg className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      {addresses.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No delivery address added</h3>
-          <p className="mt-1 text-sm text-gray-500">Add a delivery address to continue.</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="w-12 px-4 py-3"></th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer Name
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Landmark
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  City
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  State
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Pincode
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Phone
-                </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Alt. Phone
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAddresses.map((address) => (
-                <tr
-                  key={address.id}
-                  className={`cursor-pointer ${
-                    selectedAddressId === address.id ? 'bg-indigo-50' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedAddressId(address.id)}
-                >
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <input
-                      type="radio"
-                      checked={selectedAddressId === address.id}
-                      onChange={() => setSelectedAddressId(address.id)}
-                      className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
-                    />
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.name}</td>
-                  <td className="px-4 py-4 text-sm text-gray-900">{address.address}</td>
-                  <td className="px-4 py-4 text-sm text-gray-900">{address.landmark || '-'}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.city}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.state}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.pincode}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.phone}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{address.alternatePhone || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <AddDeliveryAddressModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleAddAddress}
+      <AddressTable
+        addresses={deliveryAddresses}
+        selectedId={formData.deliveryAddress?.id}
+        onSelect={handleSelectAddress}
+        type="delivery"
       />
     </div>
   );
@@ -1618,6 +1271,21 @@ const CreateOrder: React.FC = () => {
     navigate(`/search-logistics?${searchParams.toString()}`);
   };
 
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 1:
+        return <OrderDetailsForm />;
+      case 2:
+        return <PickupAddressStep />;
+      case 3:
+        return <DeliveryAddressStep />;
+      case 4:
+        return <PackageDetails />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="sticky top-0 z-40">
@@ -1627,10 +1295,7 @@ const CreateOrder: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            {currentStep === 1 && <OrderDetailsForm />}
-            {currentStep === 2 && <PickupAddressSelection />}
-            {currentStep === 3 && <DeliveryAddressSelection />}
-            {currentStep === 4 && <PackageDetails />}
+            {renderStepContent(currentStep)}
             
             <StepNavigation
               currentStep={currentStep}
