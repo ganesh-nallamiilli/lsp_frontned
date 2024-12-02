@@ -53,12 +53,12 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
           <input
             type="text"
             placeholder="Search Order ID/ Transaction ID"
-            value={filters.search}
+            value={filters?.search || ""}
             onChange={(e) => onSearch(e.target.value)}
             className="w-full pl-8 pr-8 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
           />
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-          {filters.search && (
+          {filters?.search && (
             <button
               onClick={() => onSearch('')}
               className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600"
@@ -71,7 +71,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         {/* Shipment Type Dropdown */}
         <div className="relative min-w-[200px]">
           <select
-            value={filters.category}
+            value={filters?.category || ""}
             onChange={(e) => onShipmentTypeChange(e.target.value)}
             className="w-full pl-3 pr-20 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none truncate"
             disabled={loading}
@@ -84,7 +84,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
-            {filters.category && (
+            {filters?.category && (
               <button
                 onClick={() => onShipmentTypeChange('')}
                 className="text-gray-400 hover:text-gray-600"
@@ -103,7 +103,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         {/* Provider Dropdown */}
         <div className="relative min-w-[200px]">
           <select
-            value={filters.provider}
+            value={filters?.provider || ""}
             onChange={(e) => onProviderChange(e.target.value)}
             className="w-full pl-3 pr-20 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none truncate"
             disabled={loading}
@@ -116,7 +116,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
-            {filters.provider && (
+            {filters?.provider && (
               <button
                 onClick={() => onProviderChange('')}
                 className="text-gray-400 hover:text-gray-600"
@@ -135,7 +135,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         {/* Fulfillment Status Dropdown */}
         <div className="relative min-w-[200px]">
           <select
-            value={filters.fulfillment_state}
+            value={filters?.fulfillment_state || ""}
             onChange={(e) => onFulfillmentStatusChange(e.target.value)}
             className="w-full pl-3 pr-20 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none truncate"
             disabled={loading}
@@ -148,7 +148,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
-            {filters.fulfillment_state && (
+            {filters?.fulfillment_state && (
               <button
                 onClick={() => onFulfillmentStatusChange('')}
                 className="text-gray-400 hover:text-gray-600"
@@ -167,7 +167,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         {/* Created By Dropdown */}
         <div className="relative min-w-[200px]">
           <select
-            value={filters.created_by}
+            value={filters?.created_by || ""}
             onChange={(e) => onCreatedByChange(e.target.value)}
             className="w-full pl-3 pr-20 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm appearance-none truncate"
             disabled={loading}
@@ -180,7 +180,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
             ))}
           </select>
           <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
-            {filters.created_by && (
+            {filters?.created_by && (
               <button
                 onClick={() => onCreatedByChange('')}
                 className="text-gray-400 hover:text-gray-600"
@@ -201,11 +201,11 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
           <div className="relative">
             <input
               type="date"
-              value={filters.from_date}
+              value={filters?.from_date || ""}
               onChange={(e) => onDateRangeChange(e.target.value, filters.to_date)}
               className="w-full pl-3 pr-8 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
             />
-            {filters.from_date && (
+            {filters?.from_date && (
               <button
                 onClick={() => onDateRangeChange('', filters.to_date)}
                 className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600"
@@ -217,11 +217,11 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
           <div className="relative">
             <input
               type="date"
-              value={filters.to_date}
+              value={filters?.to_date || ""}
               onChange={(e) => onDateRangeChange(filters.from_date, e.target.value)}
               className="w-full pl-3 pr-8 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
             />
-            {filters.to_date && (
+            {filters?.to_date && (
               <button
                 onClick={() => onDateRangeChange(filters.from_date, '')}
                 className="absolute right-2 top-2.5 text-gray-400 hover:text-gray-600"
