@@ -4,6 +4,9 @@ import authReducer from './slices/authSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import rtoReducer from './slices/rtoSlice';
 import lookupReducer from './slices/lookupSlice';
+import ordersReducer from './slices/ordersSlice';
+import returnsReducer from './slices/returnsSlice';
+import transactionReducer from './slices/transactionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +15,9 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     rto: rtoReducer,
     lookup: lookupReducer,
+    orders: ordersReducer,
+    returns: returnsReducer,
+    transactions: transactionReducer,
   },
 });
 

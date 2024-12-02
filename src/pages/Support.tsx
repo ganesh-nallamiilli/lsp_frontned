@@ -480,6 +480,7 @@ const Support: React.FC = () => {
                     value={ticketForm.orderId}
                     onChange={e => setTicketForm(prev => ({ ...prev, orderId: e.target.value }))}
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    id="orderId"
                   >
                     <option value="">Select Order ID</option>
                     <option value="order1">Order #1</option>
