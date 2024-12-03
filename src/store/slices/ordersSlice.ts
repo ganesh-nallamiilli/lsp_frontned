@@ -90,6 +90,27 @@ export const fetchDraftOrders = createAsyncThunk(
   }
 );
 
+export const downloadTemplate = createAsyncThunk(
+  'orders/downloadTemplate',
+  async (category: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${config.apiBaseUrl}/orders/xlsx/download`,
+        { category },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue('Failed to download template');
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,

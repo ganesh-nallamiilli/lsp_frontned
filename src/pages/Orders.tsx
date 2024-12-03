@@ -234,13 +234,14 @@ const Orders: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
         <div className="flex gap-3">
-          <button
-            onClick={handleCreateOrder}
-            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          {localStorage.getItem('user_type') !== 'STANDALONE_ADMIN' && (
+            <button
+              onClick={handleCreateOrder}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Order
-          </button>
+          </button>)}
           <button
             onClick={handleExport}
             className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"

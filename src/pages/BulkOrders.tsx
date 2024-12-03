@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../store/hooks';
+import { downloadTemplate } from '../store/slices/ordersSlice';
 
 interface RecentUpload {
   fileName: string;
@@ -12,6 +14,7 @@ interface RecentUpload {
 
 const BulkOrders: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [recentUploads, setRecentUploads] = useState<RecentUpload[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -25,6 +28,11 @@ const BulkOrders: React.FC = () => {
       setSelectedFile(file);
       // Implement file upload logic
     }
+  };
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const category = event.target.value;
+    dispatch(downloadTemplate(category));
   };
 
   return (
@@ -45,13 +53,17 @@ const BulkOrders: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Import Bulk Orders</h2>
           <div className="relative">
-            <button
-              onClick={handleDownloadTemplate}
+            <select
               className="flex items-center text-blue-600 hover:text-blue-700"
+              onChange={handleCategoryChange}
+              defaultValue=""
             >
-              <Download className="w-4 h-4 mr-2" />
-              Download Template
-            </button>
+              <option value="" disabled>Download Template</option>
+              <option value="next-day">Next Day Delivery</option>
+              <option value="standard">Standard Delivery</option>
+              <option value="express">Express Delivery</option>
+              <option value="same-day">Same Day Delivery</option>
+            </select>
           </div>
         </div>
         

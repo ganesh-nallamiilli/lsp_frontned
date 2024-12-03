@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check, Upload } from 'lucide-react';
+import { useAppDispatch } from '../store/hooks';
+import { createFranchise, createMarkup } from '../store/slices/franchiseSlice';
 
 interface FranchiseFormData {
   // Franchise Details
@@ -36,8 +38,10 @@ interface FranchiseFormData {
 
 const CreateFranchise: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
+  const [franchise_user_id, setFranchiseUserId] = useState<number>(0);
   const [formData, setFormData] = useState<FranchiseFormData>({
     // Step 1 initial values
     franchiseName: '',
@@ -99,21 +103,89 @@ const CreateFranchise: React.FC = () => {
     }
   };
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentStep(2);
+
+    const franchiseData = {
+      "name": formData.franchiseName,
+      "mobile_number": formData.mobile,
+      "email": formData.email,
+      "store_name": formData.franchiseName,
+      "profile_image": "",
+      "gst_number": formData.gstNumber,
+      "pan_number": formData.panNumber,
+      "name_as_per_pan": formData.nameAsPerPan,
+      "gst_address": {
+          "name": formData.ownerName,
+          "locality": formData.locality,
+          "building": formData.building,
+          "city": formData.city,
+          "state": formData.stateProvince,
+          "area_code": formData.zipPostalCode,
+          "country": "India"
+      },
+      "user_types": [
+          {
+              "name": "FRANCHISE"
+          }
+      ],
+      "access_template_ids": [
+          3
+      ],
+      "is_active": true,
+      "bank_details": {
+          "settlement_type": formData.settlementType,
+          "beneficiary_name": formData.accountHolderName,
+          "upi_address": formData.upiId,
+          "settlement_bank_account_no": formData.accountNumber,
+          "settlement_ifsc_code": formData.ifscCode,
+          "bank_name": formData.bankName
+      },
+      "draft_reasons": [],
+      "wallet": {
+          "total_credit": "0.00",
+          "total_debit": "0.00",
+          "total_available": "0.00"
+      },
+      "is_franchise": true
+    }
+
+    try {
+      const response = await dispatch(createFranchise(franchiseData)).unwrap();
+      setFranchiseUserId(response.data.id);
+      setCurrentStep(2);
+    } catch (error) {
+      console.error('Error creating franchise:', error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      // Add your API call here
-      // await createFranchise(formData);
+      // Transform and create markups one by one
+      for (const [service, details] of Object.entries(formData.markupDetails)) {
+        // Convert camelCase to Title Case for category_type
+        const categoryType = service
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase());
+
+        const markupPayload = {
+          category_type: categoryType,
+          markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1), // Capitalize first letter
+          markup_value: parseFloat(details.value),
+          created_by_id: franchise_user_id
+        };
+
+        // Create markup for each service type
+        await dispatch(createMarkup(markupPayload)).unwrap();
+      }
+      
+      // Navigate after all markups are created
       navigate('/franchise');
     } catch (error) {
-      console.error('Error creating franchise:', error);
+      console.error('Error creating franchise markup:', error);
     } finally {
       setLoading(false);
     }
