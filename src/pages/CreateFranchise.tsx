@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Upload } from 'lucide-react';
-import { useAppDispatch } from '../store/hooks';
-import { createFranchise, createMarkup } from '../store/slices/franchiseSlice';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Check, Upload, Edit } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { createFranchise, createMarkup, fetchFranchiseById, fetchMarkupDetails, updateFranchise, updateMarkup } from '../store/slices/franchiseSlice';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 interface FranchiseFormData {
   // Franchise Details
@@ -39,6 +41,9 @@ interface FranchiseFormData {
 const CreateFranchise: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+  const { currentFranchise, markupDetails } = useAppSelector((state) => state.franchise);
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
   const [franchise_user_id, setFranchiseUserId] = useState<number>(0);
@@ -81,6 +86,47 @@ const CreateFranchise: React.FC = () => {
     }
   });
   const [logoPreview, setLogoPreview] = useState<string>('');
+
+  useEffect(() => {
+    if (isEditMode && id) {
+      dispatch(fetchFranchiseById(id));
+      dispatch(fetchMarkupDetails(id));
+    }
+  }, [dispatch, id, isEditMode]);
+
+  useEffect(() => {
+    if (isEditMode && currentFranchise) {
+      setFormData({
+        ...formData,
+        franchiseName: currentFranchise.store_name,
+        ownerName: currentFranchise.gst_address.name,
+        email: currentFranchise.email,
+        mobile: currentFranchise.mobile_number,
+        gstNumber: currentFranchise.gst_number,
+        panNumber: currentFranchise.pan_number,
+        nameAsPerPan: currentFranchise.name_as_per_pan,
+        locality: currentFranchise.gst_address.locality,
+        building: currentFranchise.gst_address.building,
+        city: currentFranchise.gst_address.city,
+        stateProvince: currentFranchise.gst_address.state,
+        zipPostalCode: currentFranchise.gst_address.area_code,
+        settlementType: currentFranchise.bank_details.settlement_type,
+        accountHolderName: currentFranchise.bank_details.beneficiary_name,
+        accountNumber: currentFranchise.bank_details.settlement_bank_account_no,
+        bankName: currentFranchise.bank_details.bank_name,
+        ifscCode: currentFranchise.bank_details.settlement_ifsc_code,
+        upiId: currentFranchise.bank_details.upi_address,
+        // Replace the markupDetails instead of merging
+        markupDetails: markupDetails.reduce((acc, markup) => ({
+          ...acc,
+          [markup.category_type.toLowerCase().replace(/\s+/g, '')]: {
+            type: markup.markup_type.toLowerCase(),
+            value: markup.markup_value.toString()
+          }
+        }), {}) // Remove formData.markupDetails from here
+      });
+    }
+  }, [currentFranchise, markupDetails, isEditMode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -148,14 +194,22 @@ const CreateFranchise: React.FC = () => {
           "total_available": "0.00"
       },
       "is_franchise": true
-    }
+    };
 
     try {
-      const response = await dispatch(createFranchise(franchiseData)).unwrap();
-      setFranchiseUserId(response.data.id);
-      setCurrentStep(2);
+      if (isEditMode) {
+        // Update franchise
+        const response = await dispatch(updateFranchise({id, franchiseData})).unwrap();
+        console.log('Franchise updated:', response.data);
+        setCurrentStep(2);
+      } else {
+        // Create franchise
+        const response = await dispatch(createFranchise(franchiseData)).unwrap();
+        setFranchiseUserId(response.data.id);
+        setCurrentStep(2);
+      }
     } catch (error) {
-      console.error('Error creating franchise:', error);
+      console.error('Error creating/updating franchise:', error);
     }
   };
 
@@ -164,28 +218,61 @@ const CreateFranchise: React.FC = () => {
     setLoading(true);
 
     try {
-      // Transform and create markups one by one
-      for (const [service, details] of Object.entries(formData.markupDetails)) {
-        // Convert camelCase to Title Case for category_type
-        const categoryType = service
-          .replace(/([A-Z])/g, ' $1')
-          .replace(/^./, str => str.toUpperCase());
+      if (isEditMode) {
+        for (const [service, details] of Object.entries(formData.markupDetails)) {
+          console.log("Service", service);
+          const categoryType = service
+          
+          console.log('Looking for:', categoryType);
+          console.log('Available markups:', markupDetails.map(m => m.category_type));
 
-        const markupPayload = {
-          category_type: categoryType,
-          markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1), // Capitalize first letter
-          markup_value: parseFloat(details.value),
-          created_by_id: franchise_user_id
-        };
+          const existingMarkup = markupDetails.find(markup => 
+            markup.category_type.toLowerCase().replace(/\s+/g, '').trim() === categoryType.toLowerCase().trim()
+          );
 
-        // Create markup for each service type
-        await dispatch(createMarkup(markupPayload)).unwrap();
+          if (!existingMarkup) {
+            console.error(`No existing markup found for ${categoryType}`);
+            continue;
+          }
+
+          const markupPayload = {
+            id: existingMarkup.id, // Use the markup record ID instead of franchise ID
+            markupData: {
+              category_type: categoryType,
+              markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1),
+              markup_value: parseFloat(details.value),
+              created_by_id: existingMarkup.created_by_id // Preserve the original created_by_id
+            }
+          };
+
+          console.log(markupPayload);
+
+          await dispatch(updateMarkup(markupPayload)).unwrap();
+        }
+        toast.success('Markup details updated successfully');
+      } else {
+        // Create new markups (existing create logic)
+        for (const [service, details] of Object.entries(formData.markupDetails)) {
+          const categoryType = service
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase());
+
+          const markupPayload = {
+            category_type: categoryType,
+            markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1),
+            markup_value: parseFloat(details.value),
+            created_by_id: franchise_user_id
+          };
+
+          await dispatch(createMarkup(markupPayload)).unwrap();
+        }
+        toast.success('Markup details created successfully');
       }
-      
-      // Navigate after all markups are created
+
       navigate('/franchise');
     } catch (error) {
-      console.error('Error creating franchise markup:', error);
+      console.error('Error updating/creating markup details:', error);
+      toast.error('Failed to update/create markup details');
     } finally {
       setLoading(false);
     }
@@ -264,7 +351,9 @@ const CreateFranchise: React.FC = () => {
         >
           <ArrowLeft size={24} />
         </button>
-        <h1 className="text-2xl font-bold">Create New Franchise</h1>
+        <h1 className="text-2xl font-bold">
+          {isEditMode ? 'Edit Franchise' : 'Create New Franchise'}
+        </h1>
       </div>
 
       <Stepper />
@@ -688,7 +777,13 @@ const CreateFranchise: React.FC = () => {
             className={`px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
               ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {currentStep === 1 ? 'Next' : loading ? 'Creating...' : 'Create Franchise'}
+            {currentStep === 1 
+              ? (isEditMode ? 'Next' : 'Next')
+              : (loading 
+                  ? 'Updating...' 
+                  : (isEditMode ? 'Update Markup Details' : 'Create Franchise')
+                )
+            }
           </button>
         </div>
       </form>

@@ -162,6 +162,7 @@ function App() {
                 <Route path="/orders/bulk" element={<BulkOrders />} />
                 <Route path="/support/ticket/:ticketId" element={<TicketDetails />} />
                 <Route path="/franchise/view/:id" element={<FranchiseView />} />
+                <Route path="/franchise/edit/:id" element={<CreateFranchise />} />
               </Route>
               <Route path="/user_registration" element={<UserRegistration />} />
 

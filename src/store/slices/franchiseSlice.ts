@@ -185,6 +185,58 @@ export const fetchMarkupDetails = createAsyncThunk(
   }
 );
 
+interface MarkupUpdatePayload {
+  id: string;
+  markupData: {
+    category_type: string;
+    markup_type: string;
+    markup_value: number;
+    created_by_id: number;
+  };
+}
+
+export const updateMarkup = createAsyncThunk(
+  'franchise/updateMarkup',
+  async ({ id, markupData }: MarkupUpdatePayload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${config.apiBaseUrl}/np_markup/${id}/update`,
+        markupData,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update markup');
+    }
+  }
+);
+
+export const updateFranchise = createAsyncThunk(
+  'franchise/updateFranchise',
+  async ({ id, franchiseData }: { id: string; franchiseData: FranchisePayload }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/v1/lsp_backend/auth/${id}/update`,
+        franchiseData,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update franchise');
+    }
+  }
+);
+
 const franchiseSlice = createSlice({
   name: 'franchise',
   initialState,
@@ -235,6 +287,28 @@ const franchiseSlice = createSlice({
         state.markupDetails = action.payload;
       })
       .addCase(fetchMarkupDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateFranchise.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateFranchise.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateFranchise.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateMarkup.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMarkup.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateMarkup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
