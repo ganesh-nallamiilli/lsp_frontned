@@ -113,6 +113,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Cancellation/Failure/return reason</th>
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Platform Charge Amount</th>
               <th scope="col" className="px-6 py-3 whitespace-nowrap">Shipping charges</th>
+              <th scope="col" className="px-6 py-3 whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -149,7 +150,12 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">{order?.cancellationReason || "-"}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{order?.platform_charges ? parseInt(order?.platform_charges).toFixed(2) : "-"}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{order?.quote?.price?.value ? parseInt(order?.quote?.price?.value).toFixed(2) : "-"}</td>
-                
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <select className="border border-gray-300 rounded-lg text-sm p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="view">View</option>
+                    <option value="download">Download Platform Charge Invoice</option>
+                  </select>
+                </td>
               </tr>
             ))}
           </tbody>
