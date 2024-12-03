@@ -193,7 +193,8 @@ const CreateFranchise: React.FC = () => {
           "total_debit": "0.00",
           "total_available": "0.00"
       },
-      "is_franchise": true
+      "is_franchise": true,
+      "compnay_id": 1
     };
 
     try {
