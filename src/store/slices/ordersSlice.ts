@@ -8,6 +8,7 @@ interface OrdersState {
   loading: boolean;
   error: string | null;
   pagination: PaginationMeta;
+  selectedOrder: Order | null;
 }
 
 interface OrderFilters {
@@ -46,6 +47,7 @@ const initialState: OrdersState = {
     total_rows: 0,
     total_pages: 0,
   },
+  selectedOrder: null,
 };
 
 export const fetchOrders = createAsyncThunk(
@@ -111,6 +113,26 @@ export const downloadTemplate = createAsyncThunk(
   }
 );
 
+export const fetchOrderById = createAsyncThunk(
+  'orders/fetchOrderById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${config.apiBaseUrl}/orders/get/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch order details');
+    }
+  }
+);
+
 const ordersSlice = createSlice({
   name: 'orders',
   initialState,
@@ -140,6 +162,18 @@ const ordersSlice = createSlice({
       .addCase(fetchDraftOrders.rejected, (state) => {
         state.loading = false;
         state.error = 'Failed to fetch draft orders';
+      })
+      .addCase(fetchOrderById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedOrder = action.payload;
+      })
+      .addCase(fetchOrderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

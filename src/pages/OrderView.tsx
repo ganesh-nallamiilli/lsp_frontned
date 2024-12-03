@@ -1,12 +1,30 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useOrder } from '../context/OrderContext';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { fetchOrderById } from '../store/slices/ordersSlice';
 
 const OrderView: React.FC = () => {
   const navigate = useNavigate();
-  const { selectedOrder } = useOrder();
+  const { network_order_id } = useParams<{ network_order_id: string }>();
+  const dispatch = useAppDispatch();
+  const { selectedOrder, loading, error } = useAppSelector((state) => state.orders);
+  console.log("network_order_id >>>>>>>>.",network_order_id);
+  useEffect(() => {
+    if (network_order_id) {
+      dispatch(fetchOrderById(network_order_id));
+      console.log("selectedOrder >>>>>>>>.",selectedOrder);
+    }
+  }, [dispatch, network_order_id]);
 
+  if (loading) {
+    return <div className="p-4">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">Error: {error}</div>;
+  }
+  console.log("selectedOrder >>>>>",selectedOrder);
   if (!selectedOrder) {
     return (
       <div className="p-4">
@@ -37,20 +55,20 @@ const OrderView: React.FC = () => {
           <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <dt className="text-sm font-medium text-gray-500">Network Order ID</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.networkOrderId}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.network_order_id}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Retail Order ID</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.retailOrderId}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder['@ondc/org/linked_order'].order.id}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Status</dt>
               <dd className="mt-1">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium 
-                  ${selectedOrder.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                    selectedOrder.status === 'cancelled' ? 'bg-red-100 text-red-800' : 
+                  ${selectedOrder.state === 'completed' ? 'bg-green-100 text-green-800' : 
+                    selectedOrder.state === 'cancelled' ? 'bg-red-100 text-red-800' : 
                     'bg-blue-100 text-blue-800'}`}>
-                  {selectedOrder.status.toUpperCase()}
+                  {selectedOrder.state.toUpperCase()}
                 </span>
               </dd>
             </div>
@@ -83,7 +101,7 @@ const OrderView: React.FC = () => {
           <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <dt className="text-sm font-medium text-gray-500">AWB Number</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.awbNo || '-'}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder['@ondc/org/linked_order'].order.tracking_info.awb_number   || '-'}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Shipment Type</dt>

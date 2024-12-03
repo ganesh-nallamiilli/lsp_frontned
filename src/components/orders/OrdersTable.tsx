@@ -2,24 +2,23 @@ import React, { useState } from 'react';
 import { Package, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Order } from '../../types/orders';
 import { useNavigate } from 'react-router-dom';
-import { useOrder } from '../../context/OrderContext';
+import { useAppDispatch } from '../../store/hooks';
+import { fetchOrderById } from '../../store/slices/ordersSlice';
 import PaginationControls from './PaginationControls';
 
 interface OrdersTableProps {
   orders: Order[];
-  onView: (order: Order) => void;
   onEdit: (order: Order) => void;
   onDelete: (order: Order) => void;
 }
 
 const OrdersTable: React.FC<OrdersTableProps> = ({
   orders,
-  onView,
   onEdit,
   onDelete,
 }) => {
   const navigate = useNavigate();
-  const { setSelectedOrder } = useOrder();
+  const dispatch = useAppDispatch();
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,9 +52,18 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const handleViewOrder = (order: Order) => {
-    setSelectedOrder(order);
-    navigate(`/orders/${order.id}`);
+  const handleActionChange = async (event: React.ChangeEvent<HTMLSelectElement>, order: Order) => {
+    const action = event.target.value;
+    
+    if (action === 'view') {
+      try {
+        await dispatch(fetchOrderById(order.network_order_id)).unwrap();
+        navigate(`/orders/${order.network_order_id}`);
+      } catch (error) {
+        console.error('Failed to fetch order details:', error);
+        // You might want to show an error toast here
+      }
+    }
   };
 
   return (
@@ -151,7 +159,12 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">{order?.platform_charges ? parseInt(order?.platform_charges).toFixed(2) : "-"}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{order?.quote?.price?.value ? parseInt(order?.quote?.price?.value).toFixed(2) : "-"}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <select className="border border-gray-300 rounded-lg text-sm p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <select 
+                    className="border border-gray-300 rounded-lg text-sm p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    onChange={(e) => handleActionChange(e, order)}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select Action</option>
                     <option value="view">View</option>
                     <option value="download">Download Platform Charge Invoice</option>
                   </select>

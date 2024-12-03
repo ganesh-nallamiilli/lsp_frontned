@@ -134,7 +134,7 @@ function App() {
                 <Route path="profile" element={<Profile />} />
                 <Route path="support" element={<Support />} />
                 <Route path="orders/create" element={<CreateOrderPage />} />
-                <Route path="orders/:id" element={<OrderView />} />
+                <Route path="orders/:network_order_id" element={<OrderView />} />
                 <Route path="search-logistics" element={<SearchLogistics />} />
                 <Route 
                   path="/confirmation-instructions" 
