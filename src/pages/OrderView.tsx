@@ -101,27 +101,27 @@ const OrderView: React.FC = () => {
           <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <dt className="text-sm font-medium text-gray-500">AWB Number</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder['@ondc/org/linked_order'].order.tracking_info.awb_number   || '-'}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{'-'}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Shipment Type</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.shipmentType}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.category_type}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Logistics Provider</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.logisticsProvider}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.context.bap_id}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Pickup City</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.pickupCity}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.billing_address.address.city}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Delivery City</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.deliveryCity}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.end_location.location.address.city}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Promised TAT</dt>
-              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.promisedTatDelivery}</dd>
+              <dd className="mt-1 text-sm text-gray-900">{selectedOrder.context.timestamp}</dd>
             </div>
           </dl>
         </div>
