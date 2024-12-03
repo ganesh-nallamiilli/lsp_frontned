@@ -50,16 +50,26 @@ interface Franchise {
   status: boolean;
 }
 
+interface MarkupDetail {
+  shipping_service_type: string;
+  markup_type: string;
+  markup_value: number;
+}
+
 interface FranchiseState {
   franchises: Franchise[];
   loading: boolean;
   error: string | null;
+  currentFranchise: Franchise | null;
+  markupDetails: MarkupDetail[];
 }
 
 const initialState: FranchiseState = {
   franchises: [],
   loading: false,
   error: null,
+  currentFranchise: null,
+  markupDetails: [],
 };
 
 interface FranchiseResponse {
@@ -137,6 +147,44 @@ export const fetchFranchises = createAsyncThunk(
   }
 );
 
+export const fetchFranchiseById = createAsyncThunk(
+  'franchise/fetchById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${config.apiBaseUrl}/auth/get/${id}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch franchise details');
+    }
+  }
+);
+
+export const fetchMarkupDetails = createAsyncThunk(
+  'franchise/fetchMarkupDetails',
+  async (franchiseUserId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${config.apiBaseUrl}/np_markup?created_by_id=${franchiseUserId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch markup details');
+    }
+  }
+);
+
 const franchiseSlice = createSlice({
   name: 'franchise',
   initialState,
@@ -163,6 +211,30 @@ const franchiseSlice = createSlice({
         state.franchises = action.payload;
       })
       .addCase(fetchFranchises.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchFranchiseById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFranchiseById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentFranchise = action.payload;
+      })
+      .addCase(fetchFranchiseById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch franchise';
+      })
+      .addCase(fetchMarkupDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMarkupDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.markupDetails = action.payload;
+      })
+      .addCase(fetchMarkupDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

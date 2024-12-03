@@ -42,6 +42,7 @@ import BulkOrders from './pages/BulkOrders';
 import TicketDetails from './pages/TicketDetails';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
+import FranchiseView from './pages/FranchiseView';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -160,6 +161,7 @@ function App() {
                 <Route path="/franchise/create" element={<CreateFranchise />} />
                 <Route path="/orders/bulk" element={<BulkOrders />} />
                 <Route path="/support/ticket/:ticketId" element={<TicketDetails />} />
+                <Route path="/franchise/view/:id" element={<FranchiseView />} />
               </Route>
               <Route path="/user_registration" element={<UserRegistration />} />
 

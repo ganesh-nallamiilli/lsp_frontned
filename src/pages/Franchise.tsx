@@ -229,7 +229,10 @@ const Franchise: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-3">
-                      <button className="text-gray-600 hover:text-blue-600">
+                      <button 
+                        className="text-gray-600 hover:text-blue-600"
+                        onClick={() => navigate(`/franchise/view/${franchise.id}`)}
+                      >
                         <Eye size={18} />
                       </button>
                       <button className="text-gray-600 hover:text-blue-600">
