@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, Edit, Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchFranchises } from '../store/slices/franchiseSlice';
 
 interface Franchise {
   franchiseName: string;
@@ -14,31 +16,32 @@ interface Franchise {
 
 const Franchise: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { franchises, loading, error } = useAppSelector((state) => state.franchise);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Mock data - replace with actual API call
-  const franchises: Franchise[] = [
-    {
-      franchiseName: "akash",
-      ownerName: "akash",
-      email: "akash.bairagi@zionmart.in",
-      mobile: "9834446317",
-      panNumber: "DDWPG8500F",
-      createDate: "16-11-2024 11:22 am",
-      status: true
-    },
-    // Add more mock data as needed
-  ];
+  useEffect(() => {
+    dispatch(fetchFranchises());
+  }, [dispatch]);
+
+  // Filter franchises based on search term and status
+  const filteredFranchises = franchises.filter((franchise) => {
+    console.log("franchise",franchise);
+    const matchesSearch = franchise.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = !statusFilter || 
+      (statusFilter === 'active' ? franchise.status : !franchise.status);
+    return matchesSearch && matchesStatus;
+  });
 
   // Pagination calculations
-  const totalItems = franchises.length;
+  const totalItems = filteredFranchises.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = franchises.slice(startIndex, endIndex);
+  const currentItems = filteredFranchises.slice(startIndex, endIndex);
 
   // Pagination handlers
   const goToPage = (page: number) => {
@@ -169,83 +172,88 @@ const Franchise: React.FC = () => {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Franchise Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Owner Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Mobile
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                PAN Number
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Create Date & time
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {currentItems.map((franchise, index) => (
-              <tr key={index}>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.franchiseName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.ownerName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.mobile}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.panNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{franchise.createDate}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only peer"
-                      checked={franchise.status}
-                      onChange={() => {/* Handle status change */}}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex gap-3">
-                    <button className="text-gray-600 hover:text-blue-600">
-                      <Eye size={18} />
-                    </button>
-                    <button className="text-gray-600 hover:text-blue-600">
-                      <Edit size={18} />
-                    </button>
-                  </div>
-                </td>
+      {loading ? (
+        <div className="text-center py-4">Loading...</div>
+      ) : error ? (
+        <div className="text-center text-red-600 py-4">{error}</div>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Franchise Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Owner Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Mobile
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  PAN Number
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Create Date & time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {currentItems.map((franchise, index) => (
+                <tr key={index}>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.store_name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.mobile_number}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.pan_number}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{franchise.createdAt}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer"
+                        checked={franchise.is_active}
+                        onChange={() => {/* Handle status change */}}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex gap-3">
+                      <button className="text-gray-600 hover:text-blue-600">
+                        <Eye size={18} />
+                      </button>
+                      <button className="text-gray-600 hover:text-blue-600">
+                        <Edit size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Pagination */}
-        <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
-          <div className="text-sm text-gray-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{' '}
-            {totalItems} results
-          </div>
-          <div className="flex gap-2 items-center">
-            {renderPaginationButtons()}
+          {/* Pagination */}
+          <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+            <div className="text-sm text-gray-500">
+              Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{' '}
+              {totalItems} results
+            </div>
+            <div className="flex gap-2 items-center">
+              {renderPaginationButtons()}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

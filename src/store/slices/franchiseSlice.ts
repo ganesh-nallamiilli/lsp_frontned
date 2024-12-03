@@ -40,12 +40,24 @@ interface FranchisePayload {
   is_franchise: boolean;
 }
 
+interface Franchise {
+  franchiseName: string;
+  ownerName: string;
+  email: string;
+  mobile: string;
+  panNumber: string;
+  createDate: string;
+  status: boolean;
+}
+
 interface FranchiseState {
+  franchises: Franchise[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: FranchiseState = {
+  franchises: [],
   loading: false,
   error: null,
 };
@@ -106,6 +118,25 @@ export const createMarkup = createAsyncThunk(
   }
 );
 
+export const fetchFranchises = createAsyncThunk(
+  'franchise/fetchFranchises',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${config.apiBaseUrl}/auth?is_franchise=true`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch franchises');
+    }
+  }
+);
+
 const franchiseSlice = createSlice({
   name: 'franchise',
   initialState,
@@ -120,6 +151,18 @@ const franchiseSlice = createSlice({
         state.loading = false;
       })
       .addCase(createFranchise.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchFranchises.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFranchises.fulfilled, (state, action) => {
+        state.loading = false;
+        state.franchises = action.payload;
+      })
+      .addCase(fetchFranchises.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
