@@ -87,6 +87,12 @@ const INDIAN_STATES = [
   'Puducherry'
 ];
 
+type UserType = 'STANDALONE_USER' | 'STANDALONE_ADMIN';
+
+const getUserType = (): UserType => {
+  return (localStorage.getItem('user_type') as UserType) || 'STANDALONE_USER';
+};
+
 const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAuthStore();
@@ -98,6 +104,9 @@ const Profile: React.FC = () => {
     bank: false
   });
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [userType, setUserType] = useState<UserType>('STANDALONE_USER');
+  const [signature, setSignature] = useState<File | null>(null);
+  const [signaturePreview, setSignaturePreview] = useState<string>('');
 
   const [form, setForm] = useState({
     storeName: '',
@@ -176,6 +185,10 @@ const Profile: React.FC = () => {
       dispatch(fetchDeliveryAddresses());
     }
   }, [activeTab, dispatch]);
+
+  useEffect(() => {
+    setUserType(getUserType());
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -545,6 +558,21 @@ const Profile: React.FC = () => {
               </div>
             </div>
           </div>
+          
+          {userType === 'STANDALONE_ADMIN' && (
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-500 w-32">Signature:</span>
+              {signaturePreview ? (
+                <img 
+                  src={signaturePreview} 
+                  alt="Signature" 
+                  className="h-20 max-w-[200px] object-contain"
+                />
+              ) : (
+                <span className="text-gray-900">No signature uploaded</span>
+              )}
+            </div>
+          )}
         </div>
       );
     }
@@ -714,6 +742,36 @@ const Profile: React.FC = () => {
             </div>
           </div>
         </div>
+        
+        {userType === 'STANDALONE_ADMIN' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Signature
+            </label>
+            <div className="flex items-center space-x-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleSignatureChange}
+                className="hidden"
+                id="signature-upload"
+              />
+              <label
+                htmlFor="signature-upload"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+              >
+                Upload Signature
+              </label>
+              {signaturePreview && (
+                <img 
+                  src={signaturePreview} 
+                  alt="Signature Preview" 
+                  className="h-20 max-w-[200px] object-contain"
+                />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -1569,45 +1627,75 @@ const Profile: React.FC = () => {
     return time.replace(':', '');
   };
 
+  const renderTabs = () => {
+    if (userType === 'STANDALONE_ADMIN') {
+      return (
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('basic')}
+            className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'basic'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Basic Information
+          </button>
+        </nav>
+      );
+    }
+
+    return (
+      <nav className="-mb-px flex space-x-8">
+        <button
+          onClick={() => setActiveTab('basic')}
+          className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+            activeTab === 'basic'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          Basic Information
+        </button>
+        <button
+          onClick={() => setActiveTab('bank')}
+          className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+            activeTab === 'bank'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          Bank Details
+        </button>
+        <button
+          onClick={() => setActiveTab('addresses')}
+          className={`pb-4 px-1 border-b-2 font-medium text-sm ${
+            activeTab === 'addresses'
+              ? 'border-blue-500 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          Addresses
+        </button>
+      </nav>
+    );
+  };
+
+  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSignature(file);
+      setSignaturePreview(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <>
       <div className="container mx-auto px-4 py-8">
         {/* Tabs */}
         <div className="mb-8">
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8">
-              <button
-                onClick={() => setActiveTab('basic')}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'basic'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Basic Information
-              </button>
-              
-              <button
-                onClick={() => setActiveTab('bank')}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'bank'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Bank Details
-              </button>
-              <button
-                onClick={() => setActiveTab('addresses')}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'addresses'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Addresses
-              </button>
-            </nav>
+            {renderTabs()}
           </div>
         </div>
 
@@ -1641,42 +1729,47 @@ const Profile: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'addresses' && (
-            <div>{renderAddressTab()}</div>
-          )}
+          {/* Only show these tabs for STANDALONE_USER */}
+          {userType === 'STANDALONE_USER' && (
+            <>
+              {activeTab === 'addresses' && (
+                <div>{renderAddressTab()}</div>
+              )}
 
-          {activeTab === 'bank' && (
-            <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-              <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-                <div>
-                  <h4 className="text-base font-medium text-gray-900">Bank Details</h4>
-                  <p className="text-sm text-gray-500 mt-1">Manage your bank account information</p>
+              {activeTab === 'bank' && (
+                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+                  <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+                    <div>
+                      <h4 className="text-base font-medium text-gray-900">Bank Details</h4>
+                      <p className="text-sm text-gray-500 mt-1">Manage your bank account information</p>
+                    </div>
+                    <button
+                      onClick={() => editMode.bank ? handleSaveBankDetails() : toggleEdit('bank')}
+                      className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    >
+                      {editMode.bank ? (
+                        <>
+                          <Save className="w-4 h-4" />
+                          Save Changes
+                        </>
+                      ) : (
+                        <>
+                          <Pencil className="w-4 h-4" />
+                          Edit Details
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <div className="p-6">{renderBankDetails()}</div>
                 </div>
-                <button
-                  onClick={() => editMode.bank ? handleSaveBankDetails() : toggleEdit('bank')}
-                  className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
-                >
-                  {editMode.bank ? (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Save Changes
-                    </>
-                  ) : (
-                    <>
-                      <Pencil className="w-4 h-4" />
-                      Edit Details
-                    </>
-                  )}
-                </button>
-              </div>
-              <div className="p-6">{renderBankDetails()}</div>
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
-      {/* Address Modal */}
-      {showAddressModal && (
+      {/* Address Modal - Only for STANDALONE_USER */}
+      {userType === 'STANDALONE_USER' && showAddressModal && (
         <AddressModal
           isOpen={showAddressModal}
           onClose={() => {
