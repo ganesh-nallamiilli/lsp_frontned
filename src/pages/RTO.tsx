@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRTOOrders } from '../store/slices/rtoSlice';
+import { fetchRTOOrders, exportRTOOrders } from '../store/slices/rtoSlice';
 import { RootState } from '../store/store';
 import { Download, RotateCcw } from 'lucide-react';
 import OrdersTable from '../components/orders/OrdersTable';
 import OrderFilters from '../components/orders/OrderFilters';
 import { Order } from '../types/orders';
+import { toast } from 'react-hot-toast';
 
 const RTO: React.FC = () => {
   const dispatch = useDispatch();
@@ -55,7 +56,14 @@ const RTO: React.FC = () => {
   };
 
   const handleExport = () => {
-    // Implement export logic
+    dispatch(exportRTOOrders(filters))
+      .unwrap()
+      .then(() => {
+        toast.success('Export started successfully');
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to export RTO orders');
+      });
   };
 
   const handleView = (order: Order) => {

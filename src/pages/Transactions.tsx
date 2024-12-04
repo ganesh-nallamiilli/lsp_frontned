@@ -2,7 +2,8 @@ import React from 'react';
 import { ArrowUpRight, ArrowDownLeft, Download, Filter, Search, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchTransactions } from '../store/slices/transactionSlice';
+import { fetchTransactions, exportTransactions } from '../store/slices/transactionSlice';
+import { toast } from 'react-hot-toast';
 
 const Transactions: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -15,6 +16,24 @@ const Transactions: React.FC = () => {
   useEffect(() => {
     dispatch(fetchTransactions());
   }, [dispatch]);
+
+  const handleExport = () => {
+    const filters = {
+      search: searchQuery,
+      from_date: fromDate,
+      to_date: toDate,
+      transaction_type: transactionType
+    };
+
+    dispatch(exportTransactions(filters))
+      .unwrap()
+      .then(() => {
+        toast.success('Export started successfully');
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to export transactions');
+      });
+  };
 
   return (
     <div className="space-y-6">
@@ -30,7 +49,10 @@ const Transactions: React.FC = () => {
             <Filter className="w-4 h-4 mr-2" />
             Filter
           </button>
-          <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+          <button 
+            onClick={handleExport}
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
             <Download className="w-4 h-4 mr-2" />
             Export
           </button>

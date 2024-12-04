@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchReturnOrders } from '../store/slices/returnsSlice';
+import { fetchReturnOrders, exportReturnOrders } from '../store/slices/returnsSlice';
 import { RootState } from '../store/store';
 import { Download } from 'lucide-react';
 import OrdersTable from '../components/orders/OrdersTable';
 import OrderFilters from '../components/orders/OrderFilters';
 import { Order } from '../types/orders';
+import { toast } from 'react-hot-toast';
 
 const Returns: React.FC = () => {
   const dispatch = useDispatch();
@@ -53,7 +54,14 @@ const Returns: React.FC = () => {
   };
 
   const handleExport = () => {
-    // Implement export logic
+    dispatch(exportReturnOrders(filters))
+      .unwrap()
+      .then(() => {
+        toast.success('Export started successfully');
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to export return orders');
+      });
   };
 
   const handleView = (order: Order) => {

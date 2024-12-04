@@ -74,6 +74,38 @@ export const fetchRTOOrders = createAsyncThunk(
   }
 );
 
+export const exportRTOOrders = createAsyncThunk(
+  'rto/exportRTOOrders',
+  async (filters: RTOFilters = {}, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Build query params with rto=true
+      const queryParams = new URLSearchParams({ rto: 'true' });
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
+      });
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/orders/download_csv?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      // Download the file using the URL from the response
+      const downloadUrl = response.data.data.url;
+      window.open(downloadUrl, '_blank');
+      
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to export RTO orders');
+    }
+  }
+);
+
 const rtoSlice = createSlice({
   name: 'rto',
   initialState,

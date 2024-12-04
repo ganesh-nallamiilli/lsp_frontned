@@ -53,6 +53,38 @@ export const fetchReturnOrders = createAsyncThunk(
   }
 );
 
+export const exportReturnOrders = createAsyncThunk(
+  'returns/exportReturnOrders',
+  async (filters: ReturnFilters = {}, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Build query params with return=true
+      const queryParams = new URLSearchParams({ return: 'true' });
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
+      });
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/orders/download_csv?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      // Download the file using the URL from the response
+      const downloadUrl = response.data.data.url;
+      window.open(downloadUrl, '_blank');
+      
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to export return orders');
+    }
+  }
+);
+
 const returnsSlice = createSlice({
   name: 'returns',
   initialState,

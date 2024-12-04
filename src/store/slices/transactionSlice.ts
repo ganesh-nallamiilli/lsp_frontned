@@ -89,6 +89,38 @@ export const fetchTransactions = createAsyncThunk(
   }
 );
 
+export const exportTransactions = createAsyncThunk(
+  'transactions/exportTransactions',
+  async (filters: FetchTransactionsParams = {}, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Build query params
+      const queryParams = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) queryParams.append(key, value);
+      });
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/wallet/download_csv?${queryParams.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      // Download the file using the URL from the response
+      const downloadUrl = response.data.data.url;
+      window.open(downloadUrl, '_blank');
+      
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to export transactions');
+    }
+  }
+);
+
 const transactionSlice = createSlice({
   name: 'transactions',
   initialState,
