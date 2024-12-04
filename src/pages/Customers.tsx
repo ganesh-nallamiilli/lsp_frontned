@@ -3,21 +3,8 @@ import { Table } from '../components/ui/table';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
-
-interface Customer {
-  id: string;
-  userName: string;
-  email: string;
-  mobileNumber: string;
-  userType: "STANDALONE_USER";
-  totalCancelledOrders: number;
-  totalOrders: number;
-  totalDeliveredOrders: number;
-  totalRTO: number;
-  totalAmount: number;
-  walletAmount: number;
-  createdAt: string;
-}
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchCustomers } from '../store/slices/customerSlice';
 
 interface PaginationProps {
   currentPage: number;
@@ -26,149 +13,6 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (items: number) => void;
 }
-
-const mockCustomers: Customer[] = [
-  {
-    id: "1",
-    userName: "John Doe",
-    email: "john.doe@example.com",
-    mobileNumber: "9876543210",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 2,
-    totalOrders: 15,
-    totalDeliveredOrders: 12,
-    totalRTO: 1,
-    totalAmount: 25000,
-    walletAmount: 500,
-    createdAt: "2024-01-15T10:30:00Z"
-  },
-  {
-    id: "2",
-    userName: "Jane Smith",
-    email: "jane.smith@example.com",
-    mobileNumber: "9876543211",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 1,
-    totalOrders: 25,
-    totalDeliveredOrders: 23,
-    totalRTO: 1,
-    totalAmount: 45000,
-    walletAmount: 1200,
-    createdAt: "2024-01-20T14:20:00Z"
-  },
-  {
-    id: "3",
-    userName: "Robert Johnson",
-    email: "robert.j@example.com",
-    mobileNumber: "9876543212",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 0,
-    totalOrders: 8,
-    totalDeliveredOrders: 8,
-    totalRTO: 0,
-    totalAmount: 12000,
-    walletAmount: 200,
-    createdAt: "2024-02-01T09:15:00Z"
-  },
-  {
-    id: "4",
-    userName: "Sarah Williams",
-    email: "sarah.w@example.com",
-    mobileNumber: "9876543213",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 3,
-    totalOrders: 30,
-    totalDeliveredOrders: 25,
-    totalRTO: 2,
-    totalAmount: 55000,
-    walletAmount: 1500,
-    createdAt: "2024-02-05T16:45:00Z"
-  },
-  {
-    id: "5",
-    userName: "Michael Brown",
-    email: "michael.b@example.com",
-    mobileNumber: "9876543214",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 1,
-    totalOrders: 12,
-    totalDeliveredOrders: 10,
-    totalRTO: 1,
-    totalAmount: 18000,
-    walletAmount: 300,
-    createdAt: "2024-02-10T11:30:00Z"
-  },
-  {
-    id: "6",
-    userName: "Emily Davis",
-    email: "emily.d@example.com",
-    mobileNumber: "9876543215",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 2,
-    totalOrders: 20,
-    totalDeliveredOrders: 17,
-    totalRTO: 1,
-    totalAmount: 35000,
-    walletAmount: 800,
-    createdAt: "2024-02-15T13:20:00Z"
-  },
-  {
-    id: "7",
-    userName: "David Wilson",
-    email: "david.w@example.com",
-    mobileNumber: "9876543216",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 0,
-    totalOrders: 5,
-    totalDeliveredOrders: 5,
-    totalRTO: 0,
-    totalAmount: 8000,
-    walletAmount: 100,
-    createdAt: "2024-02-20T10:10:00Z"
-  },
-  {
-    id: "8",
-    userName: "Lisa Anderson",
-    email: "lisa.a@example.com",
-    mobileNumber: "9876543217",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 1,
-    totalOrders: 28,
-    totalDeliveredOrders: 26,
-    totalRTO: 1,
-    totalAmount: 48000,
-    walletAmount: 1000,
-    createdAt: "2024-02-25T15:30:00Z"
-  },
-  {
-    id: "9",
-    userName: "James Taylor",
-    email: "james.t@example.com",
-    mobileNumber: "9876543218",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 1,
-    totalOrders: 10,
-    totalDeliveredOrders: 8,
-    totalRTO: 1,
-    totalAmount: 15000,
-    walletAmount: 250,
-    createdAt: "2024-03-01T09:45:00Z"
-  },
-  {
-    id: "10",
-    userName: "Emma Martinez",
-    email: "emma.m@example.com",
-    mobileNumber: "9876543219",
-    userType: "STANDALONE_USER",
-    totalCancelledOrders: 2,
-    totalOrders: 22,
-    totalDeliveredOrders: 19,
-    totalRTO: 1,
-    totalAmount: 40000,
-    walletAmount: 900,
-    createdAt: "2024-03-05T14:15:00Z"
-  }
-];
 
 const Pagination: React.FC<PaginationProps> = ({ 
   currentPage, 
@@ -253,38 +97,27 @@ const Pagination: React.FC<PaginationProps> = ({
 };
 
 const Customers: React.FC = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const dispatch = useAppDispatch();
+  const { customers, loading, error, pagination } = useAppSelector((state) => state.customers);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
-    // Simulate API call with mock data
-    const fetchCustomers = async () => {
+    const fetchData = async () => {
       try {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setCustomers(mockCustomers);
-      } catch (error) {
-        console.error('Error fetching customers:', error);
-      } finally {
-        setIsLoading(false);
+        await dispatch(fetchCustomers({ 
+          page: currentPage, 
+          perPage: itemsPerPage,
+          search: searchTerm 
+        })).unwrap();
+      } catch (err) {
+        console.error('Failed to fetch customers:', err);
       }
     };
 
-    fetchCustomers();
-  }, []);
-
-  const filteredCustomers = customers.filter(customer =>
-    customer.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.mobileNumber.includes(searchTerm)
-  );
-
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + itemsPerPage);
+    fetchData();
+  }, [dispatch, currentPage, itemsPerPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -292,8 +125,16 @@ const Customers: React.FC = () => {
 
   const handleItemsPerPageChange = (items: number) => {
     setItemsPerPage(items);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="text-red-500">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -316,7 +157,7 @@ const Customers: React.FC = () => {
         </div>
       </div>
 
-      {isLoading ? (
+      {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
@@ -340,22 +181,22 @@ const Customers: React.FC = () => {
                 </Table.Row>
               </Table.Header>
               <Table.Body>
-                {paginatedCustomers.map((customer) => (
+                {customers?.map((customer) => (
                   <Table.Row key={customer.id}>
-                    <Table.Cell>{customer.userName}</Table.Cell>
+                    <Table.Cell>{customer.name || 'N/A'}</Table.Cell>
                     <Table.Cell>{customer.email}</Table.Cell>
-                    <Table.Cell>{customer.mobileNumber}</Table.Cell>
+                    <Table.Cell>{customer.mobile_number || 'N/A'}</Table.Cell>
                     <Table.Cell>
                       <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                        STANDALONE_USER
+                        {customer.user_types?.[0]?.name || 'N/A'}
                       </span>
                     </Table.Cell>
-                    <Table.Cell>{customer.totalCancelledOrders}</Table.Cell>
-                    <Table.Cell>{customer.totalOrders}</Table.Cell>
-                    <Table.Cell>{customer.totalDeliveredOrders}</Table.Cell>
-                    <Table.Cell>{customer.totalRTO}</Table.Cell>
-                    <Table.Cell>₹{customer.totalAmount.toLocaleString()}</Table.Cell>
-                    <Table.Cell>₹{customer.walletAmount.toLocaleString()}</Table.Cell>
+                    <Table.Cell>{customer.aggrigate?.total_cancelled_orders_count || 0}</Table.Cell>
+                    <Table.Cell>{customer.aggrigate?.total_orders_count || 0}</Table.Cell>
+                    <Table.Cell>{customer.aggrigate?.total_delivered_orders || 0}</Table.Cell>
+                    <Table.Cell>{customer.aggrigate?.total_rto || 0}</Table.Cell>
+                    <Table.Cell>₹{(customer.aggrigate?.total_amount || 0).toLocaleString()}</Table.Cell>
+                    <Table.Cell>₹{parseFloat(customer.wallet?.total_available || '0').toLocaleString()}</Table.Cell>
                     <Table.Cell>
                       {new Date(customer.createdAt).toLocaleString()}
                     </Table.Cell>
@@ -367,7 +208,7 @@ const Customers: React.FC = () => {
           
           <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={pagination.total_pages}
             itemsPerPage={itemsPerPage}
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
