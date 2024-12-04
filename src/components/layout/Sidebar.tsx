@@ -32,10 +32,12 @@ const Sidebar: React.FC = () => {
     { icon: RefreshCcw, label: 'Returns', path: '/returns' },
     { icon: FileText, label: 'Billing', path: '/billing', hideFor: ['STANDALONE_ADMIN'] },
     { icon: Receipt, label: 'Transactions', path: '/transactions' },
+    { icon: Wallet, label: 'Payouts', path: '/payouts' },
     { icon: Users, label: 'Customers', path: '/customers', showFor: ['STANDALONE_ADMIN'] },
     { icon: Store, label: 'Franchise', path: '/franchise', showFor: ['STANDALONE_ADMIN'] },
     { icon: HeadphonesIcon, label: 'Support', path: '/support' },
     { icon: Settings, label: 'Settings', path: '/settings',  showFor: ['STANDALONE_ADMIN'] },
+    
   ];
 
   return (

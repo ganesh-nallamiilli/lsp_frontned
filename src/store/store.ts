@@ -11,6 +11,7 @@ import billingReducer from './slices/billingSlice';
 import draftOrderReducer from './slices/draftOrderSlice';
 import franchiseReducer from './slices/franchiseSlice';
 import customerReducer from './slices/customerSlice';
+import payoutReducer from './slices/payoutSlice';
 
 export const store = configureStore({
   reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
     draftOrders: draftOrderReducer,
     franchise: franchiseReducer,
     customers: customerReducer,
+    payouts: payoutReducer,
   },
 });
 
