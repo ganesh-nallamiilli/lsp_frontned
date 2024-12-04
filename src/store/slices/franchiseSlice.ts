@@ -221,7 +221,7 @@ export const updateFranchise = createAsyncThunk(
   async ({ id, franchiseData }: { id: string; franchiseData: FranchisePayload }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/v1/lsp_backend/auth/${id}/update`,
+        `${config.apiBaseUrl}/auth/${id}/update`,
         franchiseData,
         {
           headers: {
