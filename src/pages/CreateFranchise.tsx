@@ -194,7 +194,7 @@ const CreateFranchise: React.FC = () => {
           "total_available": "0.00"
       },
       "is_franchise": true,
-      "compnay_id": 1
+      "company_id": 1
     };
 
     try {
