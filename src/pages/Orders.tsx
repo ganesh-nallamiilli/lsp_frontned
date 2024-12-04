@@ -6,9 +6,10 @@ import TabPanel from '../components/common/TabPanel';
 import { Order } from '../types/orders';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchOrders } from '../store/slices/ordersSlice';
+import { fetchOrders, exportOrders } from '../store/slices/ordersSlice';
 import DraftOrdersTable from '../components/orders/DraftOrdersTable';
 import { fetchDraftOrders } from '../store/slices/draftOrderSlice';
+import { toast } from 'react-hot-toast';
 
 const Orders: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -104,7 +105,14 @@ const Orders: React.FC = () => {
   ];
 
   const handleExport = () => {
-    // Implement export logic
+    dispatch(exportOrders(filters))
+      .unwrap()
+      .then(() => {
+        toast.success('Export started successfully');
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to export orders');
+      });
   };
 
   const handleView = (order: Order) => {
