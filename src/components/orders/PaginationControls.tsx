@@ -45,8 +45,9 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div id="pagination-controls-container" className="flex items-center space-x-2">
       <button
+        id="pagination-controls-container-previous-button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className={`p-2 rounded-lg ${
@@ -60,6 +61,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 
       {getPageNumbers().map((pageNumber, index) => (
         <button
+          id={`pagination-controls-container-page-button-${index}`}
           key={index}
           onClick={() => typeof pageNumber === 'number' && onPageChange(pageNumber)}
           className={`px-3 py-1 rounded-lg ${
@@ -75,6 +77,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       ))}
 
       <button
+        id="pagination-controls-container-next-button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className={`p-2 rounded-lg ${

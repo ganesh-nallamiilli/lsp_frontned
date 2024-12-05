@@ -8,7 +8,7 @@ interface TabPanelProps {
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
   return (
-    <div
+    <div                                                                                                                                                                                                          
       role="tabpanel"
       hidden={value !== index}
       id={`tabpanel-${index}`}

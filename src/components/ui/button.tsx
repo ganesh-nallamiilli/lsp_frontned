@@ -29,6 +29,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      id="button"
       className={`
         ${baseStyles}
         ${variants[variant]}

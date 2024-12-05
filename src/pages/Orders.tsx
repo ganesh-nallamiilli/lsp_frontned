@@ -148,23 +148,25 @@ const Orders: React.FC = () => {
   const renderFilters = () => {
     if (activeTab === 7) { // Draft Orders tab
       return (
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex gap-4 items-center">
-            <div className="relative">
+        <div id="draft-orders-filters-container" className="flex justify-between items-center mb-6">
+          <div id="draft-orders-filters-container-search-input" className="flex gap-4 items-center">
+            <div id="draft-orders-filters-container-search-input-search-input" className="relative">
               <input
+                id="draft-orders-filters-container-search-input-search-input-input"
                 type="text"
                 placeholder="Search Retail Order ID"
                 className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => handleSearch(e.target.value)}
               />
-              <span className="absolute left-3 top-2.5 text-gray-400">
+              <span id="draft-orders-filters-container-search-input-search-input-search-icon" className="absolute left-3 top-2.5 text-gray-400">
                 <SearchIcon className="w-5 h-5" />
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div id="draft-orders-filters-container-actions" className="flex items-center gap-3">
             {selectedOrders.length > 0 && (
               <button
+                id="draft-orders-filters-container-actions-button-delete"
                 onClick={() => handleBulkDelete()}
                 className="flex items-center px-3 py-2 text-red-600 hover:text-red-700"
                 title="Delete selected orders"
@@ -174,6 +176,7 @@ const Orders: React.FC = () => {
             )}
             <button
               onClick={handleBulkOrder}
+              id="draft-orders-filters-container-actions-button-bulk-order"
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               BULK ORDER
@@ -239,19 +242,22 @@ const Orders: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
-        <div className="flex gap-3">
+      <div id="orders-container-header" className="flex justify-between items-center">
+        <h1 id="orders-container-header-title" className="text-2xl font-bold text-gray-900">Orders Management</h1>
+        <div id="orders-container-header-actions" className="flex gap-3">
           {localStorage.getItem('user_type') !== 'STANDALONE_ADMIN' && (
             <button
               onClick={handleCreateOrder}
+              id="orders-container-header-actions-button-create-order"
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Order
-          </button>)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Order
+            </button>
+          )}
           <button
             onClick={handleExport}
+            id="orders-container-header-actions-button-export-orders"
             className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
             <Download className="w-4 h-4 mr-2" />
@@ -261,12 +267,13 @@ const Orders: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        <div className="border-b border-gray-200">
-          <nav className="flex overflow-x-auto">
+        <div id="orders-container-tabs" className="border-b border-gray-200">
+          <nav id="orders-container-tabs-nav" className="flex overflow-x-auto">
             {tabs.map((tab, index) => (
               <button
                 key={index}
                 onClick={() => setActiveTab(index)}
+                id={`orders-container-tabs-nav-button-${index}`}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
                   activeTab === index
                     ? 'border-b-2 border-indigo-500 text-indigo-600'
@@ -274,7 +281,7 @@ const Orders: React.FC = () => {
                 }`}
               >
                 {tab.label}
-                <span className="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
+                <span id={`orders-container-tabs-nav-button-${index}-count`} className="ml-2 bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
                   {tab.count}
                 </span>
               </button>
@@ -282,12 +289,12 @@ const Orders: React.FC = () => {
           </nav>
         </div>
 
-        <div className="p-6">
+        <div id="orders-container-content" className="p-6">
           {renderFilters()}
 
           {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <div id="orders-container-content-loading" className="flex items-center justify-center py-8">
+              <div id="orders-container-content-loading-spinner" className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
           ) : (
             tabs.map((_, index) => (

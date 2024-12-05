@@ -7,7 +7,7 @@ import { initiateLogin, resetAuth, verifyOtp } from '../store/slices/authSlice';
 
 const LogisticsAnimation = () => {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div id="logistics-animation" className="absolute inset-0 overflow-hidden pointer-events-none">
       <div className="absolute animate-drive-right">
         <Truck className="w-12 h-12 text-blue-500 opacity-30" />
       </div>
@@ -125,14 +125,15 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
+    <div id="login-page" className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
       <LogisticsAnimation />
       
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-8">
+      <div id="login-container" className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div id="login-form-card" className="max-w-md w-full space-y-8 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-8">
           {/* Logo */}
-          <div className="flex justify-center">
+          <div id="login-logo-container" className="flex justify-center">
             <img
+              id="login-logo"
               src="https://www.adya.ai/assets/Logo-6c607c84.png"
               alt="Logo"
               className="h-12 w-auto"
@@ -140,11 +141,11 @@ const Login: React.FC = () => {
           </div>
 
           {/* Title */}
-          <div className="text-center">
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <div id="login-header" className="text-center">
+            <h2 id="login-title" className="mt-6 text-3xl font-extrabold text-gray-900">
               Welcome Back
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p id="login-subtitle" className="mt-2 text-sm text-gray-600">
               {step === 'identifier' 
                 ? 'Please enter your email or phone number'
                 : 'Enter the OTP sent to your device'}
@@ -153,17 +154,18 @@ const Login: React.FC = () => {
 
           {/* Error Message */}
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
+            <div id="login-error" className="rounded-md bg-red-50 p-4">
               <div className="text-sm text-red-700">{error}</div>
             </div>
           )}
 
           {/* Forms */}
           {step === 'identifier' ? (
-            <form onSubmit={handleIdentifierSubmit} className="mt-8 space-y-6">
+            <form id="identifier-form" onSubmit={handleIdentifierSubmit} className="mt-8 space-y-6">
               <div className="rounded-md shadow-sm">
                 <div className="relative">
                   <input
+                    id="login-identifier-input"
                     type="text"
                     required
                     value={identifier}
@@ -171,7 +173,7 @@ const Login: React.FC = () => {
                     className="appearance-none relative block w-full px-3 py-3 pl-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                     placeholder="Enter email or phone number"
                   />
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div id="identifier-icon" className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     {identifier.includes('@') ? (
                       <Mail className="h-5 w-5 text-gray-400" />
                     ) : (
@@ -183,6 +185,7 @@ const Login: React.FC = () => {
 
               <div>
                 <button
+                  id="login-submit-button"
                   type="submit"
                   disabled={loading || !identifier}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white 
@@ -197,12 +200,12 @@ const Login: React.FC = () => {
               </div>
             </form>
           ) : (
-            <form onSubmit={handleOtpSubmit} className="mt-8 space-y-6">
-              <div className="flex justify-center space-x-4">
+            <form id="otp-form" onSubmit={handleOtpSubmit} className="mt-8 space-y-6">
+              <div id="otp-input-container" className="flex justify-center space-x-4">
                 {otp.map((digit, index) => (
                   <input
                     key={index}
-                    id={`otp-${index}`}
+                    id={`otp-input-${index}`}
                     type="text"
                     inputMode="numeric"
                     maxLength={1}
@@ -215,6 +218,7 @@ const Login: React.FC = () => {
 
               <div>
                 <button
+                  id="otp-submit-button"
                   type="submit"
                   disabled={loading || otp.some(digit => !digit)}
                   className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white 
@@ -230,6 +234,7 @@ const Login: React.FC = () => {
 
               <div className="text-center">
                 <button
+                  id="back-to-identifier-button"
                   type="button"
                   onClick={handleBackToIdentifier}
                   className="text-sm text-indigo-600 hover:text-indigo-500"

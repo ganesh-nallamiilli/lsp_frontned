@@ -22,26 +22,28 @@ const Pagination: React.FC<PaginationProps> = ({
   onItemsPerPageChange 
 }) => {
   return (
-    <div className="flex items-center justify-between px-4 py-3 sm:px-6">
-      <div className="flex items-center gap-4">
+    <div id="customers-pagination-container" className="flex items-center justify-between px-4 py-3 sm:px-6">
+      <div id="customers-pagination-container-flex-items-center-gap-4" className="flex items-center gap-4">
         <p className="text-sm text-gray-700">
           Show
         </p>
         <select
+          id="customers-pagination-container-flex-items-center-gap-4-select"
           className="border rounded-md px-2 py-1 text-sm"
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
         >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
+          <option id="customers-pagination-container-flex-items-center-gap-4-select-option-5" value={5}>5</option>
+          <option id="customers-pagination-container-flex-items-center-gap-4-select-option-10" value={10}>10</option>
+          <option id="customers-pagination-container-flex-items-center-gap-4-select-option-20" value={20}>20</option>
+          <option id="customers-pagination-container-flex-items-center-gap-4-select-option-50" value={50}>50</option>
         </select>
-        <p className="text-sm text-gray-700">entries</p>
+        <p id="customers-pagination-container-flex-items-center-gap-4-p" className="text-sm text-gray-700">entries</p>
       </div>
 
-      <div className="flex flex-1 justify-between sm:hidden">
+      <div id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden" className="flex flex-1 justify-between sm:hidden">
         <Button
+          id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-button"
           variant="outline"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -49,6 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({
           Previous
         </Button>
         <Button
+          id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-button-next"
           variant="outline"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -57,14 +60,15 @@ const Pagination: React.FC<PaginationProps> = ({
         </Button>
       </div>
 
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
-        <div className="flex items-center gap-4">
-          <p className="text-sm text-gray-700">
-            Page <span className="font-medium">{currentPage}</span> of{' '}
-            <span className="font-medium">{totalPages}</span>
+      <div id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4" className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end">
+        <div id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-div" className="flex items-center gap-4">
+          <p id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-p" className="text-sm text-gray-700">
+            Page <span id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-p-span" className="font-medium">{currentPage}</span> of{' '}
+            <span id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-p-span-total-pages" className="font-medium">{totalPages}</span>
           </p>
-          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          <nav id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-nav" className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
             <Button
+              id="customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-nav-button"
               variant="outline"
               className="rounded-l-md"
               onClick={() => onPageChange(currentPage - 1)}
@@ -74,6 +78,7 @@ const Pagination: React.FC<PaginationProps> = ({
             </Button>
             {[...Array(totalPages)].map((_, index) => (
               <Button
+                id={`customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-nav-button-${index + 1}`}
                 key={index + 1}
                 variant={currentPage === index + 1 ? "default" : "outline"}
                 onClick={() => onPageChange(index + 1)}
@@ -82,6 +87,7 @@ const Pagination: React.FC<PaginationProps> = ({
               </Button>
             ))}
             <Button
+              id={`customers-pagination-container-flex-flex-1-justify-between-sm-hidden-flex-items-center-gap-4-nav-button-next`}
               variant="outline"
               className="rounded-r-md"
               onClick={() => onPageChange(currentPage + 1)}
@@ -137,13 +143,14 @@ const Customers: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Customers</h1>
+    <div id="customers-container" className="p-6">
+      <div id="customers-container-mb-6" className="mb-6">
+        <h1 id="customers-container-mb-6-h1" className="text-2xl font-bold text-gray-900 mb-4">Customers</h1>
         <div className="flex gap-4 mb-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div id="customers-container-flex-gap-4-mb-4-div" className="relative flex-1">
+            <Search id="customers-container-flex-gap-4-mb-4-div-search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
+              id="customers-container-flex-gap-4-mb-4-div-input"
               type="text"
               placeholder="Search by name, email or mobile..."
               className="pl-10"
@@ -158,12 +165,12 @@ const Customers: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div id="customers-container-loading-flex-justify-center-items-center-h-64" className="flex justify-center items-center h-64">
+          <div id="customers-container-loading-flex-justify-center-items-center-h-64-div" className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow">
-          <div className="overflow-x-auto">
+        <div id="customers-container-bg-white-rounded-lg-shadow" className="bg-white rounded-lg shadow">
+          <div id="customers-container-overflow-x-auto" className="overflow-x-auto">
             <Table>
               <Table.Header>
                 <Table.Row>

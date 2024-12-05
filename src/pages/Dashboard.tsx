@@ -57,58 +57,58 @@ const Dashboard: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+    <div id="dashboard-container" className="space-y-6">
+      <div id="dashboard-container-flex-justify-between-items-center" className="flex justify-between items-center">
+        <h1 id="dashboard-container-flex-justify-between-items-center-h1" className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
         
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="flex justify-between items-center">
+      <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div" className="bg-white p-4 rounded-xl shadow-sm">
+          <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-flex-justify-between-items-center" className="flex justify-between items-center">
             <div>
-              <p className="text-gray-600">Total Orders Amount</p>
-              <h3 className="text-2xl font-bold">
+              <p id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-flex-justify-between-items-center-div-p" className="text-gray-600">Total Orders Amount</p>
+              <h3 id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-flex-justify-between-items-center-div-h3" className="text-2xl font-bold">
                 ₹{dashboardCounts?.total_orders_amount || '0.00'}
               </h3>
             </div>
-            <div className="text-teal-500">
-              <TrendingUp className="w-6 h-6" />
+            <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-flex-justify-between-items-center-div-text-teal-500" className="text-teal-500">
+              <TrendingUp id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-flex-justify-between-items-center-div-text-teal-500-trending-up" className="w-6 h-6" />
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="flex justify-between items-center">
+        <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2" className="bg-white p-4 rounded-xl shadow-sm">
+          <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2-flex-justify-between-items-center" className="flex justify-between items-center">
             <div>
-              <p className="text-gray-600">All Users Wallet Amount</p>
-              <h3 className="text-2xl font-bold">
+              <p id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2-flex-justify-between-items-center-div-p" className="text-gray-600">All Users Wallet Amount</p>
+              <h3 id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2-flex-justify-between-items-center-div-h3" className="text-2xl font-bold">
                 ₹{walletDetails?.total_available || '0.00'}
               </h3>
             </div>
-            <div className="text-teal-500">
-              <TrendingUp className="w-6 h-6" />
+            <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2-flex-justify-between-items-center-div-text-teal-500" className="text-teal-500">
+              <TrendingUp id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-2-flex-justify-between-items-center-div-text-teal-500-trending-up" className="w-6 h-6" />
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm">
-          <div className="flex justify-between items-center">
+        <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3" className="bg-white p-4 rounded-xl shadow-sm">
+          <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3-flex-justify-between-items-center" className="flex justify-between items-center">
             <div>
-              <p className="text-gray-600">Total Platform Commission</p>
-              <h3 className="text-2xl font-bold">
+              <p id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3-flex-justify-between-items-center-div-p" className="text-gray-600">Total Platform Commission</p>
+              <h3 id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3-flex-justify-between-items-center-div-h3" className="text-2xl font-bold">
                 ₹{dashboardCounts?.total_platform_charge || '0.00'}
               </h3>
             </div>
-            <div className="text-teal-500">
-              <TrendingUp className="w-6 h-6" />
+            <div id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3-flex-justify-between-items-center-div-text-teal-500" className="text-teal-500">
+              <TrendingUp id="dashboard-container-grid-grid-cols-1-md-grid-cols-3-gap-6-div-3-flex-justify-between-items-center-div-text-teal-500-trending-up" className="w-6 h-6" />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
-            <div className="bg-yellow-100 p-3 rounded-lg">
+      <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4" className="bg-white p-6 rounded-xl shadow-sm">
+          <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4" className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4-div" className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+            <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4-div-bg-yellow-100-p-3-rounded-lg" className="bg-yellow-100 p-3 rounded-lg">
               <Package className="w-6 h-6 text-yellow-600" />
             </div>
             <div>

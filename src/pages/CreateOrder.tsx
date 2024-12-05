@@ -239,12 +239,13 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
   ];
 
   return (
-    <div className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav aria-label="Progress" className="py-8">
-          <ol role="list" className="flex items-center">
+    <div id="create-order-progress-bar-container" className="bg-white border-b border-gray-200 shadow-sm">
+      <div id="create-order-progress-bar-container-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav id="create-order-progress-bar-container-content-nav" aria-label="Progress" className="py-8">
+          <ol id="create-order-progress-bar-container-content-nav-ol" role="list" className="flex items-center">
             {steps.map((step, stepIdx) => (
               <li 
+                id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}`}
                 key={step.name} 
                 className={`relative ${
                   stepIdx !== steps.length - 1 ? 'pr-8 sm:pr-20 flex-1' : ''
@@ -252,14 +253,16 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
               >
                 {stepIdx !== steps.length - 1 && (
                   <div 
+                    id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider`}
                     className="absolute top-4 left-0 -right-8 sm:-right-20"
                     aria-hidden="true"
                   >
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="h-0.5 w-full">
-                        <div className="h-full relative">
-                          <div className="absolute inset-0 bg-gray-200" />
+                    <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider-div`} className="absolute inset-0 flex items-center">
+                      <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider-div-h-0-5`} className="h-0.5 w-full">
+                        <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider-div-h-full`} className="h-full relative">
+                          <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider-div-h-full-bg-gray-200`} className="absolute inset-0 bg-gray-200" />
                           <div 
+                            id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-divider-div-h-full-bg-indigo-600`}
                             className="absolute inset-0 bg-indigo-600 transition-all duration-500 ease-in-out"
                             style={{ 
                               transform: `scaleX(${currentStep > step.id ? 1 : 0})`,
@@ -272,9 +275,10 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
                   </div>
                 )}
 
-                <div className="relative flex flex-col items-center group">
-                  <span className="h-9 flex items-center">
+                <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-div`} className="relative flex flex-col items-center group">
+                  <span id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-span`} className="h-9 flex items-center">
                     <span 
+                      id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-bg-${currentStep > step.id ? 'indigo-600' : currentStep === step.id ? 'white' : 'white'}`}
                       className={`
                         relative z-10 w-10 h-10 flex items-center justify-center rounded-full
                         transition-all duration-300 ease-in-out
@@ -289,7 +293,7 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
                       {currentStep > step.id ? (
                         <CheckIcon className="w-6 h-6 text-white" />
                       ) : (
-                        <span className={`w-6 h-6 ${
+                        <span id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-bg-${currentStep >= step.id ? 'indigo-600' : 'gray-400'}`} className={`w-6 h-6 ${
                           currentStep >= step.id ? 'text-indigo-600' : 'text-gray-400'
                         }`}>
                           {step.icon}
@@ -298,8 +302,9 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
                     </span>
                   </span>
 
-                  <div className="mt-3">
+                  <div id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-div-mt-3`} className="mt-3">
                     <span 
+                      id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-text-${currentStep >= step.id ? 'indigo-600' : 'gray-500'}`}
                       className={`
                         block text-sm font-medium text-center
                         ${currentStep >= step.id ? 'text-indigo-600' : 'text-gray-500'}
@@ -308,6 +313,7 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
                       {step.name}
                     </span>
                     <span 
+                      id={`create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-text-xs-mt-1-text-center-max-w-120px-mx-auto-${currentStep >= step.id ? 'text-gray-700' : 'text-gray-400'}`}
                       className={`
                         block text-xs mt-1 text-center max-w-[120px] mx-auto
                         ${currentStep >= step.id ? 'text-gray-700' : 'text-gray-400'}
@@ -329,11 +335,13 @@ const ProgressBar: React.FC<{ currentStep: number }> = ({ currentStep }) => {
 // CheckIcon component
 const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg 
+    id="create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-svg"
     className={className} 
     fill="currentColor" 
     viewBox="0 0 20 20"
   >
     <path 
+      id="create-order-progress-bar-container-content-nav-ol-li-${step.id}-span-svg-path"
       fillRule="evenodd" 
       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
       clipRule="evenodd" 
@@ -422,8 +430,9 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
   };
 
   return (
-    <div className="mt-8 pt-5 border-t border-gray-200 flex justify-between">
+    <div id="create-order-stepper-navigation-buttons-container" className="mt-8 pt-5 border-t border-gray-200 flex justify-between">
       <button
+        id="create-order-stepper-navigation-buttons-back-button"
         type="button"
         onClick={onBack}
         disabled={currentStep === 1}
@@ -435,9 +444,10 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
       >
         Back
       </button>
-      <div className="flex space-x-3">
+      <div id="create-order-stepper-navigation-buttons-actions-container" className="flex space-x-3">
         {isLastStep && (
           <button
+            id="create-order-stepper-navigation-buttons-save-for-later-button"
             type="button"
             onClick={handleSaveForLater}
             className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
@@ -446,6 +456,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
           </button>
         )}
         <button
+          id="create-order-stepper-navigation-buttons-next-button"
           type="button"
           onClick={isLastStep ? onComplete : onNext}
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -467,9 +478,9 @@ const BasicOrderInformation: React.FC = () => {
   const selectClasses = "block w-full px-4 py-1 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 sm:text-sm mt-1";
   
   return (
-    <div className="bg-white rounded-lg p-6">
+    <div id="create-order-basic-order-information-container" className="bg-white rounded-lg p-6">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
+      <div id="create-order-basic-order-information-header" className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
           <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -482,7 +493,7 @@ const BasicOrderInformation: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Franchise Order Id */}
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
+          <label id="create-order-basic-order-information-franchise-order-id-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
               Franchise Order Id
             <span className="text-red-500 ml-1">*</span>
           </label>
@@ -502,13 +513,13 @@ const BasicOrderInformation: React.FC = () => {
 
         {/* Order Amount */}
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
+          <label id="create-order-basic-order-information-order-amount-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
             Order Amount
-            <span className="text-red-500 ml-1">*</span>
+            <span id="create-order-basic-order-information-order-amount-label-asterisk" className="text-red-500 ml-1">*</span>
           </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <span className="text-gray-500 sm:text-sm ml-2">₹</span>
+          <div id="create-order-basic-order-information-order-amount-input-container" className="relative">
+            <div id="create-order-basic-order-information-order-amount-input-container-currency-symbol" className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span id="create-order-basic-order-information-order-amount-label-currency-symbol" className="text-gray-500 sm:text-sm ml-2">₹</span>
             </div>
             <input
               type="number"
@@ -518,46 +529,49 @@ const BasicOrderInformation: React.FC = () => {
               min="0"
               step="0.01"
               className={`${inputClasses} pl-10`}
+              id="create-order-basic-order-information-order-amount-input"
             />
           </div>
         </div>
 
         {/* Order Category */}
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
+          <label id="create-order-basic-order-information-order-category-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
             Order Category
-            <span className="text-red-500 ml-1">*</span>
+            <span id="create-order-basic-order-information-order-category-label-asterisk" className="text-red-500 ml-1">*</span>
           </label>
           <select
+            id="create-order-basic-order-information-order-category-select"
             value={formData.franchiseOrderCategory}
             onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderCategory: e.target.value }))}
             className={selectClasses}
           >
-            <option value="">Select a category</option>
-            <option value="electronics">Electronics</option>
-            <option value="clothing">Clothing</option>
-            <option value="food">Food</option>
-            <option value="furniture">Furniture</option>
-            <option value="other">Other</option>
+            <option id="create-order-basic-order-information-order-category-select-option-select-category" value="">Select a category</option>
+            <option id="create-order-basic-order-information-order-category-select-option-electronics" value="electronics">Electronics</option>
+            <option id="create-order-basic-order-information-order-category-select-option-clothing" value="clothing">Clothing</option>
+            <option id="create-order-basic-order-information-order-category-select-option-food" value="food">Food</option>
+            <option id="create-order-basic-order-information-order-category-select-option-furniture" value="furniture">Furniture</option>
+            <option id="create-order-basic-order-information-order-category-select-option-other" value="other">Other</option>
           </select>
         </div>
 
         {/* Order Preparation Time */}
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
+          <label id="create-order-basic-order-information-order-preparation-time-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
             Order Preparation Time
-            <span className="text-red-500 ml-1">*</span>
+            <span id="create-order-basic-order-information-order-preparation-time-label-asterisk" className="text-red-500 ml-1">*</span>
           </label>
           <select
+            id="create-order-basic-order-information-order-preparation-time-select"
             value={formData.preparationTime}
             onChange={(e) => setFormData(prev => ({ ...prev, preparationTime: e.target.value }))}
             className={selectClasses}
           >
-            <option value="">Select Preparation Time</option>
-            <option value="15">15 Minutes</option>
-            <option value="30">30 Minutes</option>
-            <option value="45">45 Minutes</option>
-            <option value="60">60 Minutes</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-select-preparation-time" value="">Select Preparation Time</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-15-minutes" value="15">15 Minutes</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-30-minutes" value="30">30 Minutes</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-45-minutes" value="45">45 Minutes</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-60-minutes" value="60">60 Minutes</option>
           </select>
         </div>
 
@@ -579,29 +593,31 @@ const BasicOrderInformation: React.FC = () => {
 
         {/* Order Category Type */}
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
+          <label id="create-order-basic-order-information-order-category-type-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
             Order Category Type
-            <span className="text-red-500 ml-1">*</span>
+            <span id="create-order-basic-order-information-order-category-type-label-asterisk" className="text-red-500 ml-1">*</span>
           </label>
           <select
+            id="create-order-basic-order-information-order-category-type-select"
             value={formData.categoryType}
             onChange={(e) => setFormData(prev => ({ ...prev, categoryType: e.target.value }))}
             className={selectClasses}
           >
-            <option value="">Select Category Type</option>
-            <option value="15">15 Minutes</option>
-            <option value="30">30 Minutes</option>
-            <option value="45">45 Minutes</option>
-            <option value="60">60 Minutes</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-select-category-type" value="">Select Category Type</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-15-minutes" value="15">15 Minutes</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-30-minutes" value="30">30 Minutes</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-45-minutes" value="45">45 Minutes</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="60">60 Minutes</option>
           </select>
         </div>
 
         {/* Additional Options - Full width */}
-        <div className="pt-4 md:col-span-2">
-          <h4 className="text-sm font-medium text-gray-900 mb-4">Additional Options</h4>
-          <div className="space-y-3">
-            <label className="flex items-center">
+        <div id="create-order-basic-order-information-additional-options-container" className="pt-4 md:col-span-2">
+          <h4 id="create-order-basic-order-information-additional-options-title" className="text-sm font-medium text-gray-900 mb-4">Additional Options</h4>
+          <div id="create-order-basic-order-information-additional-options-container-content" className="space-y-3">
+            <label id="create-order-basic-order-information-order-ready-for-shipment-label" className="flex items-center">
               <input
+                id="create-order-basic-order-information-order-ready-for-shipment-checkbox"
                 type="checkbox"
                 checked={formData.isReadyForShipment}
                 onChange={(e) => setFormData(prev => ({ ...prev, isReadyForShipment: e.target.checked }))}
@@ -609,8 +625,9 @@ const BasicOrderInformation: React.FC = () => {
               />
               <span className="ml-2 text-sm text-gray-700">Order Ready for Shipment</span>
             </label>
-            <label className="flex items-center">
+            <label id="create-order-basic-order-information-order-rto-eligible-label" className="flex items-center">
               <input
+                id="create-order-basic-order-information-order-rto-eligible-checkbox"
                 type="checkbox"
                 checked={formData.isRtoEligible}
                 onChange={(e) => setFormData(prev => ({ ...prev, isRtoEligible: e.target.checked }))}
@@ -630,21 +647,21 @@ const OrderDetailsForm: React.FC = () => {
   const { formData, setFormData } = useFormContext();
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div id="create-order-order-details-form-container" className="flex flex-col gap-4 w-full">
       {/* Left Column - Basic Order Information */}
-      <div className="w-full">
-        <div className="bg-white rounded-lg border border-gray-200">
+      <div id="create-order-order-details-form-left-column" className="w-full">
+        <div id="create-order-order-details-form-left-column-content" className="bg-white rounded-lg border border-gray-200">
           
           <BasicOrderInformation />
         </div>
       </div>
 
       {/* Right Column - Order Items */}
-      <div className="w-full">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-900 flex items-center">
-              <span className="bg-indigo-100 rounded-full p-2 mr-3">
+      <div id="create-order-order-details-form-right-column" className="w-full">
+        <div id="create-order-order-details-form-right-column-content" className="bg-white rounded-lg border border-gray-200 p-6">
+          <div id="create-order-order-details-form-right-column-content-header" className="flex justify-between items-center mb-6">
+            <h3 id="create-order-order-details-form-right-column-content-header-title" className="text-lg font-medium leading-6 text-gray-900 flex items-center">
+              <span id="create-order-order-details-form-right-column-content-header-title-icon" className="bg-indigo-100 rounded-full p-2 mr-3">
                 <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
@@ -652,6 +669,7 @@ const OrderDetailsForm: React.FC = () => {
               Order Items
             </h3>
             <button
+              id="create-order-order-details-form-right-column-content-header-add-item-button"
               type="button"
               onClick={() => setFormData(prev => ({
                 ...prev,
@@ -667,18 +685,19 @@ const OrderDetailsForm: React.FC = () => {
           </div>
 
           {/* Order Items List */}
-          <div className="space-y-4">
+          <div id="create-order-order-details-form-right-column-content-items-list" className="space-y-4">
             {formData.items.map((item, index) => (
-              <div key={index} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 flex items-center">
-                    <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-2 text-xs font-bold">
+              <div key={index} id="create-order-order-details-form-right-column-content-items-list-item" className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                <div id="create-order-order-details-form-right-column-content-items-list-item-header" className="flex justify-between items-center mb-4">
+                  <h4 id="create-order-order-details-form-right-column-content-items-list-item-header-title" className="text-sm font-medium text-gray-900 flex items-center">
+                    <span id="create-order-order-details-form-right-column-content-items-list-item-header-title-index" className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-2 text-xs font-bold">
                       {index + 1}
                     </span>
                     Item #{index + 1}
                   </h4>
                   {formData.items.length > 1 && (
                     <button
+                      id="create-order-order-details-form-right-column-content-items-list-item-header-remove-button"
                       type="button"
                       onClick={() => setFormData(prev => ({
                         ...prev,
@@ -694,12 +713,13 @@ const OrderDetailsForm: React.FC = () => {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
+                <div id="create-order-order-details-form-right-column-content-items-list-item-fields" className="grid grid-cols-1 gap-6 sm:grid-cols-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label id="create-order-order-details-form-right-column-content-items-list-item-fields-name-label" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Item Name <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="create-order-order-details-form-right-column-content-items-list-item-fields-name-input"
                       type="text"
                       required
                       placeholder="Enter item name"
@@ -714,14 +734,15 @@ const OrderDetailsForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label id="create-order-order-details-form-right-column-content-items-list-item-fields-price-label" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Price (₹) <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <div id="create-order-order-details-form-right-column-content-items-list-item-fields-price-input-container" className="relative">
+                      <div id="create-order-order-details-form-right-column-content-items-list-item-fields-price-input-container-currency-symbol" className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <span className="text-gray-500 sm:text-sm ml-2">₹</span>
                       </div>
                       <input
+                        id="create-order-order-details-form-right-column-content-items-list-item-fields-price-input"
                         type="number"
                         required
                         min="0"
@@ -739,10 +760,11 @@ const OrderDetailsForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label id="create-order-order-details-form-right-column-content-items-list-item-fields-quantity-label" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="create-order-order-details-form-right-column-content-items-list-item-fields-quantity-input"
                       type="number"
                       required
                       min="1"
@@ -758,10 +780,11 @@ const OrderDetailsForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label id="create-order-order-details-form-right-column-content-items-list-item-fields-weight-label" className="block text-sm font-medium text-gray-700 mb-1.5">
                       Weight (kg) <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="create-order-order-details-form-right-column-content-items-list-item-fields-weight-input"
                       type="number"
                       required
                       min="0"
@@ -812,16 +835,17 @@ const AddAddressModal: React.FC<{
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-screen items-center justify-center p-4">
+    <div id="create-order-add-address-modal-container" className="fixed inset-0 z-50 overflow-y-auto">
+      <div id="create-order-add-address-modal-container-content" className="flex min-h-screen items-center justify-center p-4">
         {/* Overlay */}
         <div className="fixed inset-0 bg-black opacity-30" onClick={onClose} />
 
         {/* Modal */}
         <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Add New Pickup Address</h3>
+          <div id="create-order-add-address-modal-container-content-header" className="mb-4 flex items-center justify-between">
+            <h3 id="create-order-add-address-modal-container-content-header-title" className="text-lg font-medium text-gray-900">Add New Pickup Address</h3>
             <button
+              id="create-order-add-address-modal-container-content-header-close-button"
               type="button"
               className="text-gray-400 hover:text-gray-500"
               onClick={onClose}
@@ -833,9 +857,9 @@ const AddAddressModal: React.FC<{
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="create-order-add-address-modal-container-content-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label id="create-order-add-address-modal-container-content-form-name-label" className="block text-sm font-medium text-gray-700">
                 Location Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -849,7 +873,7 @@ const AddAddressModal: React.FC<{
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label id="create-order-add-address-modal-container-content-form-address-label" className="block text-sm font-medium text-gray-700">
                 Address <span className="text-red-500">*</span>
               </label>
               <input
@@ -864,7 +888,7 @@ const AddAddressModal: React.FC<{
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label id="create-order-add-address-modal-container-content-form-city-label" className="block text-sm font-medium text-gray-700">
                   City <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -878,7 +902,7 @@ const AddAddressModal: React.FC<{
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label id="create-order-add-address-modal-container-content-form-state-label" className="block text-sm font-medium text-gray-700">
                   State <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -894,7 +918,7 @@ const AddAddressModal: React.FC<{
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label id="create-order-add-address-modal-container-content-form-pincode-label" className="block text-sm font-medium text-gray-700">
                   Pincode <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -908,7 +932,7 @@ const AddAddressModal: React.FC<{
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label id="create-order-add-address-modal-container-content-form-phone-label" className="block text-sm font-medium text-gray-700">
                   Phone <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -923,8 +947,9 @@ const AddAddressModal: React.FC<{
             </div>
 
             <div>
-              <label className="flex items-center">
+              <label id="create-order-add-address-modal-container-content-form-is-default-label" className="flex items-center">
                 <input
+                  id="create-order-add-address-modal-container-content-form-is-default-checkbox"
                   type="checkbox"
                   checked={formData.isDefault}
                   onChange={(e) => setFormData(prev => ({ ...prev, isDefault: e.target.checked }))}
@@ -936,6 +961,7 @@ const AddAddressModal: React.FC<{
 
             <div className="mt-6 flex justify-end gap-3">
               <button
+                id="create-order-add-address-modal-container-content-form-cancel-button"
                 type="button"
                 onClick={onClose}
                 className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -943,6 +969,7 @@ const AddAddressModal: React.FC<{
                 Cancel
               </button>
               <button
+                id="create-order-add-address-modal-container-content-form-save-button"
                 type="submit"
                 className="rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
@@ -964,73 +991,75 @@ const AddressTable: React.FC<{
   type: 'pickup' | 'delivery';
 }> = ({ addresses, selectedId, onSelect, type }) => {
   return (
-    <div className="mt-4 flow-root">
-      <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+    <div id="create-order-address-table-container" className="mt-4 flow-root">
+      <div id="create-order-address-table-container-content" className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div id="create-order-address-table-container-content-table" className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div id="create-order-address-table-container-content-table-content" className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <table id="create-order-address-table-container-content-table-table" className="min-w-full divide-y divide-gray-300">
+              <thead id="create-order-address-table-container-content-table-table-thead" className="bg-gray-50">
+                <tr id="create-order-address-table-container-content-table-table-thead-tr">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-select" scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                     Select
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-name" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Name
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-address" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Address
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-city" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     City
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-state" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     State
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-pincode" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Pincode
                   </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <th id="create-order-address-table-container-content-table-table-thead-tr-contact" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Contact
                   </th>
                   {type === 'delivery' && (
                     <>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th id="create-order-address-table-container-content-table-table-thead-tr-alt-contact" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Alt. Contact
                       </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <th id="create-order-address-table-container-content-table-table-thead-tr-landmark" scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                         Landmark
                       </th>
                     </>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
+              <tbody id="create-order-address-table-container-content-table-table-tbody" className="divide-y divide-gray-200 bg-white">
                 {addresses.map((address) => (
                   <tr 
+                    id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}`}
                     key={address.id}
                     className={`${selectedId === address.id ? 'bg-indigo-50' : 'hover:bg-gray-50'} cursor-pointer`}
                     onClick={() => onSelect(address)}
                   >
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                       <input
+                        id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-select`}
                         type="radio"
                         checked={selectedId === address.id}
                         onChange={() => onSelect(address)}
                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       />
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.name}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.address}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.city}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.state}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.pincode}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.phone}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-name`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.name}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-address`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.address}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-city`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.city}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-state`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.state}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-pincode`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.pincode}</td>
+                    <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-phone`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{address.phone}</td>
                     {type === 'delivery' && (
                       <>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-alt-contact`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {address.alternatePhone || '-'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <td id={`create-order-address-table-container-content-table-table-tbody-tr-${address.id}-landmark`} className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {address.landmark || '-'}
                         </td>
                       </>
@@ -1058,15 +1087,15 @@ const PickupAddressStep: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+    <div id="create-order-pickup-address-step-container" className="bg-white rounded-lg p-6">
+      <div id="create-order-pickup-address-step-container-header" className="flex items-center gap-3 mb-6">
+        <div id="create-order-pickup-address-step-container-header-icon" className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
           <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900">Select Pickup Address</h3>
+        <h3 id="create-order-pickup-address-step-container-header-title" className="text-lg font-medium text-gray-900">Select Pickup Address</h3>
       </div>
 
       <AddressTable
@@ -1091,15 +1120,15 @@ const DeliveryAddressStep: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+    <div id="create-order-delivery-address-step-container" className="bg-white rounded-lg p-6">
+      <div id="create-order-delivery-address-step-container-header" className="flex items-center gap-3 mb-6">
+        <div id="create-order-delivery-address-step-container-header-icon" className="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
           <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900">Select Delivery Address</h3>
+        <h3 id="create-order-delivery-address-step-container-header-title" className="text-lg font-medium text-gray-900">Select Delivery Address</h3>
       </div>
 
       <AddressTable

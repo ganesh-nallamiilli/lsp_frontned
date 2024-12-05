@@ -468,49 +468,49 @@ const Profile: React.FC = () => {
   const renderBasicInformation = () => {
     if (!editMode.basic) {
       return (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Profile Image:</span>
-            <div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center">
+        <div id="profile-basic-information-container" className="space-y-4">
+          <div id="profile-basic-information-container-profile-image" className="flex items-center space-x-4">
+            <span id="profile-basic-information-container-profile-image-label" className="text-gray-500 w-32">Profile Image:</span>
+            <div id="profile-basic-information-container-profile-image-image" className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center">
               {form.logo ? (
-                <img src={form.logo} alt="Profile" className="h-full w-full rounded-full object-cover" />
+                <img id="profile-basic-information-container-profile-image-image-img" src={form.logo} alt="Profile" className="h-full w-full rounded-full object-cover" />
               ) : (
-                <User className="h-8 w-8 text-gray-400" />
+                <User id="profile-basic-information-container-profile-image-image-user-icon" className="h-8 w-8 text-gray-400" />
               )}
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Store Name:</span>
-            <span className="text-gray-900">{userProfile?.store_name || '-'}</span>
+            <span id="profile-basic-information-container-store-name-label" className="text-gray-500 w-32">Store Name:</span>
+            <span id="profile-basic-information-container-store-name-value" className="text-gray-900">{userProfile?.store_name || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Website:</span>
-            <span className="text-gray-900">{form.website || '-'}</span>
+            <span id="profile-basic-information-container-website-label" className="text-gray-500 w-32">Website:</span>
+            <span id="profile-basic-information-container-website-value" className="text-gray-900">{form.website || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Full Name:</span>
-            <span className="text-gray-900">{userProfile?.name || '-'}</span>
+            <span id="profile-basic-information-container-full-name-label" className="text-gray-500 w-32">Full Name:</span>
+            <span id="profile-basic-information-container-full-name-value" className="text-gray-900">{userProfile?.name || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Email:</span>
-            <span className="text-gray-900">{form.email}</span>
+            <span id="profile-basic-information-container-email-label" className="text-gray-500 w-32">Email:</span>
+            <span id="profile-basic-information-container-email-value" className="text-gray-900">{form.email}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Phone:</span>
-            <span className="text-gray-900">{userProfile?.mobile_number || '-'}</span>
+            <span id="profile-basic-information-container-phone-label" className="text-gray-500 w-32">Phone:</span>
+            <span id="profile-basic-information-container-phone-value" className="text-gray-900">{userProfile?.mobile_number || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">GST Number:</span>
-            <span className="text-gray-900">{userProfile?.gst_number || '-'}</span>
+            <span id="profile-basic-information-container-gst-number-label" className="text-gray-500 w-32">GST Number:</span>
+            <span id="profile-basic-information-container-gst-number-value" className="text-gray-900">{userProfile?.gst_number || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">PAN Number:</span>
-            <span className="text-gray-900">{userProfile?.pan_number || '-'}</span>
+            <span id="profile-basic-information-container-pan-number-label" className="text-gray-500 w-32">PAN Number:</span>
+            <span id="profile-basic-information-container-pan-number-value" className="text-gray-900">{userProfile?.pan_number || '-'}</span>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Status:</span>
+            <span id="profile-basic-information-container-status-label" className="text-gray-500 w-32">Status:</span>
             <div>
-              <span className={`px-2 py-1 rounded-full text-sm ${
+              <span id="profile-basic-information-container-status-value" className={`px-2 py-1 rounded-full text-sm ${
                 userProfile?.is_active 
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-red-100 text-red-800'
@@ -520,9 +520,9 @@ const Profile: React.FC = () => {
               
               {/* Show draft reasons if status is inactive */}
               {!userProfile?.is_active && userProfile?.draft_reasons && userProfile.draft_reasons.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Reasons:</p>
-                  <ul className="list-disc list-inside space-y-1">
+                <div id="profile-basic-information-container-status-reasons" className="mt-2">
+                  <p id="profile-basic-information-container-status-reasons-label" className="text-sm font-medium text-gray-700 mb-1">Reasons:</p>
+                  <ul id="profile-basic-information-container-status-reasons-list" className="list-disc list-inside space-y-1">
                     {userProfile.draft_reasons.map((reason, index) => (
                       <li key={index} className="text-sm text-red-600 ml-2">
                         {reason}
@@ -533,43 +533,44 @@ const Profile: React.FC = () => {
               )}
             </div>
           </div>
-          <div className="mt-6 border-t pt-6">
-            <h5 className="text-sm font-medium text-gray-900 mb-4">GST Address</h5>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Building:</span>
-                <span className="text-gray-900">{userProfile?.gst_address?.building || '-'}</span>
+          <div id="profile-basic-information-container-gst-address" className="mt-6 border-t pt-6">
+            <h5 id="profile-basic-information-container-gst-address-label" className="text-sm font-medium text-gray-900 mb-4">GST Address</h5>
+            <div id="profile-basic-information-container-gst-address-details" className="space-y-2">
+              <div id="profile-basic-information-container-gst-address-details-building" className="flex items-center space-x-4">
+                <span id="profile-basic-information-container-gst-address-details-building-label" className="text-gray-500 w-32">Building:</span>
+                <span id="profile-basic-information-container-gst-address-details-building-value" className="text-gray-900">{userProfile?.gst_address?.building || '-'}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Locality:</span>
-                <span className="text-gray-900">{userProfile?.gst_address?.locality || '-'}</span>
+              <div id="profile-basic-information-container-gst-address-details-locality" className="flex items-center space-x-4">
+                <span id="profile-basic-information-container-gst-address-details-locality-label" className="text-gray-500 w-32">Locality:</span>
+                <span id="profile-basic-information-container-gst-address-details-locality-value" className="text-gray-900">{userProfile?.gst_address?.locality || '-'}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">City:</span>
-                <span className="text-gray-900">{userProfile?.gst_address?.city || '-'}</span>
+              <div id="profile-basic-information-container-gst-address-details-city" className="flex items-center space-x-4">
+                <span id="profile-basic-information-container-gst-address-details-city-label" className="text-gray-500 w-32">City:</span>
+                <span id="profile-basic-information-container-gst-address-details-city-value" className="text-gray-900">{userProfile?.gst_address?.city || '-'}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">State:</span>
-                <span className="text-gray-900">{userProfile?.gst_address?.state || '-'}</span>
+              <div id="profile-basic-information-container-gst-address-details-state" className="flex items-center space-x-4">
+                <span id="profile-basic-information-container-gst-address-details-state-label" className="text-gray-500 w-32">State:</span>
+                <span id="profile-basic-information-container-gst-address-details-state-value" className="text-gray-900">{userProfile?.gst_address?.state || '-'}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Area Code:</span>
-                <span className="text-gray-900">{userProfile?.gst_address?.area_code || '-'}</span>
+              <div id="profile-basic-information-container-gst-address-details-area-code" className="flex items-center space-x-4">
+                <span id="profile-basic-information-container-gst-address-details-area-code-label" className="text-gray-500 w-32">Area Code:</span>
+                <span id="profile-basic-information-container-gst-address-details-area-code-value" className="text-gray-900">{userProfile?.gst_address?.area_code || '-'}</span>
               </div>
             </div>
           </div>
           
           {userType === 'STANDALONE_ADMIN' && (
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-500 w-32">Signature:</span>
+            <div id="profile-basic-information-container-signature" className="flex items-center space-x-4">
+              <span id="profile-basic-information-container-signature-label" className="text-gray-500 w-32">Signature:</span>
               {signaturePreview ? (
                 <img 
+                  id="profile-basic-information-container-signature-image"
                   src={signaturePreview} 
                   alt="Signature" 
                   className="h-20 max-w-[200px] object-contain"
                 />
               ) : (
-                <span className="text-gray-900">No signature uploaded</span>
+                <span id="profile-basic-information-container-signature-no-signature" className="text-gray-900">No signature uploaded</span>
               )}
             </div>
           )}
@@ -578,10 +579,10 @@ const Profile: React.FC = () => {
     }
 
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-6">
+      <div id="profile-basic-information-container-form" className="space-y-6">
+        <div id="profile-basic-information-container-form-grid" className="grid grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-store-name-label" className="block text-sm font-medium text-gray-700 mb-2">
               Store Name
             </label>
             <input
@@ -593,7 +594,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-website-label" className="block text-sm font-medium text-gray-700 mb-2">
               Website
             </label>
             <input
@@ -605,7 +606,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-full-name-label" className="block text-sm font-medium text-gray-700 mb-2">
               Full Name
             </label>
             <input
@@ -617,7 +618,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-email-label" className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
@@ -629,7 +630,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-phone-number-label" className="block text-sm font-medium text-gray-700 mb-2">
               Phone Number
             </label>
             <input
@@ -642,7 +643,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-gst-number-label" className="block text-sm font-medium text-gray-700 mb-2">
               GST Number
             </label>
             <input
@@ -655,7 +656,7 @@ const Profile: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-grid-pan-number-label" className="block text-sm font-medium text-gray-700 mb-2">
               PAN Number
             </label>
             <input
@@ -674,11 +675,12 @@ const Profile: React.FC = () => {
           <h5 className="text-sm font-medium text-gray-900 mb-4">GST Address</h5>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-basic-information-container-form-grid-building-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Building
               </label>
               <input
                 type="text"
+                id="profile-basic-information-container-form-grid-building-input"
                 name="address.building"
                 value={form.address.building}
                 onChange={handleInputChange}
@@ -686,11 +688,12 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-basic-information-container-form-grid-locality-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Locality
               </label>
               <input
                 type="text"
+                id="profile-basic-information-container-form-grid-locality-input"
                 name="address.locality"
                 value={form.address.locality}
                 onChange={handleInputChange}
@@ -698,11 +701,12 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-basic-information-container-form-grid-city-label" className="block text-sm font-medium text-gray-700 mb-2">
                 City
               </label>
               <input
                 type="text"
+                id="profile-basic-information-container-form-grid-city-input"
                 name="address.city"
                 value={form.address.city}
                 onChange={handleInputChange}
@@ -710,11 +714,12 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-basic-information-container-form-grid-state-label" className="block text-sm font-medium text-gray-700 mb-2">
                 State
               </label>
               <select
-                name="address.state"
+                id="profile-basic-information-container-form-grid-state-select"
+                  name="address.state"
                 value={form.address.state}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
@@ -728,10 +733,11 @@ const Profile: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-basic-information-container-form-grid-area-code-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Area Code
               </label>
               <input
+                id="profile-basic-information-container-form-grid-area-code-input"
                 type="text"
                 name="address.zipCode"
                 value={form.address.zipCode}
@@ -745,11 +751,12 @@ const Profile: React.FC = () => {
         
         {userType === 'STANDALONE_ADMIN' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-basic-information-container-form-signature-label" className="block text-sm font-medium text-gray-700 mb-2">
               Signature
             </label>
-            <div className="flex items-center space-x-4">
+            <div id="profile-basic-information-container-form-signature-upload" className="flex items-center space-x-4">
               <input
+                
                 type="file"
                 accept="image/*"
                 onChange={handleSignatureChange}
@@ -757,6 +764,7 @@ const Profile: React.FC = () => {
                 id="signature-upload"
               />
               <label
+                id="profile-basic-information-container-form-signature-upload-label"
                 htmlFor="signature-upload"
                 className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
@@ -764,6 +772,7 @@ const Profile: React.FC = () => {
               </label>
               {signaturePreview && (
                 <img 
+                  id="profile-basic-information-container-form-signature-image"
                   src={signaturePreview} 
                   alt="Signature Preview" 
                   className="h-20 max-w-[200px] object-contain"
@@ -779,26 +788,26 @@ const Profile: React.FC = () => {
   const renderAddressInformation = () => {
     if (!editMode.address) {
       return (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Building:</span>
-            <span className="text-gray-900">{userProfile?.gst_address?.building || '-'}</span>
+        <div id="profile-address-information-container" className="space-y-4">
+          <div id="profile-address-information-container-building" className="flex items-center space-x-4">
+            <span id="profile-address-information-container-building-label" className="text-gray-500 w-32">Building:</span>
+            <span id="profile-address-information-container-building-value" className="text-gray-900">{userProfile?.gst_address?.building || '-'}</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Locality:</span>
-            <span className="text-gray-900">{userProfile?.gst_address?.locality || '-'}</span>
+          <div id="profile-address-information-container-locality" className="flex items-center space-x-4">
+            <span id="profile-address-information-container-locality-label" className="text-gray-500 w-32">Locality:</span>
+            <span id="profile-address-information-container-locality-value" className="text-gray-900">{userProfile?.gst_address?.locality || '-'}</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">City:</span>
-            <span className="text-gray-900">{userProfile?.gst_address?.city || '-'}</span>
+          <div id="profile-address-information-container-city" className="flex items-center space-x-4">
+            <span id="profile-address-information-container-city-label" className="text-gray-500 w-32">City:</span>
+            <span id="profile-address-information-container-city-value" className="text-gray-900">{userProfile?.gst_address?.city || '-'}</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">State:</span>
-            <span className="text-gray-900">{userProfile?.gst_address?.state || '-'}</span>
+          <div id="profile-address-information-container-state" className="flex items-center space-x-4">
+            <span id="profile-address-information-container-state-label" className="text-gray-500 w-32">State:</span>
+            <span id="profile-address-information-container-state-value" className="text-gray-900">{userProfile?.gst_address?.state || '-'}</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Zip Code:</span>
-            <span className="text-gray-900">{userProfile?.gst_address?.area_code || '-'}</span>
+          <div id="profile-address-information-container-zip-code" className="flex items-center space-x-4">
+            <span id="profile-address-information-container-zip-code-label" className="text-gray-500 w-32">Zip Code:</span>
+            <span id="profile-address-information-container-zip-code-value" className="text-gray-900">{userProfile?.gst_address?.area_code || '-'}</span>
           </div>
         </div>
       );
@@ -807,10 +816,11 @@ const Profile: React.FC = () => {
     return (
       <div className="grid grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-address-information-container-form-grid-building-label" className="block text-sm font-medium text-gray-700 mb-2">
             Building
           </label>
           <input
+            id="profile-address-information-container-form-grid-building-input"
             type="text"
             name="address.building"
             value={form.address.building}
@@ -819,10 +829,11 @@ const Profile: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-address-information-container-form-grid-locality-label" className="block text-sm font-medium text-gray-700 mb-2">
             Locality
           </label>
           <input
+            id="profile-address-information-container-form-grid-locality-input"
             type="text"
             name="address.locality"
             value={form.address.locality}
@@ -831,10 +842,11 @@ const Profile: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-address-information-container-form-grid-city-label" className="block text-sm font-medium text-gray-700 mb-2">
             City
           </label>
           <input
+            id="profile-address-information-container-form-grid-city-input"
             type="text"
             name="address.city"
             value={form.address.city}
@@ -843,10 +855,11 @@ const Profile: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-address-information-container-form-grid-state-label" className="block text-sm font-medium text-gray-700 mb-2">
             State
           </label>
           <select
+            id="profile-address-information-container-form-grid-state-select"
             name="address.state"
             value={form.address.state}
             onChange={handleInputChange}
@@ -861,10 +874,11 @@ const Profile: React.FC = () => {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-address-information-container-form-grid-zip-code-label" className="block text-sm font-medium text-gray-700 mb-2">
             Zip Code
           </label>
           <input
+            id="profile-address-information-container-form-grid-zip-code-input"
             type="text"
             name="address.zipCode"
             value={form.address.zipCode}
@@ -880,33 +894,33 @@ const Profile: React.FC = () => {
   const renderBankDetails = () => {
     if (!editMode.bank) {
       return (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <span className="text-gray-500 w-32">Settlement Type:</span>
-            <span className="text-gray-900 capitalize">{form.bankDetails.settlement_type}</span>
+        <div id="profile-bank-details-container" className="space-y-4">
+          <div id="profile-bank-details-container-settlement-type" className="flex items-center space-x-4">
+            <span id="profile-bank-details-container-settlement-type-label" className="text-gray-500 w-32">Settlement Type:</span>
+            <span id="profile-bank-details-container-settlement-type-value" className="text-gray-900 capitalize">{form.bankDetails.settlement_type}</span>
           </div>
           {form.bankDetails.settlement_type === 'upi' ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-500 w-32">UPI ID:</span>
-              <span className="text-gray-900">{form.bankDetails.upi_address}</span>
+            <div id="profile-bank-details-container-upi-id" className="flex items-center space-x-4">
+              <span id="profile-bank-details-container-upi-id-label" className="text-gray-500 w-32">UPI ID:</span>
+              <span id="profile-bank-details-container-upi-id-value" className="text-gray-900">{form.bankDetails.upi_address}</span>
             </div>
           ) : (
             <>
               <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Beneficiary Name:</span>
-                <span className="text-gray-900">{form.bankDetails.beneficiary_name}</span>
+                <span id="profile-bank-details-container-beneficiary-name-label" className="text-gray-500 w-32">Beneficiary Name:</span>
+                <span id="profile-bank-details-container-beneficiary-name-value" className="text-gray-900">{form.bankDetails.beneficiary_name}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Account Number:</span>
-                <span className="text-gray-900">{form.bankDetails.settlement_bank_account_no}</span>
+              <div id="profile-bank-details-container-account-number" className="flex items-center space-x-4">
+                <span id="profile-bank-details-container-account-number-label" className="text-gray-500 w-32">Account Number:</span>
+                <span id="profile-bank-details-container-account-number-value" className="text-gray-900">{form.bankDetails.settlement_bank_account_no}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">Bank Name:</span>
-                <span className="text-gray-900">{form.bankDetails.bank_name}</span>
+              <div id="profile-bank-details-container-bank-name" className="flex items-center space-x-4">
+                <span id="profile-bank-details-container-bank-name-label" className="text-gray-500 w-32">Bank Name:</span>
+                <span id="profile-bank-details-container-bank-name-value" className="text-gray-900">{form.bankDetails.bank_name}</span>
               </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-500 w-32">IFSC Code:</span>
-                <span className="text-gray-900">{form.bankDetails.settlement_ifsc_code}</span>
+              <div id="profile-bank-details-container-ifsc-code" className="flex items-center space-x-4">
+                <span id="profile-bank-details-container-ifsc-code-label" className="text-gray-500 w-32">IFSC Code:</span>
+                <span id="profile-bank-details-container-ifsc-code-value" className="text-gray-900">{form.bankDetails.settlement_ifsc_code}</span>
               </div>
             </>
           )}
@@ -915,28 +929,30 @@ const Profile: React.FC = () => {
     }
 
     return (
-      <div className="space-y-6">
+      <div id="profile-bank-details-container-form" className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label id="profile-bank-details-container-form-settlement-type-label" className="block text-sm font-medium text-gray-700 mb-2">
             Settlement Type
           </label>
           <select
+            id="profile-bank-details-container-form-settlement-type-select"
             name="bankDetails.settlement_type"
             value={form.bankDetails.settlement_type}
             onChange={handleInputChange}
             className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
           >
-            <option value="upi">UPI</option>
-            <option value="bank">Bank Account</option>
+            <option id="profile-bank-details-container-form-settlement-type-select-option-upi" value="upi">UPI</option>
+            <option id="profile-bank-details-container-form-settlement-type-select-option-bank" value="bank">Bank Account</option>
           </select>
         </div>
 
         {form.bankDetails.settlement_type === 'upi' ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label id="profile-bank-details-container-form-upi-id-label" className="block text-sm font-medium text-gray-700 mb-2">
               UPI ID
             </label>
             <input
+              id="profile-bank-details-container-form-upi-id-input"
               type="text"
               name="bankDetails.upi_address"
               value={form.bankDetails.upi_address}
@@ -947,10 +963,11 @@ const Profile: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-bank-details-container-form-beneficiary-name-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Beneficiary Name
               </label>
               <input
+                id="profile-bank-details-container-form-beneficiary-name-input"
                 type="text"
                 name="bankDetails.beneficiary_name"
                 value={form.bankDetails.beneficiary_name}
@@ -959,10 +976,11 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-bank-details-container-form-account-number-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Account Number
               </label>
               <input
+                id="profile-bank-details-container-form-account-number-input"
                 type="text"
                 name="bankDetails.settlement_bank_account_no"
                 value={form.bankDetails.settlement_bank_account_no}
@@ -971,10 +989,11 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-bank-details-container-form-bank-name-label" className="block text-sm font-medium text-gray-700 mb-2">
                 Bank Name
               </label>
               <input
+                id="profile-bank-details-container-form-bank-name-input"
                 type="text"
                 name="bankDetails.bank_name"
                 value={form.bankDetails.bank_name}
@@ -983,10 +1002,11 @@ const Profile: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label id="profile-bank-details-container-form-ifsc-code-label" className="block text-sm font-medium text-gray-700 mb-2">
                 IFSC Code
               </label>
               <input
+                id="profile-bank-details-container-form-ifsc-code-input"
                 type="text"
                 name="bankDetails.settlement_ifsc_code"
                 value={form.bankDetails.settlement_ifsc_code}
@@ -1002,20 +1022,20 @@ const Profile: React.FC = () => {
 
   const renderAddressCard = (address: any, type: 'pickup' | 'delivery') => {
     return (
-      <div key={address.id} className="bg-white border border-gray-200 rounded-lg p-4">
+      <div id={`profile-address-card-${address.id}`} key={address.id} className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="space-y-4">
           {/* Header with actions */}
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
+          <div id={`profile-address-card-${address.id}-header`} className="flex justify-between items-start">
+            <div id={`profile-address-card-${address.id}-header-title`} className="space-y-1">
               {type === 'pickup' ? (
                 // Pickup address header
-                <h4 className="font-medium text-gray-900">
+                <h4 id={`profile-address-card-${address.id}-header-title-text`} className="font-medium text-gray-900">
                   {address.location?.address?.name}
                 </h4>
               ) : (
                 // Delivery address header - Contact Person Name prominent
                 <>
-                  <h4 className="font-medium text-gray-900">
+                  <h4 id={`profile-address-card-${address.id}-header-title-text`} className="font-medium text-gray-900">
                     {address.person?.name}
                   </h4>
                   {/* <p className="text-sm text-gray-500">
@@ -1024,8 +1044,9 @@ const Profile: React.FC = () => {
                 </>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div id={`profile-address-card-${address.id}-header-actions`} className="flex items-center gap-2">
               <button
+                id={`profile-address-card-${address.id}-header-actions-edit-button`}
                 onClick={() => {
                   setEditingAddress({
                     id: address.id,
@@ -1057,33 +1078,33 @@ const Profile: React.FC = () => {
                 }}
                 className="p-1.5 text-gray-600 hover:text-blue-600 rounded-md hover:bg-blue-50"
               >
-                <Pencil className="w-4 h-4" />
+                <Pencil id={`profile-address-card-${address.id}-header-actions-edit-button-icon`} className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDeleteAddress(address.id, type)}
                 className="p-1.5 text-gray-600 hover:text-red-600 rounded-md hover:bg-red-50"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 id={`profile-address-card-${address.id}-header-actions-delete-button-icon`} className="w-4 h-4" />
               </button>
             </div>
           </div>
 
           {/* Contact Details */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Phone className="w-4 h-4" />
+            <div id={`profile-address-card-${address.id}-contact-details-phone`} className="flex items-center gap-2 text-sm text-gray-600">
+              <Phone id={`profile-address-card-${address.id}-contact-details-phone-icon`} className="w-4 h-4" />
               <span>{address.contact?.phone}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Mail className="w-4 h-4" />
+            <div id={`profile-address-card-${address.id}-contact-details-email`} className="flex items-center gap-2 text-sm text-gray-600">
+              <Mail id={`profile-address-card-${address.id}-contact-details-email-icon`} className="w-4 h-4" />
               <span>{address.contact?.email}</span>
             </div>
           </div>
 
           {/* Address Details */}
-          <div className="flex items-start gap-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 mt-0.5" />
-            <span>
+          <div id={`profile-address-card-${address.id}-address-details`} className="flex items-start gap-2 text-sm text-gray-600">
+            <MapPin id={`profile-address-card-${address.id}-address-details-icon`} className="w-4 h-4 mt-0.5" />
+            <span id={`profile-address-card-${address.id}-address-details-text`}>
               {[
                 address.location?.address?.building,
                 address.location?.address?.locality,
@@ -1096,15 +1117,15 @@ const Profile: React.FC = () => {
 
           {/* Shop Timings - Only for Pickup Addresses */}
           {type === 'pickup' && (
-            <div className="border-t border-gray-100 pt-3 mt-3">
-              <div className="text-sm text-gray-600">
-                <div className="mb-1">
-                  <span className="font-medium">Working Hours: </span>
+            <div id={`profile-address-card-${address.id}-shop-timings`} className="border-t border-gray-100 pt-3 mt-3">
+              <div id={`profile-address-card-${address.id}-shop-timings-content`} className="text-sm text-gray-600">
+                <div id={`profile-address-card-${address.id}-shop-timings-working-hours`} className="mb-1">
+                  <span id={`profile-address-card-${address.id}-shop-timings-working-hours-label`} className="font-medium">Working Hours: </span>
                   {address.provider_store_details?.time?.range?.start?.replace(/^(\d{2})(\d{2})$/, '$1:$2')} - 
                   {address.provider_store_details?.time?.range?.end?.replace(/^(\d{2})(\d{2})$/, '$1:$2')}
                 </div>
                 <div>
-                  <span className="font-medium">Working Days: </span>
+                  <span id={`profile-address-card-${address.id}-shop-timings-working-days-label`} className="font-medium">Working Days: </span>
                   {address.provider_store_details?.time?.days?.split(',').map(day => {
                     const daysMap = {
                       '1': 'Mon', '2': 'Tue', '3': 'Wed', '4': 'Thu',
@@ -1123,12 +1144,13 @@ const Profile: React.FC = () => {
 
   const renderAddressTab = () => {
     return (
-      <div className="space-y-6">
+      <div id="profile-address-tab-container" className="space-y-6">
         {/* Pickup Addresses */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-medium">Pickup Addresses</h4>
+          <div id="profile-address-tab-container-pickup-addresses-header" className="flex justify-between items-center mb-4">
+            <h4 id="profile-address-tab-container-pickup-addresses-header-title" className="text-lg font-medium">Pickup Addresses</h4>
             <button
+              id="profile-address-tab-container-pickup-addresses-header-add-new-address-button"
               onClick={() => {
                 setEditingAddress(null);
                 setShowAddressModal(true);
@@ -1139,27 +1161,28 @@ const Profile: React.FC = () => {
               Add New Address
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="profile-address-tab-container-pickup-addresses-content" className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {pickupAddresses.map(address => renderAddressCard(address, 'pickup'))}
           </div>
         </div>
 
         {/* Delivery Addresses */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-medium">Delivery Addresses</h4>
+          <div id="profile-address-tab-container-delivery-addresses-header" className="flex justify-between items-center mb-4">
+            <h4 id="profile-address-tab-container-delivery-addresses-header-title" className="text-lg font-medium">Delivery Addresses</h4>
             <button
+              id="profile-address-tab-container-delivery-addresses-header-add-new-address-button"
               onClick={() => {
                 setEditingAddress(null);
                 setShowAddressModal(true);
               }}
               className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle id="profile-address-tab-container-delivery-addresses-header-add-new-address-button-icon" className="w-4 h-4" />
               Add New Address
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="profile-address-tab-container-delivery-addresses-content" className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {deliveryAddresses.map(address => renderAddressCard(address, 'delivery'))}
           </div>
         </div>
@@ -1340,36 +1363,37 @@ const Profile: React.FC = () => {
     return (
       <>
         {/* Overlay - Increased z-index */}
-        <div className="fixed inset-0 bg-black/50 z-[150]" onClick={onClose} />
+        <div id="profile-address-modal-overlay" className="fixed inset-0 bg-black/50 z-[150]" onClick={onClose} />
         
         {/* Modal Container - Increased z-index */}
-        <div className="fixed inset-0 z-[160] overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-xl shadow-2xl">
+        <div id="profile-address-modal-container" className="fixed inset-0 z-[160] overflow-y-auto">
+          <div id="profile-address-modal-content" className="flex min-h-full items-center justify-center p-4">
+            <div id="profile-address-modal-card" className="bg-white rounded-xl w-full max-w-xl shadow-2xl">
               {/* Modal Header */}
-              <div className="sticky top-0 bg-white px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900">
+              <div id="profile-address-modal-header" className="sticky top-0 bg-white px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                <h3 id="profile-address-modal-header-title" className="text-lg font-semibold text-gray-900">
                   {address ? 'Edit Address' : 'Add New Address'}
                 </h3>
                 <button 
                   onClick={onClose} 
                   className="text-gray-400 hover:text-gray-600 p-1"
                 >
-                  <X className="w-5 h-5" />
+                  <X id="profile-address-modal-header-close-button-icon" className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-4 overflow-y-auto max-h-[calc(100vh-180px)]">
-                <div className="space-y-4">
+              <div id="profile-address-modal-body" className="p-4 overflow-y-auto max-h-[calc(100vh-180px)]">
+                <div id="profile-address-modal-body-content" className="space-y-4">
                   {/* Address Type Selection */}
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div id="profile-address-modal-body-content-address-type-selection" className="bg-gray-50 p-3 rounded-lg">
+                    <label id="profile-address-modal-body-content-address-type-selection-label" className="block text-sm font-medium text-gray-700 mb-2">
                       Select Address Type
                     </label>
-                    <div className="flex gap-3">
-                      <label className="flex-1">
+                    <div id="profile-address-modal-body-content-address-type-selection-options" className="flex gap-3">
+                      <label id="profile-address-modal-body-content-address-type-selection-options-pickup-label" className="flex-1">
                         <input
+                          id="profile-address-modal-body-content-address-type-selection-options-pickup-input"
                           type="radio"
                           name="type"
                           value="pickup"
@@ -1377,13 +1401,14 @@ const Profile: React.FC = () => {
                           onChange={handleInputChange}
                           className="sr-only peer"
                         />
-                        <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                        <div id="profile-address-modal-body-content-address-type-selection-options-pickup-option" className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
                                       peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
-                          <span className="text-sm font-medium peer-checked:text-blue-600">Pickup Address</span>
+                          <span id="profile-address-modal-body-content-address-type-selection-options-pickup-option-title" className="text-sm font-medium peer-checked:text-blue-600">Pickup Address</span>
                         </div>
                       </label>
-                      <label className="flex-1">
+                      <label id="profile-address-modal-body-content-address-type-selection-options-delivery-label" className="flex-1">
                         <input
+                          id="profile-address-modal-body-content-address-type-selection-options-delivery-input"
                           type="radio"
                           name="type"
                           value="delivery"
@@ -1391,9 +1416,9 @@ const Profile: React.FC = () => {
                           onChange={handleInputChange}
                           className="sr-only peer"
                         />
-                        <div className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
+                        <div id="profile-address-modal-body-content-address-type-selection-options-delivery-option" className="flex items-center justify-center p-4 border rounded-lg cursor-pointer
                                       peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
-                          <span className="text-sm font-medium peer-checked:text-blue-600">Delivery Address</span>
+                          <span id="profile-address-modal-body-content-address-type-selection-options-delivery-option-title" className="text-sm font-medium peer-checked:text-blue-600">Delivery Address</span>
                         </div>
                       </label>
                     </div>
@@ -1404,10 +1429,11 @@ const Profile: React.FC = () => {
                     {/* Store Name - Only for pickup */}
                     {form.type === 'pickup' && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-store-name-label" className="block text-sm font-medium text-gray-700 mb-1">
                           Store Name *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-store-name-input"
                           type="text"
                           name="storeName"
                           value={form.storeName}
@@ -1420,15 +1446,16 @@ const Profile: React.FC = () => {
 
                     {/* Contact Person */}
                     <div>
-                      <label className={`block text-sm font-medium mb-1 ${
+                      <label id="profile-address-modal-body-content-form-fields-contact-person-name-label" className={`block text-sm font-medium mb-1 ${
                         form.type === 'delivery' ? 'text-blue-600' : 'text-gray-700'
                       }`}>
                         Contact Person Name *
                         {form.type === 'delivery' && (
-                          <span className="text-xs text-gray-500 ml-1">(This will be used as address name)</span>
+                          <span id="profile-address-modal-body-content-form-fields-contact-person-name-label-description" className="text-xs text-gray-500 ml-1">(This will be used as address name)</span>
                         )}
                       </label>
                       <input
+                        id="profile-address-modal-body-content-form-fields-contact-person-name-input"
                         type="text"
                         name="contactPersonName"
                         value={form.contactPersonName}
@@ -1441,10 +1468,11 @@ const Profile: React.FC = () => {
                     {/* Contact Details */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-email-label" className="block text-sm font-medium text-gray-700 mb-1">
                           Email *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-email-input"
                           type="email"
                           name="email"
                           value={form.email}
@@ -1454,10 +1482,11 @@ const Profile: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-phone-number-label" className="block text-sm font-medium text-gray-700 mb-1">
                           Phone Number *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-phone-number-input"
                           type="tel"
                           name="phoneNumber"
                           value={form.phoneNumber}
@@ -1471,10 +1500,11 @@ const Profile: React.FC = () => {
                     {/* Address Fields */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-building-label" className="block text-sm font-medium text-gray-700 mb-1">
                           Building *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-building-input"
                           type="text"
                           name="building"
                           value={form.building}
@@ -1484,10 +1514,11 @@ const Profile: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-locality-label" className="block text-sm font-medium text-gray-700 mb-1">
                           Locality *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-locality-input"
                           type="text"
                           name="locality"
                           value={form.locality}
@@ -1500,10 +1531,11 @@ const Profile: React.FC = () => {
 
                     <div className="grid grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-city-label" className="block text-sm font-medium text-gray-700 mb-1">
                           City *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-city-input"
                           type="text"
                           name="city"
                           value={form.city}
@@ -1513,10 +1545,11 @@ const Profile: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-state-label" className="block text-sm font-medium text-gray-700 mb-1">
                           State *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-state-input"
                           type="text"
                           name="state"
                           value={form.state}
@@ -1526,10 +1559,11 @@ const Profile: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label id="profile-address-modal-body-content-form-fields-zip-code-label" className="block text-sm font-medium text-gray-700 mb-1">
                           ZIP Code *
                         </label>
                         <input
+                          id="profile-address-modal-body-content-form-fields-zip-code-input"
                           type="text"
                           name="zipCode"
                           value={form.zipCode}
@@ -1545,13 +1579,14 @@ const Profile: React.FC = () => {
                       <>
                         {/* Working Days */}
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label id="profile-address-modal-body-content-form-fields-working-days-label" className="block text-sm font-medium text-gray-700 mb-2">
                             Working Days *
                           </label>
-                          <div className="grid grid-cols-4 gap-2">
+                          <div id="profile-address-modal-body-content-form-fields-working-days-options" className="grid grid-cols-4 gap-2">
                             {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
                               <label key={day} className="flex items-center space-x-2">
                                 <input
+                                  id="profile-address-modal-body-content-form-fields-working-days-input"
                                   type="checkbox"
                                   checked={form.workingDays.includes(day)}
                                   onChange={() => handleWorkingDaysChange(day)}
@@ -1566,10 +1601,11 @@ const Profile: React.FC = () => {
                         {/* Shop Timings */}
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label id="profile-address-modal-body-content-form-fields-opening-time-label" className="block text-sm font-medium text-gray-700 mb-1">
                               Opening Time *
                             </label>
                             <input
+                              id="profile-address-modal-body-content-form-fields-opening-time-input"
                               type="time"
                               name="shopTime.start"
                               value={form.shopTime.start}
@@ -1579,10 +1615,11 @@ const Profile: React.FC = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label id="profile-address-modal-body-content-form-fields-closing-time-label" className="block text-sm font-medium text-gray-700 mb-1">
                               Closing Time *
                             </label>
                             <input
+                              id="profile-address-modal-body-content-form-fields-closing-time-input"
                               type="time"
                               name="shopTime.end"
                               value={form.shopTime.end}
@@ -1599,15 +1636,17 @@ const Profile: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="sticky bottom-0 bg-white px-4 py-3 border-t border-gray-100">
-                <div className="flex justify-end gap-3">
+              <div id="profile-address-modal-body-content-form-fields-footer" className="sticky bottom-0 bg-white px-4 py-3 border-t border-gray-100">
+                <div id="profile-address-modal-body-content-form-fields-footer-actions" className="flex justify-end gap-3">
                   <button
+                    id="profile-address-modal-body-content-form-fields-footer-actions-cancel-button"
                     onClick={onClose}
                     className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
                   >
                     Cancel
                   </button>
                   <button
+                    id="profile-address-modal-body-content-form-fields-footer-actions-save-button"
                     onClick={handleSave}
                     className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
                   >
@@ -1630,8 +1669,9 @@ const Profile: React.FC = () => {
   const renderTabs = () => {
     if (userType === 'STANDALONE_ADMIN') {
       return (
-        <nav className="-mb-px flex space-x-8">
+        <nav id="profile-tabs-container-tabs" className="-mb-px flex space-x-8">
           <button
+            id="profile-tabs-container-tabs-basic-information-button"
             onClick={() => setActiveTab('basic')}
             className={`pb-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'basic'
@@ -1646,8 +1686,9 @@ const Profile: React.FC = () => {
     }
 
     return (
-      <nav className="-mb-px flex space-x-8">
+      <nav id="profile-tabs-container-tabs" className="-mb-px flex space-x-8">
         <button
+          id="profile-tabs-container-tabs-basic-information-button"
           onClick={() => setActiveTab('basic')}
           className={`pb-4 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'basic'
@@ -1658,6 +1699,7 @@ const Profile: React.FC = () => {
           Basic Information
         </button>
         <button
+          id="profile-tabs-container-tabs-bank-details-button"
           onClick={() => setActiveTab('bank')}
           className={`pb-4 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'bank'
@@ -1668,6 +1710,7 @@ const Profile: React.FC = () => {
           Bank Details
         </button>
         <button
+          id="profile-tabs-container-tabs-addresses-button"
           onClick={() => setActiveTab('addresses')}
           className={`pb-4 px-1 border-b-2 font-medium text-sm ${
             activeTab === 'addresses'
@@ -1691,41 +1734,42 @@ const Profile: React.FC = () => {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
+      <div id="profile-container" className="container mx-auto px-4 py-8">
         {/* Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200">
+        <div id="profile-tabs-container" className="mb-8">
+          <div id="profile-tabs-container-tabs" className="border-b border-gray-200">
             {renderTabs()}
           </div>
         </div>
 
         {/* Tab Content */}
-        <div className="space-y-6">
+        <div id="profile-tab-content-container" className="space-y-6">
           {activeTab === 'basic' && (
-            <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-              <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+            <div id="profile-basic-information-container" className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+              <div id="profile-basic-information-container-header" className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
                 <div>
-                  <h4 className="text-base font-medium text-gray-900">Basic Information</h4>
-                  <p className="text-sm text-gray-500 mt-1">Manage your basic profile information</p>
+                  <h4 id="profile-basic-information-container-header-title" className="text-base font-medium text-gray-900">Basic Information</h4>
+                  <p id="profile-basic-information-container-header-description" className="text-sm text-gray-500 mt-1">Manage your basic profile information</p>
                 </div>
                 <button
+                  id="profile-basic-information-container-header-edit-button"
                   onClick={() => editMode.basic ? handleSaveBasicInfo() : toggleEdit('basic')}
                   className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
                 >
                   {editMode.basic ? (
                     <>
-                      <Save className="w-4 h-4" />
+                      <Save id="profile-basic-information-container-header-edit-button-save-icon" className="w-4 h-4" />
                       Save Changes
                     </>
                   ) : (
                     <>
-                      <Pencil className="w-4 h-4" />
+                      <Pencil id="profile-basic-information-container-header-edit-button-pencil-icon" className="w-4 h-4" />
                       Edit Details
                     </>
                   )}
                 </button>
               </div>
-              <div className="p-6">{renderBasicInformation()}</div>
+              <div id="profile-basic-information-container-body" className="p-6">{renderBasicInformation()}</div>
             </div>
           )}
 
@@ -1733,34 +1777,35 @@ const Profile: React.FC = () => {
           {userType === 'STANDALONE_USER' && (
             <>
               {activeTab === 'addresses' && (
-                <div>{renderAddressTab()}</div>
+                <div id="profile-addresses-container">{renderAddressTab()}</div>
               )}
 
               {activeTab === 'bank' && (
-                <div className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
-                  <div className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+                <div id="profile-bank-details-container" className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+                  <div id="profile-bank-details-container-header" className="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
                     <div>
-                      <h4 className="text-base font-medium text-gray-900">Bank Details</h4>
-                      <p className="text-sm text-gray-500 mt-1">Manage your bank account information</p>
+                      <h4 id="profile-bank-details-container-header-title" className="text-base font-medium text-gray-900">Bank Details</h4>
+                      <p id="profile-bank-details-container-header-description" className="text-sm text-gray-500 mt-1">Manage your bank account information</p>
                     </div>
                     <button
                       onClick={() => editMode.bank ? handleSaveBankDetails() : toggleEdit('bank')}
                       className="px-4 py-2 text-sm flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                      id="profile-bank-details-container-header-edit-button"
                     >
                       {editMode.bank ? (
                         <>
-                          <Save className="w-4 h-4" />
+                          <Save id="profile-bank-details-container-header-edit-button-save-icon" className="w-4 h-4" />
                           Save Changes
                         </>
                       ) : (
                         <>
-                          <Pencil className="w-4 h-4" />
+                          <Pencil id="profile-bank-details-container-header-edit-button-pencil-icon" className="w-4 h-4" />
                           Edit Details
                         </>
                       )}
                     </button>
                   </div>
-                  <div className="p-6">{renderBankDetails()}</div>
+                  <div id="profile-bank-details-container-body" className="p-6">{renderBankDetails()}</div>
                 </div>
               )}
             </>

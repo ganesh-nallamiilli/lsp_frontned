@@ -298,12 +298,12 @@ const CreateFranchise: React.FC = () => {
 
   // Stepper component
   const Stepper = () => (
-    <div className="mb-8">
-      <div className="flex items-center justify-center">
-        <div className="flex items-center w-2/3">
+    <div id="create-franchise-stepper" className="mb-8">
+      <div id="create-franchise-stepper-container" className="flex items-center justify-center">
+        <div id="create-franchise-stepper-steps-container" className="flex items-center w-2/3">
           {/* Step 1 */}
-          <div className="relative flex flex-col items-center flex-1">
-            <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center
+          <div id="create-franchise-stepper-step-1" className="relative flex flex-col items-center flex-1">
+            <div id="create-franchise-stepper-step-1-circle" className={`w-12 h-12 rounded-full border-2 flex items-center justify-center
               ${currentStep >= 1 
                 ? 'border-blue-600 bg-blue-600 text-white' 
                 : 'border-gray-300 text-gray-500'
@@ -311,7 +311,7 @@ const CreateFranchise: React.FC = () => {
             >
               {currentStep > 1 ? <Check className="w-6 h-6" /> : "1"}
             </div>
-            <div className={`mt-2 text-xs font-medium uppercase
+            <div id="create-franchise-stepper-step-1-title" className={`mt-2 text-xs font-medium uppercase
               ${currentStep >= 1 ? 'text-blue-600' : 'text-gray-500'}`}>
               Basic Details
             </div>
@@ -323,8 +323,8 @@ const CreateFranchise: React.FC = () => {
           </div>
 
           {/* Step 2 */}
-          <div className="relative flex flex-col items-center flex-1">
-            <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center
+          <div id="create-franchise-stepper-step-2" className="relative flex flex-col items-center flex-1">
+            <div id="create-franchise-stepper-step-2-circle" className={`w-12 h-12 rounded-full border-2 flex items-center justify-center
               ${currentStep === 2
                 ? 'border-blue-600 bg-blue-600 text-white' 
                 : 'border-gray-300 text-gray-500'
@@ -332,7 +332,7 @@ const CreateFranchise: React.FC = () => {
             >
               2
             </div>
-            <div className={`mt-2 text-xs font-medium uppercase
+            <div id="create-franchise-stepper-step-2-title" className={`mt-2 text-xs font-medium uppercase
               ${currentStep === 2 ? 'text-blue-600' : 'text-gray-500'}`}>
               Markup Details
             </div>

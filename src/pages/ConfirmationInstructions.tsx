@@ -94,17 +94,18 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div id="confirmation-instructions-container" className="container mx-auto p-6">
+      <div id="confirmation-instructions-grid" className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Pickup Instructions */}
         <div>
-          <h2 className="text-lg font-medium mb-4">Pickup Confirmation Instructions</h2>
+          <h2 id="confirmation-instructions-pickup-instructions-title" className="text-lg font-medium mb-4">Pickup Confirmation Instructions</h2>
           <div className="space-y-4">
             <div>
-              <label className="block mb-1">
+              <label id="confirmation-instructions-pickup-instructions-pickup-confirmation-type-label" className="block mb-1">
                 Pickup Confirmation Type <span className="text-red-500">*</span>
               </label>
               <select
+                id="confirmation-instructions-pickup-instructions-pickup-confirmation-type-select"
                 className="w-full p-2 border rounded-md"
                 value={pickupType}
                 onChange={(e) => setPickupType(e.target.value)}
@@ -119,11 +120,12 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             {/* Pickup code input - only show if not OTP */}
             {pickupType !== 'OTP' && (
               <div>
-                <label className="block mb-1">
+                <label id="confirmation-instructions-pickup-instructions-pickup-code-label" className="block mb-1">
                   {getPickupCodeLabel(pickupType)} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type={pickupType === 'Order preparation time' ? 'number' : 'text'}
+                  id="confirmation-instructions-pickup-instructions-pickup-code-input"
                   className="w-full p-2 border rounded-md"
                   placeholder={getPickupCodeLabel(pickupType)}
                   value={pickupCode}
@@ -133,8 +135,9 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             )}
 
             <div>
-              <label className="block mb-1">Description</label>
+              <label id="confirmation-instructions-pickup-instructions-pickup-description-label" className="block mb-1">Description</label>
               <textarea
+                id="confirmation-instructions-pickup-instructions-pickup-description-textarea"
                 className="w-full p-2 border rounded-md"
                 placeholder="Description"
                 value={pickupDescription}
@@ -143,8 +146,9 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             </div>
 
             <div>
-              <label className="block mb-1">Upload Label Images</label>
+              <label id="confirmation-instructions-pickup-instructions-upload-label-images-label" className="block mb-1">Upload Label Images</label>
               <div 
+                id="confirmation-instructions-pickup-instructions-upload-label-images-container"
                 className="border-2 border-dashed rounded-md p-6 transition-colors duration-200"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -158,27 +162,29 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
                   onChange={(e) => e.target.files && handleFileUpload(e.target.files, setPickupImages)}
                   id="pickup-images"
                 />
-                <label htmlFor="pickup-images" className="cursor-pointer">
-                  <div className="flex flex-col items-center">
-                    <img src="/placeholder-image.svg" alt="Upload" className="w-13 h-8 m-0 p-0" />
-                    <p>
+                <label id="confirmation-instructions-pickup-instructions-upload-label-images-label" htmlFor="pickup-images" className="cursor-pointer">
+                  <div id="confirmation-instructions-pickup-instructions-upload-label-images-content" className="flex flex-col items-center">
+                    <img id="confirmation-instructions-pickup-instructions-upload-label-images-placeholder-image" src="/placeholder-image.svg" alt="Upload" className="w-13 h-8 m-0 p-0" />
+                    <p id="confirmation-instructions-pickup-instructions-upload-label-images-placeholder-text">
                       <span className="text-blue-600">Upload a file</span> or drag and drop
                     </p>
-                    <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <p id="confirmation-instructions-pickup-instructions-upload-label-images-placeholder-size-text" className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
                   </div>
                 </label>
                 {pickupImages.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div id="confirmation-instructions-pickup-instructions-upload-label-images-images-container" className="mt-4 grid grid-cols-2 gap-2">
                     {pickupImages.map((file, index) => (
                       <div key={index} className="relative">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Upload ${index + 1}`}
                           className="w-full h-24 object-cover rounded"
+                          id="confirmation-instructions-pickup-instructions-upload-label-images-image"
                         />
                         <button
                           onClick={() => setPickupImages(prev => prev.filter((_, i) => i !== index))}
                           className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                          id="confirmation-instructions-pickup-instructions-upload-label-images-delete-button"
                         >
                           ×
                         </button>
@@ -192,14 +198,15 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
         </div>
 
         {/* Delivery Instructions */}
-        <div>
-          <h2 className="text-lg font-medium mb-4">Delivery Confirmation Instructions</h2>
+        <div id="confirmation-instructions-delivery-instructions-container">
+          <h2 id="confirmation-instructions-delivery-instructions-title" className="text-lg font-medium mb-4">Delivery Confirmation Instructions</h2>
           <div className="space-y-4">
             <div>
-              <label className="block mb-1">
+              <label id="confirmation-instructions-delivery-instructions-delivery-confirmation-type-label" className="block mb-1">
                 Delivery Confirmation Type <span className="text-red-500">*</span>
               </label>
               <select
+                id="confirmation-instructions-delivery-instructions-delivery-confirmation-type-select"
                 className="w-full p-2 border rounded-md"
                 value={deliveryType}
                 onChange={(e) => setDeliveryType(e.target.value)}
@@ -214,7 +221,7 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             {/* Only show code input if not OTP and not No delivery code */}
             {deliveryType !== 'OTP' && deliveryType !== 'No delivery code' && (
               <div>
-                <label className="block mb-1">
+                <label id="confirmation-instructions-delivery-instructions-delivery-code-label" className="block mb-1">
                   {getDeliveryCodeLabel(deliveryType)} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -228,8 +235,9 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             )}
 
             <div>
-              <label className="block mb-1">Description</label>
+              <label id="confirmation-instructions-delivery-instructions-delivery-description-label" className="block mb-1">Description</label>
               <textarea
+                id="confirmation-instructions-delivery-instructions-delivery-description-textarea"
                 className="w-full p-2 border rounded-md"
                 placeholder="Description"
                 value={deliveryDescription}
@@ -238,8 +246,9 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
             </div>
 
             <div>
-              <label className="block mb-1">Upload Label Images</label>
+              <label id="confirmation-instructions-delivery-instructions-upload-label-images-label" className="block mb-1">Upload Label Images</label>
               <div 
+                id="confirmation-instructions-delivery-instructions-upload-label-images-container"
                 className="border-2 border-dashed rounded-md p-6 transition-colors duration-200"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -253,9 +262,9 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
                   onChange={(e) => e.target.files && handleFileUpload(e.target.files, setDeliveryImages)}
                   id="delivery-images"
                 />
-                <label htmlFor="delivery-images" className="cursor-pointer">
-                  <div className="flex flex-col items-center">
-                    <img src="/placeholder-image.svg" alt="Upload" className="w-13 h-8 m-0 p-0" />
+                <label id="confirmation-instructions-delivery-instructions-upload-label-images-label" htmlFor="delivery-images" className="cursor-pointer">
+                  <div id="confirmation-instructions-delivery-instructions-upload-label-images-content" className="flex flex-col items-center">
+                    <img id="confirmation-instructions-delivery-instructions-upload-label-images-placeholder-image" src="/placeholder-image.svg" alt="Upload" className="w-13 h-8 m-0 p-0" />
                     <p>
                       <span className="text-blue-600">Upload a file</span> or drag and drop
                     </p>
@@ -263,17 +272,19 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
                   </div>
                 </label>
                 {deliveryImages.length > 0 && (
-                  <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div id="confirmation-instructions-delivery-instructions-upload-label-images-images-container" className="mt-4 grid grid-cols-2 gap-2">
                     {deliveryImages.map((file, index) => (
-                      <div key={index} className="relative">
+                      <div id="confirmation-instructions-delivery-instructions-upload-label-images-image" key={index} className="relative">
                         <img
                           src={URL.createObjectURL(file)}
                           alt={`Upload ${index + 1}`}
                           className="w-full h-24 object-cover rounded"
+                          id="confirmation-instructions-delivery-instructions-upload-label-images-image"
                         />
                         <button
                           onClick={() => setDeliveryImages(prev => prev.filter((_, i) => i !== index))}
                           className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                          id="confirmation-instructions-delivery-instructions-upload-label-images-delete-button"
                         >
                           ×
                         </button>
@@ -291,12 +302,14 @@ const ConfirmationInstructions: React.FC<ConfirmationInstructionsProps> = ({ onC
       <div className="flex justify-end gap-4 mt-8">
         <button
           onClick={onCancel}
+          id="confirmation-instructions-action-buttons-cancel-button"
           className="px-4 py-2 border rounded-md hover:bg-gray-50"
         >
           CANCEL
         </button>
         <button
           onClick={handleNext}
+          id="confirmation-instructions-action-buttons-next-button"
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           NEXT

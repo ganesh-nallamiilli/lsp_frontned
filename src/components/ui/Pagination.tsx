@@ -14,8 +14,9 @@ export const Pagination: React.FC<PaginationProps> = ({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div className="flex items-center justify-center space-x-2">
+    <div id="pagination-container" className="flex items-center justify-center space-x-2">
       <button
+        id="pagination-container-previous-button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className={`px-3 py-1 rounded-md ${
@@ -29,6 +30,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
       {pages.map((page) => (
         <button
+          id={`pagination-container-page-button-${page}`}
           key={page}
           onClick={() => onPageChange(page)}
           className={`px-3 py-1 rounded-md ${
@@ -42,6 +44,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       ))}
 
       <button
+        id="pagination-container-next-button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className={`px-3 py-1 rounded-md ${

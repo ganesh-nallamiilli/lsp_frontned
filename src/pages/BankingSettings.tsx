@@ -37,11 +37,12 @@ const BankingSettings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div id="banking-settings-page" className="min-h-screen bg-gray-50 p-6">
+      <div id="banking-settings-container" className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div id="banking-settings-header" className="flex items-center gap-4 mb-8">
           <button 
+            id="banking-settings-back-button"
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-800 rounded-md hover:bg-amber-200 transition-colors"
           >

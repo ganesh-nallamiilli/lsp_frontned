@@ -61,6 +61,7 @@ const Franchise: React.FC = () => {
     // Previous button
     buttons.push(
       <button
+        id="franchise-pagination-button-prev"
         key="prev"
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage === 1}
@@ -74,6 +75,7 @@ const Franchise: React.FC = () => {
     if (startPage > 1) {
       buttons.push(
         <button
+          id="franchise-pagination-button-1"
           key={1}
           onClick={() => goToPage(1)}
           className="px-3 py-1 rounded-md hover:bg-gray-100"
@@ -90,6 +92,7 @@ const Franchise: React.FC = () => {
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <button
+          id={`franchise-pagination-button-${i}`}
           key={i}
           onClick={() => goToPage(i)}
           className={`px-3 py-1 rounded-md ${
@@ -110,6 +113,7 @@ const Franchise: React.FC = () => {
       }
       buttons.push(
         <button
+          id={`franchise-pagination-button-${totalPages}`}
           key={totalPages}
           onClick={() => goToPage(totalPages)}
           className="px-3 py-1 rounded-md hover:bg-gray-100"
@@ -122,6 +126,7 @@ const Franchise: React.FC = () => {
     // Next button
     buttons.push(
       <button
+        id="franchise-pagination-button-next"
         key="next"
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -135,9 +140,9 @@ const Franchise: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <div id="franchise-container-p-6" className="p-6">
       {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
+      <div id="franchise-container-flex-justify-between-items-center-mb-6" className="flex justify-between items-center mb-6">
         <button 
           className="bg-blue-700 text-white px-6 py-2 rounded-md flex items-center gap-2 hover:bg-blue-800"
           onClick={() => navigate('/franchise/create')}
@@ -148,8 +153,9 @@ const Franchise: React.FC = () => {
 
         <div className="flex gap-4">
           {/* Search Input */}
-          <div className="relative">
+          <div id="franchise-container-flex-gap-4-div-relative" className="relative">
             <input
+              id="franchise-container-flex-gap-4-div-relative-input"
               type="text"
               placeholder="Search Franchise Name"
               className="pl-10 pr-4 py-2 border rounded-md w-64"
@@ -161,6 +167,7 @@ const Franchise: React.FC = () => {
 
           {/* Status Filter */}
           <select
+            id="franchise-container-flex-gap-4-select"
             className="border rounded-md px-4 py-2 w-40"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -173,36 +180,36 @@ const Franchise: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-4">Loading...</div>
+        <div id="franchise-container-text-center-py-4" className="text-center py-4">Loading...</div>
       ) : error ? (
-        <div className="text-center text-red-600 py-4">{error}</div>
+        <div id="franchise-container-text-center-text-red-600-py-4" className="text-center text-red-600 py-4">{error}</div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50">
+          <table id="franchise-container-table-min-w-full" className="min-w-full">
+            <thead id="franchise-container-table-thead-bg-gray-50" className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-franchise-name" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Franchise Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-owner-name" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Owner Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-email" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-mobile" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Mobile
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-pan-number" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   PAN Number
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-create-date" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Create Date & time
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-status" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th id="franchise-container-table-action" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -210,15 +217,16 @@ const Franchise: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.map((franchise, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.store_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.mobile_number}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.pan_number}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{franchise.createdAt}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td id="franchise-container-table-franchise-name" className="px-6 py-4 whitespace-nowrap">{franchise.store_name}</td>
+                  <td id="franchise-container-table-owner-name" className="px-6 py-4 whitespace-nowrap">{franchise.name}</td>
+                  <td id="franchise-container-table-email" className="px-6 py-4 whitespace-nowrap">{franchise.email}</td>
+                  <td id="franchise-container-table-mobile" className="px-6 py-4 whitespace-nowrap">{franchise.mobile_number}</td>
+                  <td id="franchise-container-table-pan-number" className="px-6 py-4 whitespace-nowrap">{franchise.pan_number}</td>
+                  <td id="franchise-container-table-create-date" className="px-6 py-4 whitespace-nowrap">{franchise.createdAt}</td>
+                  <td id="franchise-container-table-status" className="px-6 py-4 whitespace-nowrap">
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input 
+                        id="franchise-container-table-status-input"
                         type="checkbox" 
                         className="sr-only peer"
                         checked={franchise.is_active}
@@ -230,12 +238,14 @@ const Franchise: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-3">
                       <button 
+                        id="franchise-container-table-action-button-eye"
                         className="text-gray-600 hover:text-blue-600"
                         onClick={() => navigate(`/franchise/view/${franchise.id}`)}
                       >
                         <Eye size={18} />
                       </button>
                       <button 
+                        id="franchise-container-table-action-button-edit"
                         className="text-gray-600 hover:text-blue-600"
                         onClick={() => navigate(`/franchise/edit/${franchise.id}`)}
                       >
@@ -249,8 +259,8 @@ const Franchise: React.FC = () => {
           </table>
 
           {/* Pagination */}
-          <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
-            <div className="text-sm text-gray-500">
+          <div id="franchise-container-table-pagination-main" className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+            <div id="franchise-container-table-pagination-main-text-sm-text-gray-500" className="text-sm text-gray-500">
               Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{' '}
               {totalItems} results
             </div>

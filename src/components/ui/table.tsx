@@ -13,8 +13,8 @@ const Table: React.FC<TableProps> & {
   Cell: React.FC<TableProps>;
 } = ({ children, className = '' }) => {
   return (
-    <div className="w-full overflow-auto">
-      <table className={`w-full text-sm text-left ${className}`}>
+    <div id="table-container" className="w-full overflow-auto">
+      <table id="table" className={`w-full text-sm text-left ${className}`}>
         {children}
       </table>
     </div>
@@ -22,27 +22,27 @@ const Table: React.FC<TableProps> & {
 };
 
 Table.Header = ({ children, className = '' }) => (
-  <thead className={`text-xs text-gray-700 uppercase bg-gray-50 ${className}`}>
+  <thead id="table-header" className={`text-xs text-gray-700 uppercase bg-gray-50 ${className}`}>
     {children}
   </thead>
 );
 
 Table.Body = ({ children, className = '' }) => (
-  <tbody className={className}>{children}</tbody>
+  <tbody id="table-body" className={className}>{children}</tbody>
 );
 
 Table.Row = ({ children, className = '' }) => (
-  <tr className={`bg-white border-b hover:bg-gray-50 ${className}`}>
+  <tr id="table-row" className={`bg-white border-b hover:bg-gray-50 ${className}`}>
     {children}
   </tr>
 );
 
 Table.Head = ({ children, className = '' }) => (
-  <th className={`px-6 py-3 ${className}`}>{children}</th>
+  <th id="table-head" className={`px-6 py-3 ${className}`}>{children}</th>
 );
 
 Table.Cell = ({ children, className = '' }) => (
-  <td className={`px-6 py-4 ${className}`}>{children}</td>
+  <td id="table-cell" className={`px-6 py-4 ${className}`}>{children}</td>
 );
 
 export { Table }; 

@@ -105,12 +105,13 @@ const SearchLogistics: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div id="search-logistics-page-container" className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+      <div id="search-logistics-page-header" className="bg-white shadow">
+        <div id="search-logistics-page-header-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div id="search-logistics-page-header-content-back-button" className="flex justify-between items-center">
             <button 
+              id="search-logistics-page-header-content-back-button"
               className="flex items-center text-blue-600 font-medium"
               onClick={() => navigate(-1)}
             >
@@ -119,14 +120,14 @@ const SearchLogistics: React.FC = () => {
               </svg>
               BACK
             </button>
-            <div className="flex gap-4">
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-blue-600">
-                <option>Delivery</option>
-                <option>Return</option>
+            <div id="search-logistics-page-header-content-actions" className="flex gap-4">
+              <select id="search-logistics-page-header-content-actions-delivery-type-select" className="border border-gray-300 rounded-md px-3 py-1.5 text-blue-600">
+                <option id="search-logistics-page-header-content-actions-delivery-type-select-option-delivery" value="delivery">Delivery</option>
+                <option id="search-logistics-page-header-content-actions-delivery-type-select-option-return" value="return">Return</option>
               </select>
-              <select className="border border-gray-300 rounded-md px-3 py-1.5 text-blue-600">
-                <option>Version 1.1</option>
-                <option selected>Version 1.2</option>
+              <select id="search-logistics-page-header-content-actions-version-select" className="border border-gray-300 rounded-md px-3 py-1.5 text-blue-600">
+                <option id="search-logistics-page-header-content-actions-version-select-option-version-1-1" value="version-1-1">Version 1.1</option>
+                <option id="search-logistics-page-header-content-actions-version-select-option-version-1-2" value="version-1-2" selected>Version 1.2</option>
               </select>
             </div>
           </div>
@@ -134,15 +135,15 @@ const SearchLogistics: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow">
+      <div id="search-logistics-page-main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="search-logistics-page-main-content-location-details" className="bg-white rounded-lg shadow">
           {/* Location Details */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border-b">
+          <div id="search-logistics-page-main-content-location-details-content" className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border-b">
             {/* From Location */}
             <div>
-              <div className="text-sm text-gray-500 mb-1">From</div>
-              <div className="text-xl font-semibold mb-1">{fromCity}</div>
-              <div className="text-sm text-gray-600">
+              <div id="search-logistics-page-main-content-location-details-content-from-location-title" className="text-sm text-gray-500 mb-1">From</div>
+              <div id="search-logistics-page-main-content-location-details-content-from-location-city" className="text-xl font-semibold mb-1">{fromCity}</div>
+              <div id="search-logistics-page-main-content-location-details-content-from-location-address" className="text-sm text-gray-600">
                 prestige tech park, kadubeesanahalli - 560103
               </div>
               <div className="text-sm text-gray-500 mt-1">7569316575</div>
@@ -150,9 +151,9 @@ const SearchLogistics: React.FC = () => {
 
             {/* To Location */}
             <div>
-              <div className="text-sm text-gray-500 mb-1">To</div>
-              <div className="text-xl font-semibold mb-1">{toCity}</div>
-              <div className="text-sm text-gray-600">
+              <div id="search-logistics-page-main-content-location-details-content-to-location-title" className="text-sm text-gray-500 mb-1">To</div>
+              <div id="search-logistics-page-main-content-location-details-content-to-location-city" className="text-xl font-semibold mb-1">{toCity}</div>
+              <div id="search-logistics-page-main-content-location-details-content-to-location-address" className="text-sm text-gray-600">
                 Prestige Tech Park Road, Kadubeesanahalli - 560103
               </div>
               <div className="text-sm text-gray-500 mt-1">9638527410</div>
@@ -160,30 +161,31 @@ const SearchLogistics: React.FC = () => {
 
             {/* Pickup Date */}
             <div>
-              <div className="text-sm text-gray-500 mb-1">Pickup Date</div>
-              <div className="text-xl font-semibold mb-1">20 Nov '24</div>
-              <div className="text-sm text-gray-600">
+              <div id="search-logistics-page-main-content-location-details-content-pickup-date-title" className="text-sm text-gray-500 mb-1">Pickup Date</div>
+              <div id="search-logistics-page-main-content-location-details-content-pickup-date-date" className="text-xl font-semibold mb-1">20 Nov '24</div>
+              <div id="search-logistics-page-main-content-location-details-content-pickup-date-time" className="text-sm text-gray-600">
                 Wednesday, 12:00 AM - 11:00 PM
               </div>
             </div>
 
             {/* Package Dimensions */}
             <div>
-              <div className="text-sm text-gray-500 mb-1">Package Dimensions</div>
-              <div className="space-y-1">
-                <div className="text-sm text-gray-600">L: {length}cm</div>
-                <div className="text-sm text-gray-600">B: {breadth}cm</div>
-                <div className="text-sm text-gray-600">H: {height}cm</div>
-                <div className="text-sm text-gray-600">Weight: {weight} kg</div>
+              <div id="search-logistics-page-main-content-location-details-content-package-dimensions-title" className="text-sm text-gray-500 mb-1">Package Dimensions</div>
+              <div id="search-logistics-page-main-content-location-details-content-package-dimensions-dimensions" className="space-y-1">
+                <div id="search-logistics-page-main-content-location-details-content-package-dimensions-dimensions-length" className="text-sm text-gray-600">L: {length}cm</div>
+                <div id="search-logistics-page-main-content-location-details-content-package-dimensions-dimensions-breadth" className="text-sm text-gray-600">B: {breadth}cm</div>
+                <div id="search-logistics-page-main-content-location-details-content-package-dimensions-dimensions-height" className="text-sm text-gray-600">H: {height}cm</div>
+                <div id="search-logistics-page-main-content-location-details-content-package-dimensions-dimensions-weight" className="text-sm text-gray-600">Weight: {weight} kg</div>
               </div>
             </div>
           </div>
 
           {/* Delivery Options */}
-          <div className="p-6">
-            <div className="flex flex-wrap gap-4 justify-center mb-6">
+          <div id="search-logistics-page-main-content-delivery-options" className="p-6">
+            <div id="search-logistics-page-main-content-delivery-options-options" className="flex flex-wrap gap-4 justify-center mb-6">
               {deliveryOptions.map((option) => (
                 <button
+                  id={`search-logistics-page-main-content-delivery-options-options-${option.id}-button`}
                   key={option.id}
                   onClick={() => setSelectedDeliveryType(option.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full ${
@@ -192,15 +194,16 @@ const SearchLogistics: React.FC = () => {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  <span>{option.icon}</span>
-                  <span>{option.label}</span>
+                  <span id={`search-logistics-page-main-content-delivery-options-options-${option.id}-button-icon`}>{option.icon}</span>
+                  <span id={`search-logistics-page-main-content-delivery-options-options-${option.id}-button-label`}>{option.label}</span>
                 </button>
               ))}
             </div>
 
             {/* Search Button */}
-            <div className="text-center">
+            <div id="search-logistics-page-main-content-search-button" className="text-center">
               <button 
+                id="search-logistics-page-main-content-search-button-button"
                 className="bg-blue-600 text-white px-6 py-2 rounded-md font-medium hover:bg-blue-700"
                 onClick={() => setShowResults(true)}
               >
@@ -209,8 +212,8 @@ const SearchLogistics: React.FC = () => {
             </div>
 
              {/* Delivery Progress Indicator */}
-             <div className="mt-8 flex items-center justify-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+             <div id="search-logistics-page-main-content-delivery-progress-indicator" className="mt-8 flex items-center justify-center gap-4">
+              <div id="search-logistics-page-main-content-delivery-progress-indicator-package" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
                 {animations.package ? (
                   <Lottie
                     animationData={animations.package}
@@ -221,8 +224,8 @@ const SearchLogistics: React.FC = () => {
                   <span className="text-2xl">📦</span>
                 )}
               </div>
-              <div className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+              <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
+              <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
                 {animations.truck ? (
                   <Lottie
                     animationData={animations.truck}
@@ -233,8 +236,8 @@ const SearchLogistics: React.FC = () => {
                   <span className="text-2xl transform scale-x-[-1]">🚚</span>
                 )}
               </div>
-              <div className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
-              <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+              <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
+              <div id="search-logistics-page-main-content-delivery-progress-indicator-delivered" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
                 {animations.delivered ? (
                   <Lottie
                     animationData={animations.delivered}
@@ -248,9 +251,10 @@ const SearchLogistics: React.FC = () => {
             </div>
 
             {/* Filter Buttons */}
-            <div className="mt-8 flex justify-center gap-2">
+            <div id="search-logistics-page-main-content-filter-buttons" className="mt-8 flex justify-center gap-2">
               {/* Delivery Type Filters */}
               <button
+                id={`search-logistics-page-main-content-filter-buttons-hyperlocal-button`}
                 onClick={() => setDeliveryFilter(deliveryFilter === 'hyperlocal' ? null : 'hyperlocal')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
                   deliveryFilter === 'hyperlocal' 
@@ -265,6 +269,7 @@ const SearchLogistics: React.FC = () => {
               </button>
               
               <button
+                id={`search-logistics-page-main-content-filter-buttons-intercity-button`}
                 onClick={() => setDeliveryFilter(deliveryFilter === 'intercity' ? null : 'intercity')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
                   deliveryFilter === 'intercity' 
@@ -280,6 +285,7 @@ const SearchLogistics: React.FC = () => {
               
               {/* Price Filters */}
               <button
+                id={`search-logistics-page-main-content-filter-buttons-low-to-high-button`}
                 onClick={() => setPriceFilter(priceFilter === 'low-to-high' ? null : 'low-to-high')}
                 className={`px-4 py-2 rounded-full border ${
                   priceFilter === 'low-to-high' 
@@ -291,6 +297,7 @@ const SearchLogistics: React.FC = () => {
               </button>
               
               <button
+                id={`search-logistics-page-main-content-filter-buttons-high-to-low-button`}
                 onClick={() => setPriceFilter(priceFilter === 'high-to-low' ? null : 'high-to-low')}
                 className={`px-4 py-2 rounded-full border ${
                   priceFilter === 'high-to-low' 
@@ -304,7 +311,7 @@ const SearchLogistics: React.FC = () => {
 
             {/* Logistics Provider Listing */}
             {showResults && (
-              <div className="mt-8 space-y-4">
+              <div id="search-logistics-page-main-content-logistics-providers" className="mt-8 space-y-4">
                 {logisticsProviders
                   .filter(provider => {
                     // Apply delivery filter if selected
@@ -327,42 +334,43 @@ const SearchLogistics: React.FC = () => {
                     return 0; // No sorting if no price filter selected
                   })
                   .map((provider, index) => (
-                    <div key={index} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-                      <div className="flex justify-between items-start">
+                    <div key={index} id={`search-logistics-page-main-content-logistics-providers-provider-${index}`} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                      <div id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content`} className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-semibold text-lg">{provider.name}</h3>
-                          <p className="text-sm text-gray-600">{provider.domain}</p>
-                          <p className="text-sm text-gray-700">{provider.company}</p>
-                          <p className="text-sm text-gray-600">Rider Distance: {provider.distance}</p>
+                          <h3 id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-name`} className="font-semibold text-lg">{provider.name}</h3>
+                          <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-domain`} className="text-sm text-gray-600">{provider.domain}</p>
+                          <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-company`} className="text-sm text-gray-700">{provider.company}</p>
+                          <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-distance`} className="text-sm text-gray-600">Rider Distance: {provider.distance}</p>
                         </div>
-                        <div className="text-right">
-                          <h4 className="text-blue-600 font-medium">{provider.deliveryType}</h4>
-                          <p className="text-sm text-gray-600">Expected Pickup - {provider.expectedPickup}</p>
-                          <p className="text-sm text-gray-600">Estimated Delivery - {provider.estimatedDelivery}</p>
-                          <span className="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full mt-2">
+                        <div id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-right`} className="text-right">
+                          <h4 id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-delivery-type`} className="text-blue-600 font-medium">{provider.deliveryType}</h4>
+                          <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-expected-pickup`} className="text-sm text-gray-600">Expected Pickup - {provider.expectedPickup}</p>
+                          <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-estimated-delivery`} className="text-sm text-gray-600">Estimated Delivery - {provider.estimatedDelivery}</p>
+                          <span id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-delivery-mode`} className="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full mt-2">
                             {provider.deliveryMode}
                           </span>
                         </div>
-                        <div className="text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <div id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing`} className="text-right">
+                          <div id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-shipping-charges`} className="flex items-center justify-end gap-2">
                             <div>
-                              <p className="text-lg font-semibold text-center">₹ {provider.shippingCharges.toFixed(2)}</p>
-                              <p className="text-xs text-gray-600">Shipping Charges</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-shipping-charges-amount`} className="text-lg font-semibold text-center">₹ {provider.shippingCharges.toFixed(2)}</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-shipping-charges-label`} className="text-xs text-gray-600">Shipping Charges</p>
                             </div>
                             <span className="text-gray-400">+</span>
                             <div>
-                              <p className="text-lg font-semibold text-center">₹ {provider.rtoCharges.toFixed(2)}</p>
-                              <p className="text-xs text-gray-600">RTO Charges</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-rto-charges-amount`} className="text-lg font-semibold text-center">₹ {provider.rtoCharges.toFixed(2)}</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-rto-charges-label`} className="text-xs text-gray-600">RTO Charges</p>
                             </div>
                             <span className="text-gray-400">=</span>
                             <div>
-                              <p className="text-lg font-semibold text-center">₹ {(provider.shippingCharges + provider.rtoCharges).toFixed(2)}</p>
-                              <p className="text-xs text-gray-600">Total Charges</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-total-charges-amount`} className="text-lg font-semibold text-center">₹ {(provider.shippingCharges + provider.rtoCharges).toFixed(2)}</p>
+                              <p id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-pricing-total-charges-label`} className="text-xs text-gray-600">Total Charges</p>
                             </div>
                           </div>
                           
                           <p className="text-xs text-gray-500 mt-2">Prices may change according to the package details provided</p>
                           <button 
+                            id={`search-logistics-page-main-content-logistics-providers-provider-${index}-content-book-now-button`}
                             onClick={() => navigate('/confirmation-instructions', {
                               state: {
                                 provider: provider // This will pass the selected provider's data

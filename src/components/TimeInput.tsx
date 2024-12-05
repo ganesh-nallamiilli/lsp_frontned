@@ -37,11 +37,12 @@ const TimeInput: React.FC<TimeInputProps> = ({
   };
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div id="time-input-container">
+      <label id="time-input-container-label" className="block text-sm font-medium text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <input
+        id="time-input-container-input"
         type="time"
         name={name}
         value={formatTimeDisplay(value)}
