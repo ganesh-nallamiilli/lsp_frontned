@@ -367,6 +367,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { formData } = useFormContext();
+  const navigate = useNavigate();
 
   const handleSaveForLater = async () => {
     try {
@@ -419,9 +420,10 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
       const result = await dispatch(createDraftOrder(payload)).unwrap();
       console.log('Draft order created successfully:', result); // Debug log
       
-      // Show success message and optionally redirect
+      // Show success message and delay navigation
       toast.success('Draft order saved successfully');
-      // Optional: Redirect to orders page or clear form
+      
+      navigate("/orders");
       
     } catch (error) {
       console.error('Failed to save draft order:', error); // Debug log
@@ -604,10 +606,11 @@ const BasicOrderInformation: React.FC = () => {
             className={selectClasses}
           >
             <option id="create-order-basic-order-information-order-category-type-select-option-select-category-type" value="">Select Category Type</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-15-minutes" value="15">15 Minutes</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-30-minutes" value="30">30 Minutes</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-45-minutes" value="45">45 Minutes</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="60">60 Minutes</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-15-minutes" value="Next Day Delivery">Next Day Delivery</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-30-minutes" value="Standard Delivery">Standard Delivery</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-45-minutes" value="Express Delivery">Express Delivery</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="Immediate Delivery">Immediate Delivery</option>
+            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="Same Day Delivery">Same Day Delivery</option>
           </select>
         </div>
 

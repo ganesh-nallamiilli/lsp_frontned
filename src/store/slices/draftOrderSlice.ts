@@ -74,6 +74,43 @@ export const fetchDraftOrders = createAsyncThunk(
   }
 );
 
+export const bulkDeleteDraftOrders = createAsyncThunk(
+  'draftOrders/bulkDelete',
+  async (orderIds: string[], { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const payload = {
+        data: orderIds.map(id => ({ id }))
+      };
+
+      const response = await axios.delete(
+        `${config.apiBaseUrl}/draft_orders/bulk_delete`,
+        {
+          data: payload,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || 'Failed to delete draft orders';
+      
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const draftOrderSlice = createSlice({
   name: 'draftOrders',
   initialState: {
@@ -109,6 +146,18 @@ const draftOrderSlice = createSlice({
         state.orders = action.payload;
       })
       .addCase(fetchDraftOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(bulkDeleteDraftOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(bulkDeleteDraftOrders.fulfilled, (state) => {
+        state.loading = false;
+        toast.success('Draft orders deleted successfully');
+      })
+      .addCase(bulkDeleteDraftOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

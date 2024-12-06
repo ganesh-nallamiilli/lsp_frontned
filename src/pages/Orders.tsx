@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchOrders, exportOrders } from '../store/slices/ordersSlice';
 import DraftOrdersTable from '../components/orders/DraftOrdersTable';
-import { fetchDraftOrders } from '../store/slices/draftOrderSlice';
+import { fetchDraftOrders, bulkDeleteDraftOrders } from '../store/slices/draftOrderSlice';
 import { toast } from 'react-hot-toast';
 
 const Orders: React.FC = () => {
@@ -205,11 +205,16 @@ const Orders: React.FC = () => {
   };
 
   const handleBulkDelete = () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedOrders.length} orders?`)) {
-      // Implement delete logic here
-      console.log('Deleting orders:', selectedOrders);
-      setSelectedOrders([]); // Clear selection after delete
-    }
+      dispatch(bulkDeleteDraftOrders(selectedOrders))
+        .unwrap()
+        .then(() => {
+          setSelectedOrders([]); // Clear selection after successful delete
+          dispatch(fetchDraftOrders()); // Refresh the draft orders list
+        })
+        .catch((error) => {
+          console.error('Failed to delete orders:', error);
+        });
+    
   };
 
   // Add these handlers for selection
