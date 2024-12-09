@@ -699,7 +699,7 @@ const Profile: React.FC = () => {
         <div id="profile-basic-information-container-form-grid" className="grid grid-cols-2 gap-6">
           <div>
             <label id="profile-basic-information-container-form-grid-store-name-label" className="block text-sm font-medium text-gray-700 mb-2">
-              Store Name
+              Store Name *
             </label>
             <input
               type="text"
@@ -723,7 +723,7 @@ const Profile: React.FC = () => {
           </div>
           <div>
             <label id="profile-basic-information-container-form-grid-full-name-label" className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
+              Full Name *
             </label>
             <input
               type="text"
@@ -735,7 +735,7 @@ const Profile: React.FC = () => {
           </div>
           <div>
             <label id="profile-basic-information-container-form-grid-email-label" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+              Email *
             </label>
             <input
               type="email"
@@ -754,7 +754,7 @@ const Profile: React.FC = () => {
           </div>
           <div>
             <label id="profile-basic-information-container-form-grid-phone-number-label" className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
+              Phone Number *
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+91</span>
@@ -778,7 +778,7 @@ const Profile: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              GST Number
+              GST Number *
             </label>
             <input
               type="text"
@@ -802,7 +802,7 @@ const Profile: React.FC = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              PAN Number
+              PAN Number *
             </label>
             <input
               type="text"
@@ -832,7 +832,7 @@ const Profile: React.FC = () => {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label id="profile-basic-information-container-form-grid-building-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Building
+                Building *
               </label>
               <input
                 type="text"
@@ -845,7 +845,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-basic-information-container-form-grid-locality-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Locality
+                Locality *  
               </label>
               <input
                 type="text"
@@ -858,7 +858,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-basic-information-container-form-grid-city-label" className="block text-sm font-medium text-gray-700 mb-2">
-                City
+                City *
               </label>
               <input
                 type="text"
@@ -871,7 +871,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-basic-information-container-form-grid-state-label" className="block text-sm font-medium text-gray-700 mb-2">
-                State
+                State *
               </label>
               <select
                 id="profile-basic-information-container-form-grid-state-select"
@@ -890,7 +890,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-basic-information-container-form-grid-area-code-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Area Code
+                Area Code *
               </label>
               <input
                 id="profile-basic-information-container-form-grid-area-code-input"
@@ -908,7 +908,7 @@ const Profile: React.FC = () => {
         {userType === 'STANDALONE_ADMIN' && (
           <div>
             <label id="profile-basic-information-container-form-signature-label" className="block text-sm font-medium text-gray-700 mb-2">
-              Signature
+              Signature * 
             </label>
             <div id="profile-basic-information-container-form-signature-upload" className="flex items-center space-x-4">
               <input
@@ -973,7 +973,7 @@ const Profile: React.FC = () => {
       <div className="grid grid-cols-2 gap-6">
         <div>
           <label id="profile-address-information-container-form-grid-building-label" className="block text-sm font-medium text-gray-700 mb-2">
-            Building
+            Building *
           </label>
           <input
             id="profile-address-information-container-form-grid-building-input"
@@ -986,7 +986,7 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <label id="profile-address-information-container-form-grid-locality-label" className="block text-sm font-medium text-gray-700 mb-2">
-            Locality
+            Locality *
           </label>
           <input
             id="profile-address-information-container-form-grid-locality-input"
@@ -999,7 +999,7 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <label id="profile-address-information-container-form-grid-city-label" className="block text-sm font-medium text-gray-700 mb-2">
-            City
+            City *
           </label>
           <input
             id="profile-address-information-container-form-grid-city-input"
@@ -1012,7 +1012,7 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <label id="profile-address-information-container-form-grid-state-label" className="block text-sm font-medium text-gray-700 mb-2">
-            State
+            State *
           </label>
           <select
             id="profile-address-information-container-form-grid-state-select"
@@ -1031,7 +1031,7 @@ const Profile: React.FC = () => {
         </div>
         <div>
           <label id="profile-address-information-container-form-grid-zip-code-label" className="block text-sm font-medium text-gray-700 mb-2">
-            Zip Code
+            Zip Code *    
           </label>
           <input
             id="profile-address-information-container-form-grid-zip-code-input"
@@ -1088,7 +1088,7 @@ const Profile: React.FC = () => {
       <div id="profile-bank-details-container-form" className="space-y-6">
         <div>
           <label id="profile-bank-details-container-form-settlement-type-label" className="block text-sm font-medium text-gray-700 mb-2">
-            Settlement Type
+            Settlement Type *
           </label>
           <select
             id="profile-bank-details-container-form-settlement-type-select"
@@ -1105,7 +1105,7 @@ const Profile: React.FC = () => {
         {form.bankDetails.settlement_type === 'upi' ? (
           <div>
             <label id="profile-bank-details-container-form-upi-id-label" className="block text-sm font-medium text-gray-700 mb-2">
-              UPI ID
+              UPI ID *
             </label>
             <input
               id="profile-bank-details-container-form-upi-id-input"
@@ -1120,7 +1120,7 @@ const Profile: React.FC = () => {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label id="profile-bank-details-container-form-beneficiary-name-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Beneficiary Name
+                Beneficiary Name *
               </label>
               <input
                 id="profile-bank-details-container-form-beneficiary-name-input"
@@ -1133,7 +1133,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-bank-details-container-form-account-number-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Account Number
+                Account Number *
               </label>
               <input
                 id="profile-bank-details-container-form-account-number-input"
@@ -1146,7 +1146,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-bank-details-container-form-bank-name-label" className="block text-sm font-medium text-gray-700 mb-2">
-                Bank Name
+                Bank Name *
               </label>
               <input
                 id="profile-bank-details-container-form-bank-name-input"
@@ -1159,7 +1159,7 @@ const Profile: React.FC = () => {
             </div>
             <div>
               <label id="profile-bank-details-container-form-ifsc-code-label" className="block text-sm font-medium text-gray-700 mb-2">
-                IFSC Code
+                IFSC Code *
               </label>
               <input
                 id="profile-bank-details-container-form-ifsc-code-input"
