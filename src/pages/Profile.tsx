@@ -141,6 +141,22 @@ const Profile: React.FC = () => {
   const pickupAddresses = useAppSelector((state) => state.auth.pickupAddresses);
   const deliveryAddresses = useAppSelector((state) => state.auth.deliveryAddresses);
 
+  // Add email validation regex
+  const EMAIL_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // Add phone validation regex near EMAIL_REGEX
+  const PHONE_REGEX = /^[6-9]\d{9}$/;
+
+  // Add these regex constants near EMAIL_REGEX and PHONE_REGEX
+  const GST_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/;
+  const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+
+  // Add these state declarations near other error states
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [gstError, setGstError] = useState('');
+  const [panError, setPanError] = useState('');
+
   useEffect(() => {
     dispatch(fetchUserProfile());
   }, [dispatch]);
@@ -193,6 +209,82 @@ const Profile: React.FC = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
+    if (name === 'email') {
+      // Clear email error when user starts typing
+      setEmailError('');
+      
+      // Validate email
+      if (value && !EMAIL_REGEX.test(value)) {
+        setEmailError('Please enter a valid email address');
+      }
+    }
+    
+    if (name === 'phoneNumber') {
+      // Clear phone error when user starts typing
+      setPhoneError('');
+      
+      // Remove any non-digit characters
+      const cleanedValue = value.replace(/\D/g, '');
+      
+      // Validate phone number
+      if (cleanedValue && !PHONE_REGEX.test(cleanedValue)) {
+        setPhoneError('Please enter a valid 10-digit Indian mobile number');
+      }
+      
+      // Update form with cleaned value
+      setForm(prev => ({
+        ...prev,
+        [name]: cleanedValue
+      }));
+      return;
+    }
+    
+    if (name === 'gstNumber') {
+      // Clear GST error when user starts typing
+      setGstError('');
+      
+      // Convert to uppercase
+      const upperValue = value.toUpperCase();
+      
+      // Only update if within maxLength
+      if (upperValue.length <= 15) {
+        // Validate GST format
+        if (upperValue && !GST_REGEX.test(upperValue)) {
+          setGstError('Please enter a valid GST number');
+        }
+        
+        // Update form with uppercase value
+        setForm(prev => ({
+          ...prev,
+          [name]: upperValue
+        }));
+      }
+      return;
+    }
+    
+    if (name === 'panNumber') {
+      // Clear PAN error when user starts typing
+      setPanError('');
+      
+      // Convert to uppercase
+      const upperValue = value.toUpperCase();
+      
+      // Only update if within maxLength
+      if (upperValue.length <= 10) {
+        // Validate PAN format
+        if (upperValue && !PAN_REGEX.test(upperValue)) {
+          setPanError('Please enter a valid PAN number');
+        }
+        
+        // Update form with uppercase value
+        setForm(prev => ({
+          ...prev,
+          [name]: upperValue
+        }));
+      }
+      return;
+    }
+    
     if (name.startsWith('shopTime.')) {
       const timeField = name.split('.')[1];
       setForm(prev => ({
@@ -230,6 +322,30 @@ const Profile: React.FC = () => {
 
   const handleSaveBasicInfo = async () => {
     try {
+      // Validate GST if provided
+      if (form.gstNumber && !GST_REGEX.test(form.gstNumber)) {
+        setGstError('Please enter a valid GST number');
+        return;
+      }
+
+      // Validate PAN if provided
+      if (form.panNumber && !PAN_REGEX.test(form.panNumber)) {
+        setPanError('Please enter a valid PAN number');
+        return;
+      }
+
+      // Validate email before saving
+      if (!EMAIL_REGEX.test(form.email)) {
+        setEmailError('Please enter a valid email address');
+        return;
+      }
+
+      // Validate phone number before saving
+      if (!PHONE_REGEX.test(form.phoneNumber)) {
+        setPhoneError('Please enter a valid 10-digit Indian mobile number');
+        return;
+      }
+
       await dispatch(updateUserProfile({
         name: form.fullName,
         store_name: form.storeName,
@@ -625,25 +741,43 @@ const Profile: React.FC = () => {
               type="email"
               name="email"
               value={form.email}
-              disabled
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50"
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2.5 rounded-lg border ${
+                emailError ? 'border-red-500' : 'border-gray-300'
+              } ${emailError ? 'bg-red-50' : 'bg-white'}`}
             />
+            {emailError && (
+              <p className="mt-1 text-sm text-red-600">
+                {emailError}
+              </p>
+            )}
           </div>
           <div>
             <label id="profile-basic-information-container-form-grid-phone-number-label" className="block text-sm font-medium text-gray-700 mb-2">
               Phone Number
             </label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              value={form.phoneNumber}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
-              maxLength={10}
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">+91</span>
+              <input
+                type="tel"
+                name="phoneNumber"
+                value={form.phoneNumber}
+                onChange={handleInputChange}
+                className={`w-full pl-12 pr-4 py-2.5 rounded-lg border ${
+                  phoneError ? 'border-red-500' : 'border-gray-300'
+                } ${phoneError ? 'bg-red-50' : 'bg-white'}`}
+                maxLength={10}
+                placeholder="Enter 10-digit number"
+              />
+            </div>
+            {phoneError && (
+              <p className="mt-1 text-sm text-red-600">
+                {phoneError}
+              </p>
+            )}
           </div>
           <div>
-            <label id="profile-basic-information-container-form-grid-gst-number-label" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               GST Number
             </label>
             <input
@@ -651,12 +785,23 @@ const Profile: React.FC = () => {
               name="gstNumber"
               value={form.gstNumber}
               onChange={handleInputChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
+              className={`w-full px-4 py-2.5 rounded-lg border ${
+                gstError ? 'border-red-500' : 'border-gray-300'
+              } ${gstError ? 'bg-red-50' : 'bg-white'}`}
               maxLength={15}
+              placeholder="22AAAAA0000A1Z5"
             />
+            {gstError && (
+              <p className="mt-1 text-sm text-red-600">
+                {gstError}
+              </p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Format: 22AAAAA0000A1Z5 (2 digits state code + 10 characters PAN + 1 entity number + 1 Z + 1 check digit)
+            </p>
           </div>
           <div>
-            <label id="profile-basic-information-container-form-grid-pan-number-label" className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               PAN Number
             </label>
             <input
@@ -664,9 +809,20 @@ const Profile: React.FC = () => {
               name="panNumber"
               value={form.panNumber}
               onChange={handleInputChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300"
+              className={`w-full px-4 py-2.5 rounded-lg border ${
+                panError ? 'border-red-500' : 'border-gray-300'
+              } ${panError ? 'bg-red-50' : 'bg-white'}`}
               maxLength={10}
+              placeholder="AAAAA0000A"
             />
+            {panError && (
+              <p className="mt-1 text-sm text-red-600">
+                {panError}
+              </p>
+            )}
+            <p className="mt-1 text-xs text-gray-500">
+              Format: AAAAA0000A (5 letters + 4 numbers + 1 letter)
+            </p>
           </div>
         </div>
 

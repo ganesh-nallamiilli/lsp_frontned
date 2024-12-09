@@ -9,6 +9,8 @@ import {
   Truck,
   AlertCircle,
   IndianRupee,
+  Loader,
+  Loader2Icon,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -28,6 +30,7 @@ import {
   fetchWalletDetails,
   fetchUserProfile,
 } from '../store/slices/dashboardSlice';
+import { useNavigate } from 'react-router-dom';
 
 const data = [
   { name: 'Jan', orders: 4000, revenue: 2400 },
@@ -47,6 +50,7 @@ const Dashboard: React.FC = () => {
     walletDetails,
     userProfile 
   } = useAppSelector((state) => state.dashboard);
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(fetchShippingDetails());
@@ -106,6 +110,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4" className="bg-white p-6 rounded-xl shadow-sm">
+          <h2 className="text-lg font-semibold">Order Status</h2>
           <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4" className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4-div" className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
             <div id="dashboard-container-grid-grid-cols-2-md-grid-cols-3-gap-4-grid-grid-cols-2-md-grid-cols-3-gap-4-div-bg-yellow-100-p-3-rounded-lg" className="bg-yellow-100 p-3 rounded-lg">
@@ -318,19 +323,19 @@ const Dashboard: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <h2 className="text-lg font-semibold mb-6">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100" onClick={() => navigate('/orders/create')}>
               <Package className="w-6 h-6 text-indigo-600 mr-3" />
               <span className="font-medium">Create Order</span>
             </button>
-            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100" onClick={() => navigate('/rto')}>
               <Truck className="w-6 h-6 text-green-600 mr-3" />
-              <span className="font-medium">Track Shipment</span>
+              <span className="font-medium">RTO</span>
             </button>
-            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
-              <Users className="w-6 h-6 text-blue-600 mr-3" />
-              <span className="font-medium">Add Customer</span>
+            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100" onClick={() => navigate('/returns')}>
+              <Loader2Icon className="w-6 h-6 text-blue-600 mr-3" />
+              <span className="font-medium">Return Order</span>
             </button>
-            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100">
+            <button className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100" onClick={() => navigate('/support')}>
               <AlertCircle className="w-6 h-6 text-red-600 mr-3" />
               <span className="font-medium">Report Issue</span>
             </button>

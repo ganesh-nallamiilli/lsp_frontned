@@ -97,29 +97,45 @@ const UserRegistration: React.FC = () => {
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'gstNumber':
-        if (value.length !== 15) {
-          return 'GST Number must be exactly 15 characters';
+        // GST format: 2 digits state code + 10 digits PAN + 1 digit entity + 1 digit check sum
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (!gstRegex.test(value)) {
+          return 'Invalid GST Number format. Example: 27AAPFU0939F1Z5';
         }
         break;
+
       case 'panNumber':
-        if (value.length !== 10) {
-          return 'PAN Number must be exactly 10 characters';
+        // PAN format: 5 letters + 4 numbers + 1 letter
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(value)) {
+          return 'Invalid PAN Number format. Example: ABCDE1234F';
         }
         break;
+
+      case 'storeEmail':
+        // Email validation with common rules
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(value)) {
+          return 'Invalid email address format';
+        }
+        break;
+
       case 'storeMobile':
-        if (!/^\d{10}$/.test(value)) {
-          return 'Mobile number must be exactly 10 digits';
+        // Mobile validation for Indian numbers
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(value)) {
+          return 'Invalid mobile number. Must be 10 digits starting with 6-9';
         }
         break;
     }
     return '';
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'gstNumber' || name === 'panNumber' ? value.toUpperCase() : value
     }));
     
     const fieldError = validateField(name, value);

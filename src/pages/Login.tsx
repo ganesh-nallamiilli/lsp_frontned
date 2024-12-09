@@ -56,13 +56,32 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { loading: authLoading, error: authError, otpSent, userId } = useAppSelector((state) => state.auth);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isValidPhone = (phone: string): boolean => {
+    // Matches Indian phone numbers (10 digits, optionally starting with +91 or 91)
+    const phoneRegex = /^(?:\+91|91)?[6-9]\d{9}$/;
+    return phoneRegex.test(phone.replace(/\s+/g, ''));
+  };
 
   const handleIdentifierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
+    const trimmedIdentifier = identifier.trim();
+    if (!isValidEmail(trimmedIdentifier) && !isValidPhone(trimmedIdentifier)) {
+      setError('Please enter a valid email address or phone number');
+      return;
+    }
+    
     try {
-      const result = await dispatch(initiateLogin(identifier)).unwrap();
+      const result = await dispatch(initiateLogin(trimmedIdentifier)).unwrap();
       if (result.data.otp_sent) {
         setStep('otp');
       }
@@ -80,7 +99,7 @@ const Login: React.FC = () => {
 
     // Auto-focus next input
     if (value && index < 5) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
+      const nextInput = document.getElementById(`otp-input-${index + 1}`);
       nextInput?.focus();
     }
   };
@@ -124,6 +143,30 @@ const Login: React.FC = () => {
     dispatch(resetAuth());
   };
 
+  const handleResendOtp = async () => {
+    try {
+      const result = await dispatch(initiateLogin(identifier)).unwrap();
+      if (result.data.otp_sent) {
+        setResendTimer(30);
+        setCanResend(false);
+      }
+    } catch (err) {
+      setError('Failed to resend OTP. Please try again.');
+    }
+  };
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (step === 'otp' && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (resendTimer === 0) {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [step, resendTimer]);
+
   return (
     <div id="login-page" className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
       <LogisticsAnimation />
@@ -145,10 +188,10 @@ const Login: React.FC = () => {
             <h2 id="login-title" className="mt-6 text-3xl font-extrabold text-gray-900">
               Welcome Back
             </h2>
-            <p id="login-subtitle" className="mt-2 text-sm text-gray-600">
+            <p id="login-subtitle" className="mt-5 text-sm text-gray-600">
               {step === 'identifier' 
                 ? 'Please enter your email or phone number'
-                : 'Enter the OTP sent to your device'}
+                : <p>Enter the OTP sent to <span className="font-bold">{identifier}</span></p>}
             </p>
           </div>
 
@@ -161,7 +204,7 @@ const Login: React.FC = () => {
 
           {/* Forms */}
           {step === 'identifier' ? (
-            <form id="identifier-form" onSubmit={handleIdentifierSubmit} className="mt-8 space-y-6">
+            <form id="identifier-form" onSubmit={handleIdentifierSubmit} className="mt-5 space-y-6">
               <div className="rounded-md shadow-sm">
                 <div className="relative">
                   <input
@@ -170,15 +213,11 @@ const Login: React.FC = () => {
                     required
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    className="appearance-none relative block w-full px-3 py-3 pl-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    className="appearance-none relative block w-full px-3 py-3 pl-12 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Enter email or phone number"
                   />
-                  <div id="identifier-icon" className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    {identifier.includes('@') ? (
-                      <Mail className="h-5 w-5 text-gray-400" />
-                    ) : (
-                      <Phone className="h-5 w-5 text-gray-400" />
-                    )}
+                  <div id="identifier-icon" className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                    <Mail className="h-5 w-5 text-gray-400" />
                   </div>
                 </div>
               </div>
@@ -206,7 +245,7 @@ const Login: React.FC = () => {
                   <input
                     key={index}
                     id={`otp-input-${index}`}
-                    type="text"
+                    type="password"
                     inputMode="numeric"
                     maxLength={1}
                     value={digit}
@@ -232,7 +271,20 @@ const Login: React.FC = () => {
                 </button>
               </div>
 
-              <div className="text-center">
+              <div className="text-center space-y-4">
+                <div className="text-sm text-gray-600">
+                  {canResend ? (
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      className="text-indigo-600 hover:text-indigo-500"
+                    >
+                      Resend OTP
+                    </button>
+                  ) : (
+                    <span>Resend OTP in {resendTimer}s</span>
+                  )}
+                </div>
                 <button
                   id="back-to-identifier-button"
                   type="button"
