@@ -97,24 +97,36 @@ const UserRegistration: React.FC = () => {
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'gstNumber':
-        // GST format: 2 digits state code + 10 digits PAN + 1 digit entity + 1 digit check sum
         const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
         if (!gstRegex.test(value)) {
           return 'Invalid GST Number format. Example: 27AAPFU0939F1Z5';
         }
+        
+        // Extract PAN from GST and compare if PAN exists
+        const panFromGst = value.substring(2, 12);
+        if (formData.panNumber && formData.panNumber !== panFromGst) {
+          return 'PAN number should match with the PAN in GST';
+        }
         break;
 
       case 'panNumber':
-        // PAN format: 5 letters + 4 numbers + 1 letter
         const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
         if (!panRegex.test(value)) {
           return 'Invalid PAN Number format. Example: ABCDE1234F';
         }
+        
+        // If GST exists, validate PAN against it
+        if (formData.gstNumber) {
+          const panFromGst = formData.gstNumber.substring(2, 12);
+          if (value !== panFromGst) {
+            return 'PAN number should match with the PAN in GST';
+          }
+        }
         break;
 
       case 'storeEmail':
-        // Email validation with common rules
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        // Improved email validation
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(value)) {
           return 'Invalid email address format';
         }
@@ -125,6 +137,22 @@ const UserRegistration: React.FC = () => {
         const mobileRegex = /^[6-9]\d{9}$/;
         if (!mobileRegex.test(value)) {
           return 'Invalid mobile number. Must be 10 digits starting with 6-9';
+        }
+        break;
+
+      case 'upiAddress':
+        // UPI format validation: username@bankname or mobile@bankname
+        const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/;
+        if (!upiRegex.test(value)) {
+          return 'Invalid UPI address format. Example: username@upi or mobile@upi';
+        }
+        break;
+
+      case 'areaCode':
+        // Indian pincode validation
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+        if (!pincodeRegex.test(value)) {
+          return 'Invalid pincode. Must be 6 digits and cannot start with 0';
         }
         break;
     }
@@ -362,7 +390,7 @@ const UserRegistration: React.FC = () => {
 
               <div>
                 <label htmlFor="areaCode" className="block text-sm font-medium text-gray-700">
-                  Area code <span className="text-red-500">*</span>
+                  Pincode <span className="text-red-500">*</span>
                 </label>
                 <Input
                   id="areaCode"
@@ -370,8 +398,15 @@ const UserRegistration: React.FC = () => {
                   value={formData.areaCode}
                   onChange={handleChange}
                   required
+                  maxLength={6}
+                  type="text"
+                  pattern="[1-9][0-9]{5}"
                   className="mt-1"
+                  placeholder="Enter 6-digit pincode"
                 />
+                {error && formData.areaCode.length > 0 && error.includes('pincode') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
             </div>
 
@@ -406,7 +441,11 @@ const UserRegistration: React.FC = () => {
                     onChange={handleChange}
                     required
                     className="mt-1"
+                    placeholder="username@bankname"
                   />
+                  {error && formData.upiAddress.length > 0 && error.includes('UPI') && (
+                    <p className="text-sm text-red-500 mt-1">{error}</p>
+                  )}
                 </div>
               )}
 
