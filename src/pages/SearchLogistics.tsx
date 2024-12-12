@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchDraftOrderById } from '../store/slices/draftOrderSlice';
+import { fetchDraftOrderById, searchLSP } from '../store/slices/draftOrderSlice';
+import { toast } from 'react-hot-toast';
 
 interface LocationDetails {
   city: string;
@@ -74,6 +75,17 @@ const SearchLogistics: React.FC = () => {
       .unwrap()
       .then((result) => {
         console.log('Draft order fetch successful:', result);
+        // Call searchLSP after successfully fetching draft order
+        dispatch(searchLSP(result))
+          .unwrap()
+          .then((lspResult) => {
+            console.log('LSP search successful:', lspResult);
+            setShowResults(true); // Automatically show results after search
+          })
+          .catch((error) => {
+            console.error('LSP search failed:', error);
+            toast.error('Failed to search logistics providers');
+          });
       })
       .catch((error) => {
         console.error('Draft order fetch failed:', error);

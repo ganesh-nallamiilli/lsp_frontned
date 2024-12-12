@@ -216,12 +216,12 @@ export const searchLSP = createAsyncThunk(
 
       const payload: LSPSearchPayload = {
         context: {
-          city: draftOrder.delivery_address?.city || 'Bengaluru',
+          city: draftOrder?.draft_order?.deliveryAddress?.city || '',
           core_version: "1.2.0",
-          area_code: draftOrder.delivery_address?.area_code || '560103'
+          area_code: draftOrder?.draft_order?.deliveryAddress?.pincode || ''
         },
         message: {
-          category_id: "Standard Delivery",
+          category_id: draftOrder?.draft_order?.orderDetails?.retail_order_category_type?.value || '',
           fulfillment_type: "Delivery",
           provider: {
             time: {
@@ -238,30 +238,30 @@ export const searchLSP = createAsyncThunk(
           },
           fulfillment: {
             start: {
-              gps: draftOrder.pickup_address?.location?.gps || "12.9423572,77.696726",
-              area_code: draftOrder.pickup_address?.location?.area_code || "560103"
+              gps: draftOrder?.draft_order?.pickupAddress?.location?.gps || "12.9423572,77.696726",
+              area_code: draftOrder?.draft_order?.pickupAddress?.pincode || "560103"
             },
             end: {
-              gps: draftOrder.delivery_address?.location?.gps || "12.9394125,77.68924140000001",
-              area_code: draftOrder.delivery_address?.area_code || "560103"
+              gps: draftOrder?.draft_order?.deliveryAddress?.location?.gps || "12.9394125,77.68924140000001",
+              area_code: draftOrder?.draft_order?.deliveryAddress?.pincode || ""
             }
           },
           payment: {
-            type: "POST-FULFILLMENT"
+            type: draftOrder?.draft_order?.orderDetails?.retail_order_payment_method || ""
           },
           payload_details: {
-            weight: draftOrder.package_details?.weight || 1.5,
-            weight_unit: "kilogram",
-            length: draftOrder.package_details?.dimensions?.length || 10,
+            weight: draftOrder?.draft_order?.packageDetails?.weight?.value || 0,
+            weight_unit: draftOrder?.draft_order?.packageDetails?.weight?.type || "",
+            length: draftOrder?.draft_order?.packageDetails?.length || 0,
             length_unit: "centimeter",
-            breadth: draftOrder.package_details?.dimensions?.breadth || 10,
+            breadth: draftOrder?.draft_order?.packageDetails?.breadth || 0,
             breadth_unit: "centimeter",
-            height: draftOrder.package_details?.dimensions?.height || 10,
+            height: draftOrder?.draft_order?.packageDetails?.height || 0,
             height_unit: "centimeter"
           },
-          product_category: draftOrder.category || "Electronics",
+          product_category: draftOrder?.draft_order?.orderDetails?.retail_order_category?.value || "",
           value: {
-            value: draftOrder.value?.toString() || "1000.00",
+            value: draftOrder?.draft_order?.orderDetails?.retail_order_amount?.toString() || "",
             currency: "INR"
           },
           dangerous_goods: false
@@ -269,7 +269,7 @@ export const searchLSP = createAsyncThunk(
       };
 
       const response = await axios.post(
-        `http://20.197.4.12:8080/api/v1/ondc/lsp_bap/clientApis/msn_search`,
+        `http://20.197.4.12:3008/api/v1/ondc/lsp_bap/clientApis/msn_search`,
         payload,
         {
           headers: {
