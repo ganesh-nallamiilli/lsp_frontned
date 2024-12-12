@@ -355,7 +355,7 @@ interface StepNavigationProps {
   onNext: () => void;
   onBack: () => void;
   isLastStep: boolean;
-  onComplete: () => void;
+  onComplete: (draftOrderId: string) => void;
 }
 
 const StepNavigation: React.FC<StepNavigationProps> = ({
@@ -431,6 +431,76 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
     }
   };
 
+  const handleSearchLogistics = async () => {
+    try {
+      console.log('Saving draft order with payload:', formData); // Debug log
+      
+      const payload = {
+        draft_order: {
+          deliveryAddressId: formData.deliveryAddress?.id,
+          deliveryAddress: formData.deliveryAddress,
+          pickupAddressId: formData.pickupAddress?.id,
+          pickupAddress: formData.pickupAddress,
+          packageDetails: {
+            height: formData.packageHeight.toString(),
+            weight: {
+              value: formData.packageWeight.toString(),
+              type: "kilogram"
+            },
+            breadth: formData.packageWidth.toString(),
+            length: formData.packageLength.toString(),
+            hazardous: formData.isFragile
+          },
+          order_items: formData.items.map(item => [
+            { key: "name", value: item.name },
+            { key: "price", value: item.price.toString() },
+            { key: "item_quantity", value: item.quantity.toString() },
+            { key: "weight", value: item.weight.toString(), type: "kilogram" }
+          ]),
+          orderDetails: {
+            retail_order_payment_method: "POST-FULFILLMENT",
+            retail_order_id: formData.franchiseOrderId,
+            retail_order_amount: formData.franchiseOrderAmount.toString(),
+            retail_order_category: {
+              value: formData.franchiseOrderCategory,
+              label: formData.franchiseOrderCategory
+            },
+            retail_order_preparation_time: {
+              value: `PT${formData.preparationTime}M`,
+              label: `Within ${formData.preparationTime} minutes`
+            },
+            retail_order_category_type: {
+              label: formData.categoryType,
+              value: formData.categoryType
+            }
+          },
+          readytoShip: formData.isReadyForShipment,
+          rto: formData.isRtoEligible
+        }
+      };
+
+      console.log('Sending payload to createDraftOrder:', payload);
+      
+      const response = await dispatch(createDraftOrder(payload)).unwrap();
+      console.log('API Response:', response);
+
+      if (!response || !response.data || !response.data.id) {
+        throw new Error('Invalid response format: Missing draft order ID');
+      }
+      
+      toast.success('Draft order saved successfully');
+      
+      const draftOrderId = response.data.id;
+      console.log('Draft Order ID:', draftOrderId);
+      
+      onComplete(draftOrderId);
+      
+    } catch (error) {
+      console.error('Failed to save draft order:', error);
+      toast.error('Failed to save draft order. Please try again.');
+    }
+  };
+
   return (
     <div id="create-order-stepper-navigation-buttons-container" className="mt-8 pt-5 border-t border-gray-200 flex justify-between">
       <button
@@ -460,7 +530,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
         <button
           id="create-order-stepper-navigation-buttons-next-button"
           type="button"
-          onClick={isLastStep ? onComplete : onNext}
+          onClick={isLastStep ? handleSearchLogistics : onNext}
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           {isLastStep ? 'Search Logistics' : 'Continue'}
@@ -1289,15 +1359,9 @@ const CreateOrder: React.FC = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
-  const handleComplete = () => {
-    // Add null checks for the optional fields
+  const handleComplete = (draftOrderId: any) => {
     const searchParams = new URLSearchParams({
-      from: formData.pickupAddress?.city || 'Unknown',
-      to: formData.deliveryAddress?.city || 'Unknown',
-      length: formData.packageLength?.toString() || '0',
-      breadth: formData.packageWidth?.toString() || '0',
-      height: formData.packageHeight?.toString() || '0',
-      weight: formData.packageWeight?.toString() || '0',
+      draftOrderId: draftOrderId
     });
 
     navigate(`/search-logistics?${searchParams.toString()}`);

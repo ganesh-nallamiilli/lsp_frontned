@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import Lottie from 'lottie-react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchDraftOrderById } from '../store/slices/draftOrderSlice';
 
 interface LocationDetails {
   city: string;
@@ -30,6 +32,10 @@ interface LogisticsProvider {
 }
 
 const SearchLogistics: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { selectedDraftOrder, loading: draftOrderLoading, error: draftOrderError } = useAppSelector(
+    (state) => state.draftOrders
+  );
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -37,6 +43,53 @@ const SearchLogistics: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [deliveryFilter, setDeliveryFilter] = useState<string | null>(null);
   const [priceFilter, setPriceFilter] = useState<string | null>(null);
+
+  const draftOrderId = searchParams.get('draftOrderId');
+
+  // Fetch draft order data when component mounts
+  useEffect(() => {
+    console.log('Current draftOrderId from query params:', draftOrderId); // Debug log
+    if (!draftOrderId) {
+      console.log('No draftOrderId present in query params'); // Debug log
+      return;
+    }
+    
+    console.log('Initiating draft order fetch for ID:', draftOrderId);
+    dispatch(fetchDraftOrderById(draftOrderId))
+      .unwrap()
+      .then((result) => {
+        console.log('Draft order fetch successful:', result);
+      })
+      .catch((error) => {
+        console.error('Draft order fetch failed:', error);
+      });
+  }, [dispatch, draftOrderId]);
+
+  // Show loading state
+  if (draftOrderLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (draftOrderError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600">Error: {draftOrderError}</div>
+      </div>
+    );
+  }
+
+  // Update initial values with draft order data when available
+  useEffect(() => {
+    if (selectedDraftOrder) {
+      setSelectedDeliveryType(selectedDraftOrder.deliveryType || 'same_day');
+      // ... update other fields as needed
+    }
+  }, [selectedDraftOrder]);
 
   const deliveryOptions = [
     { id: 'next_day', label: 'Next Day Delivery', icon: '📅' },
@@ -62,15 +115,16 @@ const SearchLogistics: React.FC = () => {
     // Add other providers as needed
   ];
 
-  // Get the parameters from the URL
-  const fromCity = searchParams.get('from') || 'Bengaluru';
-  const toCity = searchParams.get('to') || 'Bengaluru';
-  const length = searchParams.get('length') || '20';
-  const breadth = searchParams.get('breadth') || '20';
-  const height = searchParams.get('height') || '10';
-  const weight = searchParams.get('weight') || '0.3';
+  // Get the parameters from the URL with fallback values
+  const fromCity = searchParams.get('from') || selectedDraftOrder?.fromCity || 'Bengaluru';
+  const toCity = searchParams.get('to') || selectedDraftOrder?.toCity || 'Bengaluru';
+  const length = searchParams.get('length') || selectedDraftOrder?.packageDimensions?.length || '20';
+  const breadth = searchParams.get('breadth') || selectedDraftOrder?.packageDimensions?.breadth || '20';
+  const height = searchParams.get('height') || selectedDraftOrder?.packageDimensions?.height || '10';
+  const weight = searchParams.get('weight') || selectedDraftOrder?.packageDimensions?.weight || '0.3';
 
-  // Replace the animation imports with async loading
+  // Add error boundary for animations
+  const [animationError, setAnimationError] = useState(false);
   const [animations, setAnimations] = useState<{
     package: any;
     truck: any;
@@ -81,7 +135,7 @@ const SearchLogistics: React.FC = () => {
     delivered: null,
   });
 
-  // Load animations when component mounts
+  // Load animations with error handling
   useEffect(() => {
     const loadAnimations = async () => {
       try {
@@ -98,11 +152,26 @@ const SearchLogistics: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to load animations:', error);
+        setAnimationError(true);
       }
     };
 
     loadAnimations();
   }, []);
+
+  // Render fallback icons if animations fail to load
+  const renderAnimationOrFallback = (animation: any, fallbackIcon: string) => {
+    if (animationError || !animation) {
+      return <span className="text-2xl">{fallbackIcon}</span>;
+    }
+    return (
+      <Lottie
+        animationData={animation}
+        loop={true}
+        style={{ width: 50, height: 50 }}
+      />
+    );
+  };
 
   return (
     <div id="search-logistics-page-container" className="min-h-screen bg-gray-50">
@@ -214,39 +283,13 @@ const SearchLogistics: React.FC = () => {
              {/* Delivery Progress Indicator */}
              <div id="search-logistics-page-main-content-delivery-progress-indicator" className="mt-8 flex items-center justify-center gap-4">
               <div id="search-logistics-page-main-content-delivery-progress-indicator-package" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                {animations.package ? (
-                  <Lottie
-                    animationData={animations.package}
-                    loop={true}
-                    style={{ width: 50, height: 50 }}
-                  />
-                ) : (
-                  <span className="text-2xl">📦</span>
-                )}
+                {renderAnimationOrFallback(animations.package, '📦')}
               </div>
-              <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
               <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                {animations.truck ? (
-                  <Lottie
-                    animationData={animations.truck}
-                    loop={true}
-                    style={{ width: 50, height: 50 }}
-                  />
-                ) : (
-                  <span className="text-2xl transform scale-x-[-1]">🚚</span>
-                )}
+                {renderAnimationOrFallback(animations.truck, '🚚')}
               </div>
-              <div id="search-logistics-page-main-content-delivery-progress-indicator-truck" className="flex-1 border-t-2 border-dashed border-blue-200 max-w-[200px]"></div>
               <div id="search-logistics-page-main-content-delivery-progress-indicator-delivered" className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                {animations.delivered ? (
-                  <Lottie
-                    animationData={animations.delivered}
-                    loop={true}
-                    style={{ width: 50, height: 50 }}
-                  />
-                ) : (
-                  <span className="text-2xl">🏠</span>
-                )}
+                {renderAnimationOrFallback(animations.delivered, '✅')}
               </div>
             </div>
 

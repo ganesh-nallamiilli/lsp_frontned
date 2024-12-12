@@ -44,16 +44,16 @@ export const createDraftOrder = createAsyncThunk(
 
 export const fetchDraftOrders = createAsyncThunk(
   'draftOrders/fetch',
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, perPage = 10 }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
       
       if (!token) {
         throw new Error('No authentication token found');
       }
-      
+
       const response = await axios.get(
-        `${config.apiBaseUrl}/draft_orders`,
+        `${config.apiBaseUrl}/draft_orders?per_page=${perPage}&page_no=${page}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -111,13 +111,62 @@ export const bulkDeleteDraftOrders = createAsyncThunk(
   }
 );
 
+export const fetchDraftOrderById = createAsyncThunk(
+  'draftOrders/fetchById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      console.log('Fetching draft order:', id);
+      console.log('API URL:', `${config.apiBaseUrl}/draft_orders/get/${id}`);
+
+      const response = await axios.get(
+        `${config.apiBaseUrl}/draft_orders/get/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log('API Response:', response.data);
+
+      if (!response.data) {
+        throw new Error('No data received from API');
+      }
+
+      return response.data.data || response.data;
+      
+    } catch (error: any) {
+      console.error('API Error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch draft order';
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+interface DraftOrderState {
+  orders: any[];
+  selectedDraftOrder: any | null;
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: DraftOrderState = {
+  orders: [],
+  selectedDraftOrder: null,
+  loading: false,
+  error: null,
+};
+
 const draftOrderSlice = createSlice({
   name: 'draftOrders',
-  initialState: {
-    orders: [],
-    loading: false,
-    error: null,
-  },
+  initialState: initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -158,6 +207,19 @@ const draftOrderSlice = createSlice({
         toast.success('Draft orders deleted successfully');
       })
       .addCase(bulkDeleteDraftOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchDraftOrderById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDraftOrderById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedDraftOrder = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchDraftOrderById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
