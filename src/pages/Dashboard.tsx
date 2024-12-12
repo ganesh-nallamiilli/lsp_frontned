@@ -117,7 +117,7 @@ const Dashboard: React.FC = () => {
               <Package className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
+              <p className="text-sm text-gray-600">Created</p>
               <p className="font-semibold">{dashboardCounts?.order_details?.created || 0}</p>
             </div>
           </div>
