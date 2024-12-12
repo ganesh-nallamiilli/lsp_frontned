@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchDraftOrderById, searchLSP } from '../store/slices/draftOrderSlice';
+import { fetchDraftOrderById } from '../store/slices/draftOrderSlice';
 
 interface LocationDetails {
   city: string;
@@ -176,12 +176,6 @@ const SearchLogistics: React.FC = () => {
     },
     // Add other providers as needed
   ];
-
-  useEffect(() => {
-    if (selectedDraftOrder) {
-      dispatch(searchLSP(selectedDraftOrder));
-    }
-  }, [selectedDraftOrder]);
 
   return (
     <div id="search-logistics-page-container" className="min-h-screen bg-gray-50">
