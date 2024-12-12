@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { createDraftOrder } from '../store/slices/draftOrderSlice';
 import { fetchPickupAddresses, fetchDeliveryAddresses } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
-import { fetchRetailOrderCategories } from '../store/slices/lookupSlice';
+import { fetchRetailOrderCategories, fetchTimeDurations } from '../store/slices/lookupSlice';
 
 // Define the form context type
 interface FormContextType {
@@ -560,10 +560,18 @@ const validateOrderId = (value: string): string => {
 // Basic Order Information section
 const BasicOrderInformation: React.FC = () => {
   const { formData, setFormData } = useFormContext();
-  const { retailOrderCategories } = useAppSelector((state) => state.lookup);
+  const dispatch = useAppDispatch();
+  const { retailOrderCategories, timeDurations = [] } = useAppSelector((state) => state.lookup);
   
   const selectClasses = "block w-full px-4 py-1 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 sm:text-sm mt-1";
   
+  useEffect(() => {
+    // Fetch time durations if not already loaded
+    if (timeDurations.length === 0) {
+      dispatch(fetchTimeDurations());
+    }
+  }, [dispatch, timeDurations.length]);
+
   return (
     <div id="create-order-basic-order-information-container" className="bg-white rounded-lg p-6">
       {/* Header */}
@@ -661,11 +669,18 @@ const BasicOrderInformation: React.FC = () => {
             onChange={(e) => setFormData(prev => ({ ...prev, preparationTime: e.target.value }))}
             className={selectClasses}
           >
-            <option id="create-order-basic-order-information-order-preparation-time-select-option-select-preparation-time" value="">Select Preparation Time</option>
-            <option id="create-order-basic-order-information-order-preparation-time-select-option-15-minutes" value="15">15 Minutes</option>
-            <option id="create-order-basic-order-information-order-preparation-time-select-option-30-minutes" value="30">30 Minutes</option>
-            <option id="create-order-basic-order-information-order-preparation-time-select-option-45-minutes" value="45">45 Minutes</option>
-            <option id="create-order-basic-order-information-order-preparation-time-select-option-60-minutes" value="60">60 Minutes</option>
+            <option id="create-order-basic-order-information-order-preparation-time-select-option-select-preparation-time" value="">
+              Select Preparation Time
+            </option>
+            {Array.isArray(timeDurations) && timeDurations.map((duration) => (
+              <option
+                key={duration.id}
+                id={`create-order-basic-order-information-order-preparation-time-select-option-${duration.lookup_code}`}
+                value={duration.lookup_code}
+              >
+                {duration.display_name}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -31,6 +31,11 @@ interface LookupState {
   loading: boolean;
   error: string | null;
   retailOrderCategories: LookupCategory[];
+  timeDurations: Array<{
+    lookup_code: string;
+    display_name: string;
+    id: number;
+  }>;
 }
 
 const initialState: LookupState = {
@@ -41,6 +46,7 @@ const initialState: LookupState = {
   loading: false,
   error: null,
   retailOrderCategories: [],
+  timeDurations: [],
 };
 
 export const fetchCategoryTypes = createAsyncThunk(
@@ -133,6 +139,24 @@ export const fetchRetailOrderCategories = createAsyncThunk(
   }
 );
 
+export const fetchTimeDurations = createAsyncThunk(
+  'lookup/fetchTimeDurations',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${config.apiBaseUrl}/lookup_code/TIME_DURATION`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch time durations');
+    }
+  }
+);
+
 const lookupSlice = createSlice({
   name: 'lookup',
   initialState,
@@ -187,8 +211,20 @@ const lookupSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(fetchRetailOrderCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchRetailOrderCategories.fulfilled, (state, action) => {
+        state.loading = false;
         state.retailOrderCategories = action.payload;
+      })
+      .addCase(fetchRetailOrderCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchTimeDurations.fulfilled, (state, action) => {
+        state.timeDurations = action.payload;
       });
   },
 });
