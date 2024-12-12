@@ -71,6 +71,21 @@ const Login: React.FC = () => {
     return phoneRegex.test(phone.replace(/\s+/g, ''));
   };
 
+  const maskIdentifier = (value: string): string => {
+    const trimmedValue = value.trim();
+    
+    // Check if it's an email
+    if (trimmedValue.includes('@')) {
+      const [username, domain] = trimmedValue.split('@');
+      const maskedUsername = username.charAt(0) + '*'.repeat(username.length - 1);
+      return `${maskedUsername}@${domain}`;
+    }
+    
+    // Phone number
+    const cleanPhone = trimmedValue.replace(/\D/g, '').slice(-10); // Get last 10 digits
+    return cleanPhone.charAt(0) + '*'.repeat(8) + cleanPhone.slice(-1);
+  };
+
   const handleIdentifierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -192,7 +207,7 @@ const Login: React.FC = () => {
             <p id="login-subtitle" className="mt-5 text-sm text-gray-600">
               {step === 'identifier' 
                 ? 'Please enter your email or phone number'
-                : <p>Enter the OTP sent to <span className="font-bold">{identifier}</span></p>}
+                : <p>Enter the OTP sent to <span className="font-bold">{maskIdentifier(identifier)}</span></p>}
             </p>
           </div>
 
