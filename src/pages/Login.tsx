@@ -60,7 +60,8 @@ const Login: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
 
   const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Strict email regex that prevents multiple TLDs
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,6})$/;
     return emailRegex.test(email);
   };
 
