@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { createDraftOrder } from '../store/slices/draftOrderSlice';
 import { fetchPickupAddresses, fetchDeliveryAddresses } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
-import { fetchRetailOrderCategories, fetchTimeDurations } from '../store/slices/lookupSlice';
+import { fetchRetailOrderCategories, fetchRTOFulfillmentStatuses, fetchTimeDurations } from '../store/slices/lookupSlice';
 
 // Define the form context type
 interface FormContextType {
@@ -561,7 +561,7 @@ const validateOrderId = (value: string): string => {
 const BasicOrderInformation: React.FC = () => {
   const { formData, setFormData } = useFormContext();
   const dispatch = useAppDispatch();
-  const { retailOrderCategories, timeDurations = [] } = useAppSelector((state) => state.lookup);
+  const { retailOrderCategories, timeDurations = [], rtoFulfillmentStatuses } = useAppSelector((state) => state.lookup);
   
   const selectClasses = "block w-full px-4 py-1 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 sm:text-sm mt-1";
   
@@ -712,12 +712,15 @@ const BasicOrderInformation: React.FC = () => {
             onChange={(e) => setFormData(prev => ({ ...prev, categoryType: e.target.value }))}
             className={selectClasses}
           >
-            <option id="create-order-basic-order-information-order-category-type-select-option-select-category-type" value="">Select Category Type</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-15-minutes" value="Next Day Delivery">Next Day Delivery</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-30-minutes" value="Standard Delivery">Standard Delivery</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-45-minutes" value="Express Delivery">Express Delivery</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="Immediate Delivery">Immediate Delivery</option>
-            <option id="create-order-basic-order-information-order-category-type-select-option-60-minutes" value="Same Day Delivery">Same Day Delivery</option>
+            <option value="">Select Category Type</option>
+            {rtoFulfillmentStatuses.map((status) => (
+              <option 
+                key={status.id}
+                value={status.lookup_code}
+              >
+                {status.display_name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -1388,10 +1391,11 @@ const CreateOrder: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const { formData } = useFormContext();
   const dispatch = useAppDispatch();
-  const { retailOrderCategories } = useAppSelector((state) => state.lookup);
+  const { retailOrderCategories, timeDurations = [], rtoFulfillmentStatuses } = useAppSelector((state) => state.lookup);
 
   useEffect(() => {
     dispatch(fetchRetailOrderCategories());
+    dispatch(fetchRTOFulfillmentStatuses());
   }, [dispatch]);
 
   const handleNext = () => {

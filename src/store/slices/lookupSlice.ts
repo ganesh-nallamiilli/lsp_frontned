@@ -36,6 +36,7 @@ interface LookupState {
     display_name: string;
     id: number;
   }>;
+  rtoFulfillmentStatuses: LookupCode[];
 }
 
 const initialState: LookupState = {
@@ -47,6 +48,7 @@ const initialState: LookupState = {
   error: null,
   retailOrderCategories: [],
   timeDurations: [],
+  rtoFulfillmentStatuses: [],
 };
 
 export const fetchCategoryTypes = createAsyncThunk(
@@ -157,6 +159,24 @@ export const fetchTimeDurations = createAsyncThunk(
   }
 );
 
+export const fetchRTOFulfillmentStatuses = createAsyncThunk(
+  'lookup/fetchRTOFulfillmentStatuses',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${config.apiBaseUrl}/lookup_code/CATEGORY_TYPE`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch RTO fulfillment statuses');
+    }
+  }
+);
+
 const lookupSlice = createSlice({
   name: 'lookup',
   initialState,
@@ -225,6 +245,9 @@ const lookupSlice = createSlice({
       })
       .addCase(fetchTimeDurations.fulfilled, (state, action) => {
         state.timeDurations = action.payload;
+      })
+      .addCase(fetchRTOFulfillmentStatuses.fulfilled, (state, action) => {
+        state.rtoFulfillmentStatuses = action.payload;
       });
   },
 });
