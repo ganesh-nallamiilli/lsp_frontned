@@ -125,9 +125,12 @@ const UserRegistration: React.FC = () => {
         break;
 
       case 'storeEmail':
-        // Improved email validation
-        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(value)) {
+        // Stricter email regex that prevents multiple domains and ensures single TLD
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/;
+        
+        // Additional check for multiple .com or similar TLDs
+        const domainParts = value.split('@')[1]?.split('.') || [];
+        if (domainParts.length > 2 || !emailRegex.test(value)) {
           return 'Invalid email address format';
         }
         break;
@@ -255,6 +258,9 @@ const UserRegistration: React.FC = () => {
                   required
                   className="mt-1"
                 />
+                {error && formData.storeEmail.length > 0 && error.includes('email') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
