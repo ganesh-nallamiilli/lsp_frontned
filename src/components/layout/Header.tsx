@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSidebar } from '../../context/SidebarContext';
 import { useAuth } from '../../context/AuthContext';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
-import { fetchWalletDetails } from '../../store/slices/dashboardSlice';
+import { fetchWalletDetails, fetchUserProfile } from '../../store/slices/dashboardSlice';
 const Header: React.FC = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
@@ -15,10 +15,12 @@ const Header: React.FC = () => {
   const { isOpen, toggle } = useSidebar();
   const { logout } = useAuth();
   const { walletDetails } = useAppSelector((state) => state.dashboard);
+  const { userProfile } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   
   useEffect(() => {
     dispatch(fetchWalletDetails());
+    dispatch(fetchUserProfile());
   }, [dispatch]);
 
   useEffect(() => {
@@ -110,8 +112,14 @@ const Header: React.FC = () => {
               className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg"
             >
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.name || "Ganesh"} </p>
-                <p className="text-xs text-gray-500">{localStorage.getItem("user_type") == "STANDALONE_USER"? "user": localStorage.getItem("user_type") == "STANDALONE_ADMIN" ? "admin":"franchise" || "user type"}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {userProfile?.name || "Guest"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {localStorage.getItem("user_type") == "STANDALONE_USER" ? "user" : 
+                   localStorage.getItem("user_type") == "STANDALONE_ADMIN" ? "admin" : 
+                   "franchise" || "user type"}
+                </p>
               </div>
               <User className="h-8 w-8 text-gray-600" />
               <ChevronDown className="h-4 w-4 text-gray-600" />
