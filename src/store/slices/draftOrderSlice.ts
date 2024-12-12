@@ -150,6 +150,142 @@ export const fetchDraftOrderById = createAsyncThunk(
   }
 );
 
+interface LSPSearchPayload {
+  context: {
+    city: string;
+    core_version: string;
+    area_code: string;
+  };
+  message: {
+    category_id: string;
+    fulfillment_type: string;
+    provider: {
+      time: {
+        days: string;
+        schedule: {
+          holidays: string[];
+        };
+        range: {
+          start: string;
+          end: string;
+        };
+        duration: string;
+      };
+    };
+    fulfillment: {
+      start: {
+        gps: string;
+        area_code: string;
+      };
+      end: {
+        gps: string;
+        area_code: string;
+      };
+    };
+    payment: {
+      type: string;
+    };
+    payload_details: {
+      weight: number;
+      weight_unit: string;
+      length: number;
+      length_unit: string;
+      breadth: number;
+      breadth_unit: string;
+      height: number;
+      height_unit: string;
+    };
+    product_category: string;
+    value: {
+      value: string;
+      currency: string;
+    };
+    dangerous_goods: boolean;
+  };
+}
+
+export const searchLSP = createAsyncThunk(
+  'draftOrders/searchLSP',
+  async (draftOrder: any, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const payload: LSPSearchPayload = {
+        context: {
+          city: draftOrder.delivery_address?.city || 'Bengaluru',
+          core_version: "1.2.0",
+          area_code: draftOrder.delivery_address?.area_code || '560103'
+        },
+        message: {
+          category_id: "Standard Delivery",
+          fulfillment_type: "Delivery",
+          provider: {
+            time: {
+              days: "1,2,3,4,5,6,7",
+              schedule: {
+                holidays: []
+              },
+              range: {
+                start: "0000",
+                end: "2300"
+              },
+              duration: "PT45M"
+            }
+          },
+          fulfillment: {
+            start: {
+              gps: draftOrder.pickup_address?.location?.gps || "12.9423572,77.696726",
+              area_code: draftOrder.pickup_address?.location?.area_code || "560103"
+            },
+            end: {
+              gps: draftOrder.delivery_address?.location?.gps || "12.9394125,77.68924140000001",
+              area_code: draftOrder.delivery_address?.area_code || "560103"
+            }
+          },
+          payment: {
+            type: "POST-FULFILLMENT"
+          },
+          payload_details: {
+            weight: draftOrder.package_details?.weight || 1.5,
+            weight_unit: "kilogram",
+            length: draftOrder.package_details?.dimensions?.length || 10,
+            length_unit: "centimeter",
+            breadth: draftOrder.package_details?.dimensions?.breadth || 10,
+            breadth_unit: "centimeter",
+            height: draftOrder.package_details?.dimensions?.height || 10,
+            height_unit: "centimeter"
+          },
+          product_category: draftOrder.category || "Electronics",
+          value: {
+            value: draftOrder.value?.toString() || "1000.00",
+            currency: "INR"
+          },
+          dangerous_goods: false
+        }
+      };
+
+      const response = await axios.post(
+        `http://20.197.4.12:8080/api/v1/ondc/lsp_bap/clientApis/msn_search`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to search LSP');
+    }
+  }
+);
+
 interface DraftOrderState {
   orders: any[];
   selectedDraftOrder: any | null;
@@ -220,6 +356,19 @@ const draftOrderSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchDraftOrderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(searchLSP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchLSP.fulfilled, (state, action) => {
+        state.loading = false;
+        // Handle the LSP search response as needed
+        // You might want to store it in a new state property
+      })
+      .addCase(searchLSP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
