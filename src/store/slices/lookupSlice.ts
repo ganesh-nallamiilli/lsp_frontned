@@ -15,6 +15,14 @@ interface User {
   name: string;
 }
 
+interface LookupCategory {
+  lookup_type: string;
+  lookup_code: string;
+  display_name: string;
+  is_enabled: boolean;
+  id: number;
+}
+
 interface LookupState {
   categoryTypes: LookupCode[];
   fulfillmentStatuses: LookupCode[];
@@ -22,6 +30,7 @@ interface LookupState {
   users: User[];
   loading: boolean;
   error: string | null;
+  retailOrderCategories: LookupCategory[];
 }
 
 const initialState: LookupState = {
@@ -31,6 +40,7 @@ const initialState: LookupState = {
   users: [],
   loading: false,
   error: null,
+  retailOrderCategories: [],
 };
 
 export const fetchCategoryTypes = createAsyncThunk(
@@ -105,6 +115,24 @@ export const fetchUsers = createAsyncThunk(
   }
 );
 
+export const fetchRetailOrderCategories = createAsyncThunk(
+  'lookup/fetchRetailOrderCategories',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${config.apiBaseUrl}/lookup_code/RETAIL_ORDER_CATEGORIES`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch retail order categories');
+    }
+  }
+);
+
 const lookupSlice = createSlice({
   name: 'lookup',
   initialState,
@@ -158,6 +186,9 @@ const lookupSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(fetchRetailOrderCategories.fulfilled, (state, action) => {
+        state.retailOrderCategories = action.payload;
       });
   },
 });

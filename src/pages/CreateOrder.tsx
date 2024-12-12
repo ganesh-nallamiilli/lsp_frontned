@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { createDraftOrder } from '../store/slices/draftOrderSlice';
 import { fetchPickupAddresses, fetchDeliveryAddresses } from '../store/slices/authSlice';
 import { toast } from 'react-hot-toast';
+import { fetchRetailOrderCategories } from '../store/slices/lookupSlice';
 
 // Define the form context type
 interface FormContextType {
@@ -559,6 +560,7 @@ const validateOrderId = (value: string): string => {
 // Basic Order Information section
 const BasicOrderInformation: React.FC = () => {
   const { formData, setFormData } = useFormContext();
+  const { retailOrderCategories } = useAppSelector((state) => state.lookup);
   
   const selectClasses = "block w-full px-4 py-1 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 sm:text-sm mt-1";
   
@@ -638,12 +640,12 @@ const BasicOrderInformation: React.FC = () => {
             onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderCategory: e.target.value }))}
             className={selectClasses}
           >
-            <option id="create-order-basic-order-information-order-category-select-option-select-category" value="">Select a category</option>
-            <option id="create-order-basic-order-information-order-category-select-option-electronics" value="electronics">Electronics</option>
-            <option id="create-order-basic-order-information-order-category-select-option-clothing" value="clothing">Clothing</option>
-            <option id="create-order-basic-order-information-order-category-select-option-food" value="food">Food</option>
-            <option id="create-order-basic-order-information-order-category-select-option-furniture" value="furniture">Furniture</option>
-            <option id="create-order-basic-order-information-order-category-select-option-other" value="other">Other</option>
+            <option value="">Select a category</option>
+            {retailOrderCategories?.map((category) => (
+              <option key={category.id} value={category.display_name}>
+                {category.display_name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -1370,6 +1372,12 @@ const CreateOrder: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const { formData } = useFormContext();
+  const dispatch = useAppDispatch();
+  const { retailOrderCategories } = useAppSelector((state) => state.lookup);
+
+  useEffect(() => {
+    dispatch(fetchRetailOrderCategories());
+  }, [dispatch]);
 
   const handleNext = () => {
     setCurrentStep(prev => Math.min(prev + 1, 4));
