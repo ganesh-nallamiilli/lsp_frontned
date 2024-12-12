@@ -46,6 +46,21 @@ const SearchLogistics: React.FC = () => {
 
   const draftOrderId = searchParams.get('draftOrderId');
 
+  // Add null check for selectedDraftOrder before accessing its properties
+  const fromCity = searchParams.get('from') || selectedDraftOrder?.fromCity || 'Bengaluru';
+  const toCity = searchParams.get('to') || selectedDraftOrder?.toCity || 'Bengaluru';
+  const length = searchParams.get('length') || selectedDraftOrder?.packageDimensions?.length?.toString() || '20';
+  const breadth = searchParams.get('breadth') || selectedDraftOrder?.packageDimensions?.breadth?.toString() || '20';
+  const height = searchParams.get('height') || selectedDraftOrder?.packageDimensions?.height?.toString() || '10';
+  const weight = searchParams.get('weight') || selectedDraftOrder?.packageDimensions?.weight?.toString() || '0.3';
+
+  // Move useEffect hooks before any rendering logic
+  useEffect(() => {
+    if (selectedDraftOrder) {
+      setSelectedDeliveryType(selectedDraftOrder.deliveryType || 'same_day');
+    }
+  }, [selectedDraftOrder]);
+
   // Fetch draft order data when component mounts
   useEffect(() => {
     console.log('Current draftOrderId from query params:', draftOrderId); // Debug log
@@ -64,64 +79,6 @@ const SearchLogistics: React.FC = () => {
         console.error('Draft order fetch failed:', error);
       });
   }, [dispatch, draftOrderId]);
-
-  // Show loading state
-  if (draftOrderLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (draftOrderError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600">Error: {draftOrderError}</div>
-      </div>
-    );
-  }
-
-  // Update initial values with draft order data when available
-  useEffect(() => {
-    if (selectedDraftOrder) {
-      setSelectedDeliveryType(selectedDraftOrder.deliveryType || 'same_day');
-      // ... update other fields as needed
-    }
-  }, [selectedDraftOrder]);
-
-  const deliveryOptions = [
-    { id: 'next_day', label: 'Next Day Delivery', icon: '📅' },
-    { id: 'standard', label: 'Standard Delivery', icon: '🚚' },
-    { id: 'express', label: 'Express Delivery', icon: '⚡' },
-    { id: 'immediate', label: 'Immediate Delivery', icon: '🏃' },
-    { id: 'same_day', label: 'Same Day Delivery', icon: '📦' },
-  ];
-
-  const logisticsProviders: LogisticsProvider[] = [
-    {
-      name: "ONDC Test Courier Services",
-      domain: "ondc-mock-server-dev.thewitslab.com",
-      company: "ONDC Test Courier Services Inc",
-      distance: "25 kilometer",
-      deliveryType: "Same Day delivery",
-      expectedPickup: "P1D",
-      estimatedDelivery: "P1D",
-      deliveryMode: "Hyperlocal -P2P",
-      shippingCharges: 1.00,
-      rtoCharges: 1.00
-    },
-    // Add other providers as needed
-  ];
-
-  // Get the parameters from the URL with fallback values
-  const fromCity = searchParams.get('from') || selectedDraftOrder?.fromCity || 'Bengaluru';
-  const toCity = searchParams.get('to') || selectedDraftOrder?.toCity || 'Bengaluru';
-  const length = searchParams.get('length') || selectedDraftOrder?.packageDimensions?.length || '20';
-  const breadth = searchParams.get('breadth') || selectedDraftOrder?.packageDimensions?.breadth || '20';
-  const height = searchParams.get('height') || selectedDraftOrder?.packageDimensions?.height || '10';
-  const weight = searchParams.get('weight') || selectedDraftOrder?.packageDimensions?.weight || '0.3';
 
   // Add error boundary for animations
   const [animationError, setAnimationError] = useState(false);
@@ -159,19 +116,66 @@ const SearchLogistics: React.FC = () => {
     loadAnimations();
   }, []);
 
-  // Render fallback icons if animations fail to load
+  // Wrap the animation rendering in a try-catch
   const renderAnimationOrFallback = (animation: any, fallbackIcon: string) => {
-    if (animationError || !animation) {
+    try {
+      if (animationError || !animation) {
+        return <span className="text-2xl">{fallbackIcon}</span>;
+      }
+      return (
+        <Lottie
+          animationData={animation}
+          loop={true}
+          style={{ width: 50, height: 50 }}
+        />
+      );
+    } catch (error) {
+      console.error('Animation render error:', error);
       return <span className="text-2xl">{fallbackIcon}</span>;
     }
-    return (
-      <Lottie
-        animationData={animation}
-        loop={true}
-        style={{ width: 50, height: 50 }}
-      />
-    );
   };
+
+  // Show loading state first
+  if (draftOrderLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (draftOrderError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600">Error: {draftOrderError}</div>
+      </div>
+    );
+  }
+
+  const deliveryOptions = [
+    { id: 'next_day', label: 'Next Day Delivery', icon: '📅' },
+    { id: 'standard', label: 'Standard Delivery', icon: '🚚' },
+    { id: 'express', label: 'Express Delivery', icon: '⚡' },
+    { id: 'immediate', label: 'Immediate Delivery', icon: '🏃' },
+    { id: 'same_day', label: 'Same Day Delivery', icon: '📦' },
+  ];
+
+  const logisticsProviders: LogisticsProvider[] = [
+    {
+      name: "ONDC Test Courier Services",
+      domain: "ondc-mock-server-dev.thewitslab.com",
+      company: "ONDC Test Courier Services Inc",
+      distance: "25 kilometer",
+      deliveryType: "Same Day delivery",
+      expectedPickup: "P1D",
+      estimatedDelivery: "P1D",
+      deliveryMode: "Hyperlocal -P2P",
+      shippingCharges: 1.00,
+      rtoCharges: 1.00
+    },
+    // Add other providers as needed
+  ];
 
   return (
     <div id="search-logistics-page-container" className="min-h-screen bg-gray-50">
