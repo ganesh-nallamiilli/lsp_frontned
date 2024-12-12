@@ -543,6 +543,19 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
 // First, define the shared input styles
 const inputClasses = "block w-full px-4 py-1 text-gray-900 placeholder:text-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all duration-200 sm:text-sm mt-1";
 
+// Add this validation function at the top of your file, after the imports
+const validateOrderId = (value: string): string => {
+  try {
+    // Remove any non-alphanumeric characters
+    const sanitized = value.replace(/[^a-zA-Z0-9]/g, '');
+    // Limit to 16 characters
+    return sanitized.slice(0, 16);
+  } catch (error) {
+    console.error('Error validating order ID:', error);
+    return '';
+  }
+};
+
 // Basic Order Information section
 const BasicOrderInformation: React.FC = () => {
   const { formData, setFormData } = useFormContext();
@@ -566,7 +579,7 @@ const BasicOrderInformation: React.FC = () => {
         {/* Franchise Order Id */}
         <div>
           <label id="create-order-basic-order-information-franchise-order-id-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
-              Franchise Order Id
+              Retail Order Id
             <span className="text-red-500 ml-1">*</span>
           </label>
           <div className="relative">
@@ -575,12 +588,19 @@ const BasicOrderInformation: React.FC = () => {
             </div>
             <input
               type="text"
-              value={formData.franchiseOrderId}
-              onChange={(e) => setFormData(prev => ({ ...prev, franchiseOrderId: e.target.value }))}
-              placeholder="Enter order ID"
+              value={formData?.franchiseOrderId || ''}
+              onChange={(e) => {
+                const validatedValue = validateOrderId(e.target.value);
+                setFormData(prev => ({ ...prev, franchiseOrderId: validatedValue }));
+              }}
+              maxLength={16}
+              placeholder="Enter 16-character order ID"
               className={`${inputClasses} pl-10`}
             />
           </div>
+          <p className="mt-1 text-sm text-gray-500">
+            {(formData?.franchiseOrderId || '').length}/16 characters (alphanumeric only)
+          </p>
         </div>
 
         {/* Order Amount */}
