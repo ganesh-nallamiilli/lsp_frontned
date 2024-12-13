@@ -309,6 +309,103 @@ const OrderView: React.FC = () => {
           </dl>
         </div>
       </div>
+
+      {/* Package Details */}
+      <div className="bg-white shadow rounded-lg mt-8">
+        <div className="px-6 py-5 border-b border-gray-200">
+          <h2 className="text-lg font-medium text-gray-900">Package Details</h2>
+        </div>
+        <div className="px-6 py-5">
+          <div className="grid grid-cols-4 gap-6">
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Weight (Kg)</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {selectedOrder["@ondc/org/linked_order"]?.order?.weight?.value || '-'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Length (cms)</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {selectedOrder["@ondc/org/linked_order"]?.order?.dimensions?.length?.value || '-'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Breadth (cms)</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {selectedOrder["@ondc/org/linked_order"]?.order?.dimensions?.breadth?.value || '-'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Height (cms)</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {selectedOrder["@ondc/org/linked_order"]?.order?.dimensions?.height?.value || '-'}
+              </dd>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Details */}
+      <div className="bg-white shadow rounded-lg mt-8">
+        <div className="px-6 py-5 border-b border-gray-200">
+          <h2 className="text-lg font-medium text-gray-900">Product Details</h2>
+        </div>
+        <div className="px-6 py-5">
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead className="bg-orange-400">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-white">Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-white">Quantity</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-white">Weight (Kg)</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-white">Price (INR)</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {selectedOrder["@ondc/org/linked_order"]?.items?.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item?.descriptor?.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item?.quantity?.count}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item?.quantity?.measure?.value || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">{item?.price?.value || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Details */}
+      <div className="bg-white shadow rounded-lg mt-8">
+        <div className="px-6 py-5 border-b border-gray-200">
+          <h2 className="text-lg font-medium text-gray-900">Payment Details</h2>
+        </div>
+        <div className="px-6 py-5">
+          <dl className="space-y-3">
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-500">Delivery</dt>
+              <dd className="text-sm text-gray-900">₹{selectedOrder?.quote?.breakup.map((item:any)=>item["@ondc/org/title_type"] === "delivery" ? item?.price?.value : null) || '0.00'}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-500">Tax</dt>
+              <dd className="text-sm text-gray-900">₹{selectedOrder?.quote?.breakup.map((item:any)=>item["@ondc/org/title_type"] === "tax" ? item?.price?.value : null) || '0.00'}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-500">RTO Charge</dt>
+              <dd className="text-sm text-gray-900">₹{selectedOrder?.quote?.price?.value || '0.00'}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-sm text-gray-500">Platform Charge</dt>
+              <dd className="text-sm text-gray-900">₹{selectedOrder?.platform_charges || '0.00'}</dd>
+            </div>
+            <div className="flex justify-between pt-3 border-t border-gray-200">
+              <dt className="text-sm font-medium text-gray-900">Total</dt>
+              <dd className="text-sm font-medium text-gray-900">₹{parseFloat(selectedOrder?.quote?.breakup.map((item:any)=>item["@ondc/org/title_type"] === "delivery" ? item?.price?.value : 0)) + parseFloat(selectedOrder?.quote?.breakup.map((item:any)=>item["@ondc/org/title_type"] === "tax" ? item?.price?.value : 0)) + parseFloat(selectedOrder?.quote?.price?.value) + parseFloat(selectedOrder?.platform_charges) || '0.00'}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
     </div>
   );
 };
