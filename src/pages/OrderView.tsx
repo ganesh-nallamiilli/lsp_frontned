@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Phone } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { fetchOrderById } from '../store/slices/ordersSlice';
 
@@ -36,14 +36,48 @@ const OrderView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => navigate('/orders')}
-          className="p-2 hover:bg-gray-100 rounded-lg"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          
+          <button
+            onClick={() => navigate('/orders')}
+            className="p-2 hover:bg-gray-100 rounded-lg"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
+        </div>
+        
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          <button
+            onClick={() => {/* Add call logic */}}
+            className="p-4 rounded-full bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+          >
+            <Phone className="w-6 h-6" /> {/* Import Phone icon from lucide-react */}
+          </button>
+    
+          <button
+            onClick={() => {/* Add get status logic */}}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Get Status
+          </button>
+          
+          <button
+            onClick={() => {/* Add cancel order logic */}}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Cancel Order
+          </button>
+          
+          <button
+            onClick={() => {/* Add create ticket logic */}}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            Create Ticket
+          </button>
+        </div>
       </div>
 
       {/* Order Information */}
