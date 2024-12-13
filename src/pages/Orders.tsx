@@ -31,6 +31,7 @@ const Orders: React.FC = () => {
   useEffect(() => {
     if (activeTab === 7) {
       console.log("activeTab",activeTab)
+      dispatch(fetchDraftOrders({page: 1, perPage: 10}))
     } else {
       const tabFilters = { ...filters };
       
@@ -59,7 +60,6 @@ const Orders: React.FC = () => {
       }
 
       dispatch(fetchOrders(tabFilters));
-      dispatch(fetchDraftOrders());
 
     }
   }, [dispatch, filters, activeTab]);
@@ -93,15 +93,14 @@ const Orders: React.FC = () => {
   };
 
   const tabs = [
-    { label: 'All Orders', count: orders.length },
-    { label: 'Ready to Ship', count: orders.filter((o) => o.status === 'ready_to_ship').length },
-    { label: 'Created', count: orders.filter((o) => o.status === 'created').length },
-    { label: 'Accepted', count: orders.filter((o) => o.status === 'accepted').length },
-    { label: 'In Progress', count: orders.filter((o) => o.status === 'in_progress').length },
-    { label: 'Completed', count: orders.filter((o) => o.status === 'completed').length },
-    { label: 'Cancelled', count: orders.filter((o) => o.status === 'cancelled').length },
-    { label: 'Draft Orders', count: orders.filter((o) => o.status === 'draft').length },
-
+    { label: 'All Orders', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Ready to Ship', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Created', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Accepted', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'In Progress', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Completed', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Cancelled', count: orders?.meta?.pagination?.total_rows || 0 },
+    { label: 'Draft Orders', count: draftOrders?.meta?.pagination?.total_rows || 0 },
   ];
 
   const handleExport = () => {
@@ -219,9 +218,9 @@ const Orders: React.FC = () => {
 
   // Add these handlers for selection
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const draftOrders = orders.filter(order => order.status === 'draft');
+    const draftOrdersList = draftOrders?.data || [];
     if (e.target.checked) {
-      setSelectedOrders(draftOrders.map(order => order.id));
+      setSelectedOrders(draftOrdersList.map(order => order.id));
     } else {
       setSelectedOrders([]);
     }
@@ -306,7 +305,7 @@ const Orders: React.FC = () => {
               <TabPanel key={index} value={activeTab} index={index}>
                 {activeTab === 7 ? (
                   <DraftOrdersTable
-                    orders={draftOrders.data}
+                    orders={draftOrders?.data || []}
                     onEdit={handleEdit}
                     onShipNow={handleShipNow}
                     selectedOrders={selectedOrders}
