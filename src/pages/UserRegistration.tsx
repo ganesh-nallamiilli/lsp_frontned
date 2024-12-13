@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button';
 import { Truck, Package, MapPin, Box } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { registerUser } from '../store/slices/authSlice';
+import { registerUser, checkGstPan } from '../store/slices/authSlice';
 
 interface RegistrationForm {
   storeName: string;
@@ -181,19 +181,28 @@ const UserRegistration: React.FC = () => {
       setError('GST Number must be exactly 15 characters');
       return;
     }
-    if (formData.panNumber.length !== 10) {
-      setError('PAN Number must be exactly 10 characters');
-      return;
-    }
-    
+
+    // Check if GST/PAN already exists
     try {
+      const checkResult = await dispatch(checkGstPan({
+        gst_number: formData.gstNumber,
+        pan_number: formData.panNumber
+      })).unwrap();
+
+      if (checkResult.data.status === true) {
+        setError(checkResult.data.message || 'GST/PAN already registered');
+        document.getElementById('gstNumber')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // Continue with registration if GST/PAN check passes
       const registrationData = {
         store_name: formData.storeName,
+        email: formData.storeEmail,
+        mobile_number: formData.storeMobile,
+        name: formData.fullName,
         gst_number: formData.gstNumber,
         pan_number: formData.panNumber,
-        name: formData.fullName,
-        mobile_number: formData.storeMobile,
-        email: formData.storeEmail,
         gst_address: {
           building: formData.building,
           locality: formData.locality,
@@ -201,23 +210,19 @@ const UserRegistration: React.FC = () => {
           state: formData.state,
           area_code: formData.areaCode
         },
-        bank_details: {
+        settlement_details: {
           settlement_type: formData.settlementType,
-          ...(formData.settlementType === 'upi' 
-            ? { upi_address: formData.upiAddress }
-            : {
-                settlement_bank_account_no: formData.accountNumber,
-                settlement_ifsc_code: formData.ifscCode,
-                beneficiary_name: formData.beneficiaryName
-              }
-          )
+          upi_address: formData.upiAddress,
+          account_number: formData.accountNumber,
+          ifsc_code: formData.ifscCode,
+          beneficiary_name: formData.beneficiaryName
         }
       };
 
       await dispatch(registerUser(registrationData)).unwrap();
       navigate('/dashboard');
-    } catch (err) {
-      setError('Failed to register user. Please try again.');
+    } catch (error: any) {
+      setError(error.message || 'Registration failed');
     }
   };
 

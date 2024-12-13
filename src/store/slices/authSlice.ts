@@ -209,6 +209,17 @@ interface DeliveryAddressResponse {
   id: number;
 }
 
+interface CheckGstPanResponse {
+  meta: {
+    status: boolean;
+    message: string;
+  };
+  data: {
+    status: boolean;
+    message: string;
+  };
+}
+
 const initialState: AuthState = {
   loading: false,
   error: null,
@@ -580,6 +591,21 @@ export const deleteDeliveryAddress = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to delete delivery address');
+    }
+  }
+);
+
+export const checkGstPan = createAsyncThunk(
+  'auth/checkGstPan',
+  async (payload: { gst_number: string; pan_number: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post<CheckGstPanResponse>(
+        `${config.apiBaseUrl}/auth/check_gst_pan`,
+        payload
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to check GST/PAN');
     }
   }
 );
