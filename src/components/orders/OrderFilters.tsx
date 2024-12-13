@@ -173,8 +173,8 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
         </div>
 
         {/* Created By Dropdown */}
-        <div id="order-filters-container-created-by-dropdown" className="relative min-w-[200px]">
-          <select
+        {localStorage.getItem("user_type") == "STANDALONE_ADMIN" && <div id="order-filters-container-created-by-dropdown" className="relative min-w-[200px]">
+           <select
             id="order-filters-container-created-by-dropdown-select"
             value={filters?.created_by || ""}
             onChange={(e) => onCreatedByChange(e.target.value)}
@@ -204,7 +204,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({
               </svg>
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* Date Range Inputs */}
         <div id="order-filters-container-date-range-inputs" className="flex gap-2">
