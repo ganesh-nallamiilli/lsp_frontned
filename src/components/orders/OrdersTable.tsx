@@ -58,6 +58,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({
     if (action === 'view') {
       try {
         await dispatch(fetchOrderById(order.network_order_id)).unwrap();
+        console.log("order >>>>>>>>.",order);
         navigate(`/orders/${order.network_order_id}`);
       } catch (error) {
         console.error('Failed to fetch order details:', error);

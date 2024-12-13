@@ -82,13 +82,13 @@ const Header: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div 
+          {localStorage.getItem("user_type") != "STANDALONE_ADMIN" && <div 
             onClick={() => navigate('/wallet')}
             className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
           >
             <Wallet className="h-5 w-5 text-gray-600" />
             <span className="text-sm font-medium text-gray-700">₹{walletDetails?.total_available || '0.00'}</span>
-          </div>
+          </div>}
 
           <a 
             href="tel:+918806500700"
@@ -98,15 +98,15 @@ const Header: React.FC = () => {
             <span className="text-sm font-medium text-gray-700">+91 8806500700</span>
           </a>
 
-          <button 
+          {localStorage.getItem("user_type") != "STANDALONE_ADMIN" && <button 
             onClick={() => navigate('/notifications')} 
             className="p-2 hover:bg-gray-100 rounded-full relative"
           >
             <Bell className="h-6 w-6 text-gray-600" />
             <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
-          </button>
+          </button>}
 
-          <div className="relative" ref={dropdownRef}>
+          <div className="rel ative" ref={dropdownRef}>
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg"
