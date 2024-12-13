@@ -113,7 +113,7 @@ const Header: React.FC = () => {
             >
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {userProfile?.name || "Guest"}
+                  {localStorage.getItem("user_type") == "STANDALONE_ADMIN" ? "LSP": userProfile?.name || "Guest"}
                 </p>
                 <p className="text-xs text-gray-500">
                   {localStorage.getItem("user_type") == "STANDALONE_USER" ? "user" : 

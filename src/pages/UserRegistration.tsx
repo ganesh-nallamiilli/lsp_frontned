@@ -189,8 +189,8 @@ const UserRegistration: React.FC = () => {
         pan_number: formData.panNumber
       })).unwrap();
 
-      if (checkResult.data.status === true) {
-        setError(checkResult.data.message || 'GST/PAN already registered');
+      if (checkResult.status === true) {
+        setError(checkResult.message || 'GST/PAN already registered');
         document.getElementById('gstNumber')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
@@ -246,8 +246,11 @@ const UserRegistration: React.FC = () => {
                   value={formData.storeName}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className={`mt-1 ${error && formData.storeName.length > 0 && error.includes('store') ? 'border-red-500' : ''}`}
                 />
+                {error && formData.storeName.length > 0 && error.includes('store') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
@@ -303,8 +306,11 @@ const UserRegistration: React.FC = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="mt-1"
+                  className={`mt-1 ${error && formData.fullName.length > 0 && error.includes('name') ? 'border-red-500' : ''}`}
                 />
+                {error && formData.fullName.length > 0 && error.includes('name') && (
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
+                )}
               </div>
 
               <div>
@@ -473,8 +479,11 @@ const UserRegistration: React.FC = () => {
                       onChange={handleChange}
                       required
                       maxLength={16}
-                      className="mt-1"
+                      className={`mt-1 ${error && formData.accountNumber.length > 0 && error.includes('account') ? 'border-red-500' : ''}`}
                     />
+                    {error && formData.accountNumber.length > 0 && error.includes('account') && (
+                      <p className="text-sm text-red-500 mt-1">{error}</p>
+                    )}
                   </div>
 
                   <div>
@@ -508,6 +517,12 @@ const UserRegistration: React.FC = () => {
                 </>
               )}
             </div>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                {error}
+              </div>
+            )}
 
             <Button
               type="submit"
