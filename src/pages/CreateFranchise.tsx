@@ -235,7 +235,8 @@ const CreateFranchise: React.FC = () => {
         is_franchise: true, // Required field for franchise creation
         user_types: [{ name: "FRANCHISE" }], // Required field
         access_template_ids: [], // Required field
-        is_active: true // Required field
+        is_active: true,
+        company_id: 1 // Required field
       };
 
       // If we're in edit mode (URL has an ID) or we have a stored franchise ID
