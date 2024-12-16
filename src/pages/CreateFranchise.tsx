@@ -86,6 +86,7 @@ const CreateFranchise: React.FC = () => {
     }
   });
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (isEditMode && id) {
@@ -128,11 +129,24 @@ const CreateFranchise: React.FC = () => {
     }
   }, [currentFranchise, markupDetails, isEditMode]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // For GST and PAN, convert to uppercase
+    const processedValue = ['gstNumber', 'panNumber', 'ifscCode'].includes(name) 
+      ? value.toUpperCase() 
+      : value;
+
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: processedValue
+    }));
+
+    // Validate the field
+    const error = validateField(name, processedValue);
+    setFieldErrors(prev => ({
+      ...prev,
+      [name]: error
     }));
   };
 
@@ -152,6 +166,24 @@ const CreateFranchise: React.FC = () => {
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check for any validation errors
+    const errors: { [key: string]: string } = {};
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key as keyof typeof formData]);
+      if (error) {
+        errors[key] = error;
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      // Scroll to first error
+      const firstErrorField = document.querySelector(`[name="${Object.keys(errors)[0]}"]`);
+      firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Continue with form submission...
     const franchiseData = {
       "name": formData.franchiseName,
       "mobile_number": formData.mobile,
@@ -199,18 +231,17 @@ const CreateFranchise: React.FC = () => {
 
     try {
       if (isEditMode) {
-        // Update franchise
         const response = await dispatch(updateFranchise({id, franchiseData})).unwrap();
         console.log('Franchise updated:', response.data);
         setCurrentStep(2);
       } else {
-        // Create franchise
         const response = await dispatch(createFranchise(franchiseData)).unwrap();
         setFranchiseUserId(response.data.id);
         setCurrentStep(2);
       }
     } catch (error) {
       console.error('Error creating/updating franchise:', error);
+      toast.error('Failed to create/update franchise');
     }
   };
 
@@ -342,6 +373,83 @@ const CreateFranchise: React.FC = () => {
     </div>
   );
 
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'gstNumber':
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        if (!gstRegex.test(value)) {
+          return 'Invalid GST Number format. Example: 27AAPFU0939F1Z5';
+        }
+        
+        // Extract PAN from GST and compare if PAN exists
+        const panFromGst = value.substring(2, 12);
+        if (formData.panNumber && formData.panNumber !== panFromGst) {
+          return 'PAN number should match with the PAN in GST';
+        }
+        break;
+
+      case 'panNumber':
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(value)) {
+          return 'Invalid PAN Number format. Example: ABCDE1234F';
+        }
+        
+        // If GST exists, validate PAN against it
+        if (formData.gstNumber) {
+          const panFromGst = formData.gstNumber.substring(2, 12);
+          if (value !== panFromGst) {
+            return 'PAN number should match with the PAN in GST';
+          }
+        }
+        break;
+
+      case 'email':
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}$/;
+        const domainParts = value.split('@')[1]?.split('.') || [];
+        if (domainParts.length > 2 || !emailRegex.test(value)) {
+          return 'Invalid email address format';
+        }
+        break;
+
+      case 'mobile':
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(value)) {
+          return 'Invalid mobile number. Must be 10 digits starting with 6-9';
+        }
+        break;
+
+      case 'zipPostalCode':
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+        if (!pincodeRegex.test(value)) {
+          return 'Invalid pincode. Must be 6 digits and cannot start with 0';
+        }
+        break;
+
+      case 'accountNumber':
+        if (value.length < 9 || value.length > 18) {
+          return 'Account number should be between 9 and 18 digits';
+        }
+        break;
+
+      case 'ifscCode':
+        const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        if (!ifscRegex.test(value)) {
+          return 'Invalid IFSC Code format. Example: HDFC0123456';
+        }
+        break;
+
+      case 'upiId':
+        if (value) {  // Only validate if UPI ID is provided
+          const upiRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z]{3,}$/;
+          if (!upiRegex.test(value)) {
+            return 'Invalid UPI address format. Example: username@upi';
+          }
+        }
+        break;
+    }
+    return '';
+  };
+
   return (
     <div className="">
       {/* Header */}
@@ -407,11 +515,16 @@ const CreateFranchise: React.FC = () => {
                     type="tel"
                     name="mobile"
                     required
+                    maxLength={10}
                     value={formData.mobile}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.mobile ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Phone Number"
                   />
+                  {fieldErrors.mobile && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.mobile}</p>
+                  )}
                 </div>
 
                 <div>
@@ -424,9 +537,13 @@ const CreateFranchise: React.FC = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.email ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Email Address"
                   />
+                  {fieldErrors.email && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.email}</p>
+                  )}
                 </div>
 
                 <div>
@@ -438,9 +555,13 @@ const CreateFranchise: React.FC = () => {
                     name="gstNumber"
                     value={formData.gstNumber}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.gstNumber ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="GST Number"
                   />
+                  {fieldErrors.gstNumber && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.gstNumber}</p>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
@@ -454,9 +575,13 @@ const CreateFranchise: React.FC = () => {
                       required
                       value={formData.panNumber}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        ${fieldErrors.panNumber ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="PAN Number"
                     />
+                    {fieldErrors.panNumber && (
+                      <p className="text-sm text-red-500 mt-1">{fieldErrors.panNumber}</p>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -534,7 +659,7 @@ const CreateFranchise: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State/Province <span className="text-red-500">*</span>
+                      State <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -549,7 +674,7 @@ const CreateFranchise: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      ZIP/Postal Code <span className="text-red-500">*</span>
+                      Pin Code <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -659,9 +784,13 @@ const CreateFranchise: React.FC = () => {
                     required
                     value={formData.accountNumber}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.accountNumber ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Account Number"
                   />
+                  {fieldErrors.accountNumber && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.accountNumber}</p>
+                  )}
                 </div>
 
                 <div>
@@ -689,9 +818,13 @@ const CreateFranchise: React.FC = () => {
                     required
                     value={formData.ifscCode}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.ifscCode ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="IFSC Code"
                   />
+                  {fieldErrors.ifscCode && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.ifscCode}</p>
+                  )}
                 </div>
 
                 <div>
@@ -792,4 +925,4 @@ const CreateFranchise: React.FC = () => {
   );
 };
 
-export default CreateFranchise; 
+export default CreateFranchise;  
