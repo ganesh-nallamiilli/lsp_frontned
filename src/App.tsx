@@ -52,7 +52,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (!isAuthenticated) {
     // Redirect to login page with the intended destination
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/landing" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
@@ -113,6 +113,8 @@ function App() {
               />
 
               {/* Protected Routes */}
+              <Route path="/landing" element={<PublicRoute><LandingPage /></PublicRoute>} />
+
               <Route
                 path="/"
                 element={
@@ -166,13 +168,12 @@ function App() {
                 <Route path="/franchise/edit/:id" element={<CreateFranchise />} />
               </Route>
               <Route path="/user_registration" element={<UserRegistration />} />
-              <Route path="/landing" element={<LandingPage />} />
 
               {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
               <Route
                 path="*"
                 element={
-                  <Navigate to="/login" replace />
+                  <Navigate to="/landing" replace />
                 }
               />
             </Routes>
