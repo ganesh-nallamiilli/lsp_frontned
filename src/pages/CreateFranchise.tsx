@@ -335,18 +335,26 @@ const CreateFranchise: React.FC = () => {
 
       // Prepare markup data
       const markupData = Object.entries(formData.markupDetails).map(([type, details]) => ({
-        category_type: type,
+        category_type: type.replace(/([A-Z])/g, ' $1').trim().toUpperCase(), // Convert camelCase to UPPER CASE with spaces
         markup_type: details.type,
         markup_value: parseFloat(details.value),
         created_by_id: parseInt(franchiseId)
       }));
 
-      // Update markup details
+      // Create markup details
       for (const markup of markupData) {
-        await dispatch(updateMarkup({
-          id: franchiseId,
-          markupData: markup
-        })).unwrap();
+        if (isEditMode) {
+          // If editing, update existing markup
+          await dispatch(updateMarkup({
+            id: franchiseId,
+            markupData: markup
+          })).unwrap();
+        } else {
+          // If creating new, create new markup
+          await dispatch(createMarkup({
+           ...markup
+          })).unwrap();
+        }
       }
 
       toast.success('Franchise markup details saved successfully');
