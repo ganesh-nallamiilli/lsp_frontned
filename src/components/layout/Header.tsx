@@ -90,7 +90,7 @@ const Header: React.FC = () => {
             <span className="text-sm font-medium text-gray-700">₹{walletDetails?.total_available || '0.00'}</span>
           </div>}
 
-          <div className="relative group">
+          { localStorage.getItem("user_type") != "STANDALONE_ADMIN" && <div className="relative group">
             <button 
               className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
             >
@@ -122,7 +122,7 @@ const Header: React.FC = () => {
                 <span>WhatsApp Support</span>
               </a>
             </div>
-          </div>
+          </div>}
 
           {localStorage.getItem("user_type") != "STANDALONE_ADMIN" && <button 
             onClick={() => navigate('/notifications')} 
