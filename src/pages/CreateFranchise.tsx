@@ -905,9 +905,13 @@ const CreateFranchise: React.FC = () => {
                     name="upiId"
                     value={formData.upiId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="UPI Id"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.upiId ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="username@upi"
                   />
+                  {fieldErrors.upiId && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.upiId}</p>
+                  )}
                 </div>
               </div>
             </div>
