@@ -83,18 +83,28 @@ export const createFranchise = createAsyncThunk(
   'franchise/createFranchise',
   async (franchiseData: FranchisePayload, { rejectWithValue }) => {
     try {
-      const response = await axios.post<FranchiseResponse>(
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      console.log('Creating franchise with data:', franchiseData); // Debug log
+
+      const response = await axios.post(
         `${config.apiBaseUrl}/auth/create`,
         franchiseData,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
       );
+
+      console.log('Create franchise response:', response.data); // Debug log
       return response.data;
     } catch (error: any) {
+      console.error('Create franchise error:', error.response || error); // Debug log
       return rejectWithValue(error.response?.data?.message || 'Failed to create franchise');
     }
   }
@@ -218,20 +228,30 @@ export const updateMarkup = createAsyncThunk(
 
 export const updateFranchise = createAsyncThunk(
   'franchise/updateFranchise',
-  async ({ id, franchiseData }: { id: string; franchiseData: FranchisePayload }, { rejectWithValue }) => {
+  async ({ id, franchiseData }: { id: string; franchiseData: any }, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      console.log('Updating franchise with data:', franchiseData); // Debug log
+
       const response = await axios.post(
         `${config.apiBaseUrl}/auth/${id}/update`,
         franchiseData,
         {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
       );
+
+      console.log('Update franchise response:', response.data); // Debug log
       return response.data;
     } catch (error: any) {
+      console.error('Update franchise error:', error.response || error); // Debug log
       return rejectWithValue(error.response?.data?.message || 'Failed to update franchise');
     }
   }

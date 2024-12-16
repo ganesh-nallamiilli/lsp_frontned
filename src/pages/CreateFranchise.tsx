@@ -165,148 +165,156 @@ const CreateFranchise: React.FC = () => {
 
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Check for any validation errors
-    const errors: { [key: string]: string } = {};
-    Object.keys(formData).forEach(key => {
-      const error = validateField(key, formData[key as keyof typeof formData]);
-      if (error) {
-        errors[key] = error;
-      }
-    });
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      // Scroll to first error
-      const firstErrorField = document.querySelector(`[name="${Object.keys(errors)[0]}"]`);
-      firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    // Continue with form submission...
-    const franchiseData = {
-      "name": formData.franchiseName,
-      "mobile_number": formData.mobile,
-      "email": formData.email,
-      "store_name": formData.franchiseName,
-      "profile_image": "",
-      "gst_number": formData.gstNumber,
-      "pan_number": formData.panNumber,
-      "name_as_per_pan": formData.nameAsPerPan,
-      "gst_address": {
-          "name": formData.ownerName,
-          "locality": formData.locality,
-          "building": formData.building,
-          "city": formData.city,
-          "state": formData.stateProvince,
-          "area_code": formData.zipPostalCode,
-          "country": "India"
-      },
-      "user_types": [
-          {
-              "name": "FRANCHISE"
-          }
-      ],
-      "access_template_ids": [
-          3
-      ],
-      "is_active": true,
-      "bank_details": {
-          "settlement_type": formData.settlementType,
-          "beneficiary_name": formData.accountHolderName,
-          "upi_address": formData.upiId,
-          "settlement_bank_account_no": formData.accountNumber,
-          "settlement_ifsc_code": formData.ifscCode,
-          "bank_name": formData.bankName
-      },
-      "draft_reasons": [],
-      "wallet": {
-          "total_credit": "0.00",
-          "total_debit": "0.00",
-          "total_available": "0.00"
-      },
-      "is_franchise": true,
-      "company_id": 1
-    };
-
+    
     try {
-      if (isEditMode) {
-        const response = await dispatch(updateFranchise({id, franchiseData})).unwrap();
-        console.log('Franchise updated:', response.data);
-        setCurrentStep(2);
-      } else {
-        const response = await dispatch(createFranchise(franchiseData)).unwrap();
-        setFranchiseUserId(response.data.id);
-        setCurrentStep(2);
+      setLoading(true);
+
+      // Validate first step data
+      if (!validateFirstStep()) {
+        return;
       }
-    } catch (error) {
-      console.error('Error creating/updating franchise:', error);
-      toast.error('Failed to create/update franchise');
+
+      // Prepare the franchise data according to the API requirements
+      const franchiseData = {
+        name: formData.ownerName,
+        mobile_number: formData.mobile,
+        email: formData.email,
+        store_name: formData.franchiseName,
+        profile_image: formData.franchiseLogo,
+        gst_number: formData.gstNumber,
+        pan_number: formData.panNumber,
+        name_as_per_pan: formData.nameAsPerPan,
+        gst_address: {
+          building: formData.building,
+          locality: formData.locality,
+          city: formData.city,
+          state: formData.stateProvince,
+          area_code: formData.zipPostalCode,
+          country: "India"
+        },
+        bank_details: {
+          settlement_type: formData.settlementType,
+          beneficiary_name: formData.accountHolderName,
+          upi_address: formData.upiId || '',
+          settlement_bank_account_no: formData.accountNumber,
+          settlement_ifsc_code: formData.ifscCode,
+          bank_name: formData.bankName
+        },
+        user_types: [{ name: "FRANCHISE_USER" }],
+        access_template_ids: [1],
+        is_active: true
+      };
+
+      console.log('Sending franchise data:', franchiseData); // Debug log
+
+      if (isEditMode && id) {
+        const result = await dispatch(updateFranchise({ 
+          id, 
+          franchiseData 
+        })).unwrap();
+        console.log('Update response:', result); // Debug log
+      } else {
+        const result = await dispatch(createFranchise(franchiseData)).unwrap();
+        console.log('Create response:', result); // Debug log
+        // Store the newly created franchise ID if needed
+        if (result?.data?.id) {
+          localStorage.setItem('currentFranchiseId', result.data.id.toString());
+        }
+      }
+
+      // Move to next step only if API call was successful
+      setCurrentStep(2);
+      toast.success('Franchise details saved successfully');
+      
+    } catch (error: any) {
+      console.error('Error in handleNext:', error);
+      toast.error(error?.message || 'Failed to save franchise details');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const validateFirstStep = () => {
+    const errors: { [key: string]: string } = {};
+
+    // Validate required fields
+    if (!formData.franchiseName) errors.franchiseName = 'Franchise name is required';
+    if (!formData.ownerName) errors.ownerName = 'Owner name is required';
+    if (!formData.email) errors.email = 'Email is required';
+    if (!formData.mobile) errors.mobile = 'Mobile number is required';
+    if (!formData.panNumber) errors.panNumber = 'PAN number is required';
+    if (!formData.nameAsPerPan) errors.nameAsPerPan = 'Name as per PAN is required';
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    // Validate mobile number
+    if (formData.mobile && !/^\d{10}$/.test(formData.mobile)) {
+      errors.mobile = 'Mobile number must be 10 digits';
+    }
+
+    // Validate PAN format (assuming Indian PAN format)
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (formData.panNumber && !panRegex.test(formData.panNumber)) {
+      errors.panNumber = 'Invalid PAN format';
+    }
+
+    // If GST number is provided, validate its format
+    if (formData.gstNumber && !/^\d{2}[A-Z]{5}\d{4}[A-Z]{1}\d[Z]{1}[A-Z\d]{1}$/.test(formData.gstNumber)) {
+      errors.gstNumber = 'Invalid GST format';
+    }
+
+    // Update field errors
+    setFieldErrors(errors);
+
+    // Return true if no errors, false otherwise
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
+    
     try {
-      if (isEditMode) {
-        for (const [service, details] of Object.entries(formData.markupDetails)) {
-          console.log("Service", service);
-          const categoryType = service
-          
-          console.log('Looking for:', categoryType);
-          console.log('Available markups:', markupDetails.map(m => m.category_type));
+      setLoading(true);
 
-          const existingMarkup = markupDetails.find(markup => 
-            markup.category_type.toLowerCase().replace(/\s+/g, '').trim() === categoryType.toLowerCase().trim()
-          );
-
-          if (!existingMarkup) {
-            console.error(`No existing markup found for ${categoryType}`);
-            continue;
-          }
-
-          const markupPayload = {
-            id: existingMarkup.id, // Use the markup record ID instead of franchise ID
-            markupData: {
-              category_type: categoryType,
-              markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1),
-              markup_value: parseFloat(details.value),
-              created_by_id: existingMarkup.created_by_id // Preserve the original created_by_id
-            }
-          };
-
-          console.log(markupPayload);
-
-          await dispatch(updateMarkup(markupPayload)).unwrap();
-        }
-        toast.success('Markup details updated successfully');
-      } else {
-        // Create new markups (existing create logic)
-        for (const [service, details] of Object.entries(formData.markupDetails)) {
-          const categoryType = service
-            .replace(/([A-Z])/g, ' $1')
-            .replace(/^./, str => str.toUpperCase());
-
-          const markupPayload = {
-            category_type: categoryType,
-            markup_type: details.type.charAt(0).toUpperCase() + details.type.slice(1),
-            markup_value: parseFloat(details.value),
-            created_by_id: franchise_user_id
-          };
-
-          await dispatch(createMarkup(markupPayload)).unwrap();
-        }
-        toast.success('Markup details created successfully');
+      const franchiseId = isEditMode ? id : localStorage.getItem('currentFranchiseId');
+      
+      if (!franchiseId) {
+        throw new Error('Franchise ID not found');
       }
 
-      navigate('/franchise');
-    } catch (error) {
-      console.error('Error updating/creating markup details:', error);
-      toast.error('Failed to update/create markup details');
+      // Prepare markup details
+      const markupData = {
+        markup_details: Object.entries(formData.markupDetails).map(([type, details]) => ({
+          shipping_service_type: type,
+          markup_type: details.type,
+          markup_value: parseFloat(details.value)
+        }))
+      };
+
+      console.log('Sending markup data:', markupData); // Debug log
+
+      // Update franchise with markup details
+      const result = await dispatch(updateFranchise({
+        id: franchiseId,
+        franchiseData: markupData
+      })).unwrap();
+
+      console.log('Final update response:', result); // Debug log
+
+      toast.success('Franchise saved successfully');
+      navigate('/franchises');
+      
+    } catch (error: any) {
+      console.error('Error in handleSubmit:', error);
+      toast.error(error?.message || 'Failed to save franchise');
     } finally {
       setLoading(false);
+      // Clean up
+      localStorage.removeItem('currentFranchiseId');
     }
   };
 
@@ -326,6 +334,99 @@ const CreateFranchise: React.FC = () => {
       }
     }));
   };
+
+  const handleBack = async () => {
+    if (currentStep === 2) {
+      try {
+        setLoading(true);
+        
+        // Store the current form data in localStorage to persist it
+        localStorage.setItem('franchiseFormData', JSON.stringify(formData));
+
+        // If we're in edit mode, update the franchise data
+        if (isEditMode && id) {
+          const franchiseData = {
+            name: formData.ownerName,
+            mobile_number: formData.mobile,
+            email: formData.email,
+            store_name: formData.franchiseName,
+            profile_image: formData.franchiseLogo,
+            gst_number: formData.gstNumber,
+            pan_number: formData.panNumber,
+            name_as_per_pan: formData.nameAsPerPan,
+            gst_address: {
+              building: formData.building,
+              locality: formData.locality,
+              city: formData.city,
+              state: formData.stateProvince,
+              area_code: formData.zipPostalCode,
+              country: "India"
+            },
+            bank_details: {
+              settlement_type: formData.settlementType,
+              beneficiary_name: formData.accountHolderName,
+              upi_address: formData.upiId || '',
+              settlement_bank_account_no: formData.accountNumber,
+              settlement_ifsc_code: formData.ifscCode,
+              bank_name: formData.bankName
+            }
+          };
+
+          await dispatch(updateFranchise({ 
+            id, 
+            franchiseData 
+          })).unwrap();
+        }
+
+        // Set current step to 1 and ensure edit mode
+        setCurrentStep(1);
+        
+        // If not already in edit mode, get the franchise ID from localStorage
+        const franchiseId = id || localStorage.getItem('currentFranchiseId');
+        
+        if (franchiseId) {
+          // Fetch the latest franchise data
+          await dispatch(fetchFranchiseById(franchiseId));
+          await dispatch(fetchMarkupDetails(franchiseId));
+        }
+
+      } catch (error) {
+        console.error('Error handling back:', error);
+        toast.error('Failed to update franchise details');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setCurrentStep(1);
+    }
+  };
+
+  // Add this useEffect to handle data restoration when component mounts
+  useEffect(() => {
+    const savedFormData = localStorage.getItem('franchiseFormData');
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
+
+    // Cleanup when component unmounts
+    return () => {
+      localStorage.removeItem('franchiseFormData');
+    };
+  }, []);
+
+  // Update the useEffect that handles fetching franchise data
+  useEffect(() => {
+    if (isEditMode && id) {
+      dispatch(fetchFranchiseById(id));
+      dispatch(fetchMarkupDetails(id));
+    } else {
+      // Check if we have saved form data
+      const savedFormData = localStorage.getItem('franchiseFormData');
+      if (savedFormData) {
+        setFormData(JSON.parse(savedFormData));
+      }
+    }
+  }, [dispatch, id, isEditMode]);
 
   // Stepper component
   const Stepper = () => (
@@ -449,6 +550,13 @@ const CreateFranchise: React.FC = () => {
     }
     return '';
   };
+
+  // Add this useEffect to log the current state for debugging
+  useEffect(() => {
+    console.log('Current form data:', formData);
+    console.log('Current step:', currentStep);
+    console.log('Is edit mode:', isEditMode);
+  }, [formData, currentStep, isEditMode]);
 
   return (
     <div className="">
@@ -899,10 +1007,12 @@ const CreateFranchise: React.FC = () => {
           {currentStep === 2 && (
             <button
               type="button"
-              onClick={() => setCurrentStep(1)}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              onClick={handleBack}
+              disabled={loading}
+              className={`px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Back
+              {loading ? 'Updating...' : 'Back'}
             </button>
           )}
           <button
