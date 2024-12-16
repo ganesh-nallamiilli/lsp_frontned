@@ -589,7 +589,7 @@ const BasicOrderInformation: React.FC = () => {
         {/* Franchise Order Id */}
         <div>
           <label id="create-order-basic-order-information-franchise-order-id-label" className="flex items-center text-sm font-medium text-gray-700 mb-1.5">
-              Retail Order Id
+              {localStorage.getItem('userType') === 'FRANCHISE' ? 'Franchise Order Id' : 'Retail Order Id'}
             <span className="text-red-500 ml-1">*</span>
           </label>
           <div className="relative">
