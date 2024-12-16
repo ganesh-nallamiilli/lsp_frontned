@@ -163,6 +163,37 @@ const CreateFranchise: React.FC = () => {
     }
   };
 
+  const handleBack = async () => {
+    if (currentStep === 2) {
+      try {
+        setLoading(true);
+        
+        // Store current markup details before going back
+        localStorage.setItem('markupDetails', JSON.stringify(formData.markupDetails));
+
+        // Get the franchise ID (either from URL params or localStorage)
+        const franchiseId = id || localStorage.getItem('currentFranchiseId');
+        
+        if (!franchiseId) {
+          throw new Error('Franchise ID not found');
+        }
+
+        // Fetch latest franchise data
+        await dispatch(fetchFranchiseById(franchiseId));
+        await dispatch(fetchMarkupDetails(franchiseId));
+
+        // Set current step to 1
+        setCurrentStep(1);
+
+      } catch (error) {
+        console.error('Error handling back:', error);
+        toast.error('Failed to load franchise details');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleNext = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -174,7 +205,7 @@ const CreateFranchise: React.FC = () => {
         return;
       }
 
-      // Prepare the franchise data according to the API requirements
+      // Prepare the franchise data
       const franchiseData = {
         name: formData.ownerName,
         mobile_number: formData.mobile,
@@ -190,7 +221,8 @@ const CreateFranchise: React.FC = () => {
           city: formData.city,
           state: formData.stateProvince,
           area_code: formData.zipPostalCode,
-          country: "India"
+          country: "India",
+          name: formData.ownerName // Adding name to gst_address as required by API
         },
         bank_details: {
           settlement_type: formData.settlementType,
@@ -200,31 +232,35 @@ const CreateFranchise: React.FC = () => {
           settlement_ifsc_code: formData.ifscCode,
           bank_name: formData.bankName
         },
-        user_types: [{ name: "FRANCHISE_USER" }],
-        access_template_ids: [1],
-        is_active: true
+        is_franchise: true, // Required field for franchise creation
+        user_types: [{ name: "FRANCHISE" }], // Required field
+        access_template_ids: [], // Required field
+        is_active: true // Required field
       };
 
-      console.log('Sending franchise data:', franchiseData); // Debug log
-
-      if (isEditMode && id) {
-        const result = await dispatch(updateFranchise({ 
+      // If we're in edit mode (URL has an ID) or we have a stored franchise ID
+      if (id) {
+        // We're in edit mode from URL
+        await dispatch(updateFranchise({ 
           id, 
           franchiseData 
         })).unwrap();
-        console.log('Update response:', result); // Debug log
+        toast.success('Franchise details updated successfully');
       } else {
+        // First time creation
+        console.log('Creating new franchise with data:', franchiseData);
         const result = await dispatch(createFranchise(franchiseData)).unwrap();
-        console.log('Create response:', result); // Debug log
-        // Store the newly created franchise ID if needed
+        
         if (result?.data?.id) {
           localStorage.setItem('currentFranchiseId', result.data.id.toString());
+          toast.success('Franchise created successfully');
+        } else {
+          throw new Error('Failed to get franchise ID after creation');
         }
       }
 
-      // Move to next step only if API call was successful
+      // Move to next step
       setCurrentStep(2);
-      toast.success('Franchise details saved successfully');
       
     } catch (error: any) {
       console.error('Error in handleNext:', error);
@@ -280,41 +316,39 @@ const CreateFranchise: React.FC = () => {
     try {
       setLoading(true);
 
-      const franchiseId = isEditMode ? id : localStorage.getItem('currentFranchiseId');
+      const franchiseId = id || localStorage.getItem('currentFranchiseId');
       
       if (!franchiseId) {
         throw new Error('Franchise ID not found');
       }
 
-      // Prepare markup details
-      const markupData = {
-        markup_details: Object.entries(formData.markupDetails).map(([type, details]) => ({
-          shipping_service_type: type,
-          markup_type: details.type,
-          markup_value: parseFloat(details.value)
-        }))
-      };
+      // Prepare markup data
+      const markupData = Object.entries(formData.markupDetails).map(([type, details]) => ({
+        category_type: type,
+        markup_type: details.type,
+        markup_value: parseFloat(details.value),
+        created_by_id: parseInt(franchiseId)
+      }));
 
-      console.log('Sending markup data:', markupData); // Debug log
+      // Update markup details
+      for (const markup of markupData) {
+        await dispatch(updateMarkup({
+          id: franchiseId,
+          markupData: markup
+        })).unwrap();
+      }
 
-      // Update franchise with markup details
-      const result = await dispatch(updateFranchise({
-        id: franchiseId,
-        franchiseData: markupData
-      })).unwrap();
-
-      console.log('Final update response:', result); // Debug log
-
-      toast.success('Franchise saved successfully');
+      toast.success('Franchise markup details saved successfully');
       navigate('/franchises');
       
     } catch (error: any) {
       console.error('Error in handleSubmit:', error);
-      toast.error(error?.message || 'Failed to save franchise');
+      toast.error(error?.message || 'Failed to save markup details');
     } finally {
       setLoading(false);
       // Clean up
       localStorage.removeItem('currentFranchiseId');
+      localStorage.removeItem('markupDetails');
     }
   };
 
@@ -334,99 +368,6 @@ const CreateFranchise: React.FC = () => {
       }
     }));
   };
-
-  const handleBack = async () => {
-    if (currentStep === 2) {
-      try {
-        setLoading(true);
-        
-        // Store the current form data in localStorage to persist it
-        localStorage.setItem('franchiseFormData', JSON.stringify(formData));
-
-        // If we're in edit mode, update the franchise data
-        if (isEditMode && id) {
-          const franchiseData = {
-            name: formData.ownerName,
-            mobile_number: formData.mobile,
-            email: formData.email,
-            store_name: formData.franchiseName,
-            profile_image: formData.franchiseLogo,
-            gst_number: formData.gstNumber,
-            pan_number: formData.panNumber,
-            name_as_per_pan: formData.nameAsPerPan,
-            gst_address: {
-              building: formData.building,
-              locality: formData.locality,
-              city: formData.city,
-              state: formData.stateProvince,
-              area_code: formData.zipPostalCode,
-              country: "India"
-            },
-            bank_details: {
-              settlement_type: formData.settlementType,
-              beneficiary_name: formData.accountHolderName,
-              upi_address: formData.upiId || '',
-              settlement_bank_account_no: formData.accountNumber,
-              settlement_ifsc_code: formData.ifscCode,
-              bank_name: formData.bankName
-            }
-          };
-
-          await dispatch(updateFranchise({ 
-            id, 
-            franchiseData 
-          })).unwrap();
-        }
-
-        // Set current step to 1 and ensure edit mode
-        setCurrentStep(1);
-        
-        // If not already in edit mode, get the franchise ID from localStorage
-        const franchiseId = id || localStorage.getItem('currentFranchiseId');
-        
-        if (franchiseId) {
-          // Fetch the latest franchise data
-          await dispatch(fetchFranchiseById(franchiseId));
-          await dispatch(fetchMarkupDetails(franchiseId));
-        }
-
-      } catch (error) {
-        console.error('Error handling back:', error);
-        toast.error('Failed to update franchise details');
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setCurrentStep(1);
-    }
-  };
-
-  // Add this useEffect to handle data restoration when component mounts
-  useEffect(() => {
-    const savedFormData = localStorage.getItem('franchiseFormData');
-    if (savedFormData) {
-      setFormData(JSON.parse(savedFormData));
-    }
-
-    // Cleanup when component unmounts
-    return () => {
-      localStorage.removeItem('franchiseFormData');
-    };
-  }, []);
-
-  // Update the useEffect that handles fetching franchise data
-  useEffect(() => {
-    if (isEditMode && id) {
-      dispatch(fetchFranchiseById(id));
-      dispatch(fetchMarkupDetails(id));
-    } else {
-      // Check if we have saved form data
-      const savedFormData = localStorage.getItem('franchiseFormData');
-      if (savedFormData) {
-        setFormData(JSON.parse(savedFormData));
-      }
-    }
-  }, [dispatch, id, isEditMode]);
 
   // Stepper component
   const Stepper = () => (
