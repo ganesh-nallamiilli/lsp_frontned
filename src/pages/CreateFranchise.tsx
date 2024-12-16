@@ -534,11 +534,21 @@ const CreateFranchise: React.FC = () => {
                     type="text"
                     name="franchiseName"
                     required
+                    maxLength={50}
                     value={formData.franchiseName}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.franchiseName ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Franchise Name"
                   />
+                  <div className="flex justify-between mt-1">
+                    {fieldErrors.franchiseName && (
+                      <p className="text-sm text-red-500">{fieldErrors.franchiseName}</p>
+                    )}
+                    <p className="text-sm text-gray-500">
+                      {formData.franchiseName.length}/50 characters
+                    </p>
+                  </div>
                 </div>
 
                 <div>
@@ -549,11 +559,21 @@ const CreateFranchise: React.FC = () => {
                     type="text"
                     name="ownerName"
                     required
+                    maxLength={50}
                     value={formData.ownerName}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                      ${fieldErrors.ownerName ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Owner Full Name"
                   />
+                  <div className="flex justify-between mt-1">
+                    {fieldErrors.ownerName && (
+                      <p className="text-sm text-red-500">{fieldErrors.ownerName}</p>
+                    )}
+                    <p className="text-sm text-gray-500">
+                      {formData.ownerName.length}/50 characters
+                    </p>
+                  </div>
                 </div>
 
                 <div>
