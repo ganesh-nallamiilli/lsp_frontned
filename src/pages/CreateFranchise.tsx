@@ -282,6 +282,16 @@ const CreateFranchise: React.FC = () => {
     if (!formData.panNumber) errors.panNumber = 'PAN number is required';
     if (!formData.nameAsPerPan) errors.nameAsPerPan = 'Name as per PAN is required';
 
+    // Add pincode validation
+    if (!formData.zipPostalCode) {
+      errors.zipPostalCode = 'Pincode is required';
+    } else {
+      const pincodeRegex = /^[1-9][0-9]{5}$/;
+      if (!pincodeRegex.test(formData.zipPostalCode)) {
+        errors.zipPostalCode = 'Invalid pincode. Must be 6 digits and cannot start with 0';
+      }
+    }
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
@@ -752,9 +762,13 @@ const CreateFranchise: React.FC = () => {
                       required
                       value={formData.zipPostalCode}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                        ${fieldErrors.zipPostalCode ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="ZIP/Postal Code"
                     />
+                    {fieldErrors.zipPostalCode && (
+                      <p className="text-sm text-red-500 mt-1">{fieldErrors.zipPostalCode}</p>
+                    )}
                   </div>
                 </div>
 
