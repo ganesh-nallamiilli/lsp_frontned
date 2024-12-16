@@ -52,7 +52,14 @@ export default {
           '0%': { 'stroke-dashoffset': '1000' },
           '100%': { 'stroke-dashoffset': '0' },
         },
-      }
+      },
+      backgroundImage: {
+        'grid-pattern': `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+      },
+      backgroundSize: {
+        'grid': '20px 20px',
+      },
     }
   },
   plugins: [],

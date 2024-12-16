@@ -43,6 +43,7 @@ import TicketDetails from './pages/TicketDetails';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import FranchiseView from './pages/FranchiseView';
+import LandingPage from './pages/LandingPage';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -165,6 +166,7 @@ function App() {
                 <Route path="/franchise/edit/:id" element={<CreateFranchise />} />
               </Route>
               <Route path="/user_registration" element={<UserRegistration />} />
+              <Route path="/landing" element={<LandingPage />} />
 
               {/* Catch all route - redirect to login if not authenticated, dashboard if authenticated */}
               <Route
